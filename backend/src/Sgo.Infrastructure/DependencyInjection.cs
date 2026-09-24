@@ -5,10 +5,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using Sgo.Application.Catalog;
 using Sgo.Application.Common;
+using Sgo.Application.Inventory;
 using Sgo.Application.Organization;
 using Sgo.Application.Security;
 using Sgo.Infrastructure.Csv;
 using Sgo.Infrastructure.Identity;
+using Sgo.Infrastructure.Inventory;
 using Sgo.Infrastructure.Persistence;
 using Sgo.Infrastructure.Persistence.Interceptors;
 using Sgo.Infrastructure.Persistence.Seed;
@@ -80,6 +82,9 @@ public static class DependencyInjection
         services.AddScoped<IItemService, ItemService>();
         services.AddScoped<IItemImportService, ItemImportService>();
         services.AddSingleton<ICsvReader, CsvFileReader>();
+        services.AddScoped<IInventoryPostingService, InventoryPostingService>();
+        services.AddScoped<ILotAllocator, LotAllocator>();
+        services.AddScoped<ILotRegistry, LotRegistry>();
 
         services.Configure<SeedOptions>(configuration.GetSection(SeedOptions.Section));
         services.Configure<DatabaseOptions>(configuration.GetSection(DatabaseOptions.Section));

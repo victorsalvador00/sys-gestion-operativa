@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Sgo.Application.Common;
 using Sgo.Domain.Catalog;
 using Sgo.Domain.Common;
+using Sgo.Domain.Inventory;
 using Sgo.Domain.Organization;
 using Sgo.Domain.Security;
 using Sgo.Infrastructure.Identity;
@@ -19,6 +20,10 @@ public class SgoDbContext(DbContextOptions<SgoDbContext> options)
     public DbSet<ItemCategory> ItemCategories => Set<ItemCategory>();
     public DbSet<Item> Items => Set<Item>();
     public DbSet<ItemLocationSetting> ItemLocationSettings => Set<ItemLocationSetting>();
+    public DbSet<Lot> Lots => Set<Lot>();
+    public DbSet<StockBalance> StockBalances => Set<StockBalance>();
+    public DbSet<ItemLocationCost> ItemLocationCosts => Set<ItemLocationCost>();
+    public DbSet<InventoryMovement> InventoryMovements => Set<InventoryMovement>();
     public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
     public DbSet<UserLocation> UserLocations => Set<UserLocation>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();

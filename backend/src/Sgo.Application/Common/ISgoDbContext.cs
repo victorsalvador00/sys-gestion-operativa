@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Sgo.Domain.Catalog;
+using Sgo.Domain.Inventory;
 using Sgo.Domain.Organization;
 using Sgo.Domain.Security;
 
@@ -19,6 +20,10 @@ public interface ISgoDbContext
     DbSet<ItemCategory> ItemCategories { get; }
     DbSet<Item> Items { get; }
     DbSet<ItemLocationSetting> ItemLocationSettings { get; }
+    DbSet<Lot> Lots { get; }
+    DbSet<StockBalance> StockBalances { get; }
+    DbSet<ItemLocationCost> ItemLocationCosts { get; }
+    DbSet<InventoryMovement> InventoryMovements { get; }
     DbSet<RolePermission> RolePermissions { get; }
     DbSet<UserLocation> UserLocations { get; }
     DbSet<AuditLog> AuditLogs { get; }
