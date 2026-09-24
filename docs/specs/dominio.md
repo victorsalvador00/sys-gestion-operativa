@@ -265,7 +265,7 @@ El código (clases, tablas, endpoints) va en **inglés**; la interfaz de usuario
 | Catálogos | `catalog.view`, `catalog.manage` |
 | Inventario | `inventory.view`, `inventory.adjust`, `inventory.count`, `inventory.consumption` |
 | Producción | `production.view`, `production.recipes.manage`, `production.orders.manage`, `production.orders.complete` |
-| Logística | `logistics.view`, `logistics.orders.create`, `logistics.orders.approve`, `logistics.transfers.dispatch`, `logistics.transfers.receive` |
+| Logística | `logistics.view`, `logistics.orders.create`, `logistics.orders.approve`, `logistics.transfers.dispatch`, `logistics.transfers.receive`, `logistics.transfers.special` (rutas distintas de fábrica/comisariato → sucursal) |
 | Compras | `purchasing.view`, `purchasing.suppliers.manage`, `purchasing.requisitions.manage`, `purchasing.po.manage`, `purchasing.po.approve`, `purchasing.receive` |
 | Seguridad | `security.users.manage`, `security.roles.manage`, `security.audit.view` |
 | Configuración | `settings.manage` |
@@ -275,10 +275,10 @@ El código (clases, tablas, endpoints) va en **inglés**; la interfaz de usuario
 | Rol | Permisos |
 |---|---|
 | Administrador | Todos |
-| Gerente de operaciones | Todos los `*.view`, aprobaciones (`logistics.orders.approve`, `purchasing.po.approve`), `locations.all`, `security.audit.view` |
+| Gerente de operaciones | Todos los `*.view`, aprobaciones (`logistics.orders.approve`, `purchasing.po.approve`), `locations.all`, `security.audit.view`, `logistics.transfers.special` |
 | Compras | `purchasing.*` excepto `purchasing.po.approve`; `catalog.view`; `inventory.view` |
 | Jefe de producción | `production.*`, `inventory.view`, `inventory.count`, `catalog.view` |
-| Almacén comisariato/fábrica | `inventory.*`, `logistics.view`, `logistics.orders.approve`, `logistics.transfers.dispatch`, `purchasing.receive`, `purchasing.view` |
+| Almacén comisariato/fábrica | `inventory.*`, `logistics.view`, `logistics.orders.approve`, `logistics.transfers.dispatch`, `logistics.transfers.special`, `purchasing.receive`, `purchasing.view` |
 | Encargado de sucursal | `inventory.view`, `inventory.count`, `inventory.consumption`, `logistics.view`, `logistics.orders.create`, `logistics.transfers.receive` |
 | Consulta | Todos los `*.view` |
 
@@ -287,6 +287,6 @@ El código (clases, tablas, endpoints) va en **inglés**; la interfaz de usuario
 1. **Salidas en sucursal.** Sin integración con punto de venta, ¿cómo baja el inventario de sucursal? Propuesta: captura diaria de consumo (`ConsumptionEntry`) por artículo, más conteo físico semanal.
 2. **Método de costeo.** Promedio ponderado por ubicación (propuesto) o costo estándar.
 3. **Umbral de aprobación de OC.** Monto en MXN.
-4. **Traspasos entre sucursales y entre fábrica y comisariato.** Propuesta: permitidos, con permiso.
+4. **Traspasos entre sucursales y entre fábrica y comisariato.** ✅ Resuelto: permitidos con el permiso `logistics.transfers.special` (también devoluciones a fábrica/comisariato).
 5. **Control por lote.** ¿Todos los perecederos llevan lote y caducidad?
 6. **Días de anticipación** para la alerta de caducidad.

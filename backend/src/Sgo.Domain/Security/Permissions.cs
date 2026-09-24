@@ -26,6 +26,9 @@ public static class Permissions
     public const string LogisticsTransfersDispatch = "logistics.transfers.dispatch";
     public const string LogisticsTransfersReceive = "logistics.transfers.receive";
 
+    /// <summary>Decisión abierta 4: routes other than factory/commissary → branch (between branches, factory ↔ commissary, returns).</summary>
+    public const string LogisticsTransfersSpecial = "logistics.transfers.special";
+
     public const string PurchasingView = "purchasing.view";
     public const string PurchasingSuppliersManage = "purchasing.suppliers.manage";
     public const string PurchasingRequisitionsManage = "purchasing.requisitions.manage";
@@ -61,6 +64,7 @@ public static class Permissions
         new(LogisticsOrdersApprove, "Logística", "Aprobar pedidos de sucursal"),
         new(LogisticsTransfersDispatch, "Logística", "Despachar traspasos"),
         new(LogisticsTransfersReceive, "Logística", "Recibir traspasos"),
+        new(LogisticsTransfersSpecial, "Logística", "Traspasos entre sucursales, entre fábrica y comisariato, y devoluciones"),
         new(PurchasingView, "Compras", "Ver compras"),
         new(PurchasingSuppliersManage, "Compras", "Administrar proveedores"),
         new(PurchasingRequisitionsManage, "Compras", "Administrar requisiciones"),

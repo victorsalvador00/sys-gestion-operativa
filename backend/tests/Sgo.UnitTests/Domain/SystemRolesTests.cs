@@ -9,7 +9,15 @@ public class SystemRolesTests
         SystemRoles.All.Single(r => r.Name == role).Permissions;
 
     [Fact]
-    public void Catalog_has_the_28_permissions_of_the_spec() => Assert.Equal(28, Codes.Count);
+    public void Catalog_has_the_29_permissions_of_the_spec() => Assert.Equal(29, Codes.Count);
+
+    [Fact]
+    public void Special_transfer_routes_go_to_warehouse_and_operations_manager()
+    {
+        Assert.Contains(LogisticsTransfersSpecial, PermissionsOf("Almacén comisariato/fábrica"));
+        Assert.Contains(LogisticsTransfersSpecial, PermissionsOf("Gerente de operaciones"));
+        Assert.DoesNotContain(LogisticsTransfersSpecial, PermissionsOf("Encargado de sucursal"));
+    }
 
     [Fact]
     public void Every_role_uses_valid_permissions_without_duplicates() =>

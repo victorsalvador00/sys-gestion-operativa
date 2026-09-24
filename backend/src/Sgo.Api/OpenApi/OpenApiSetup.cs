@@ -4,6 +4,7 @@ using Microsoft.OpenApi;
 using Sgo.Application.Catalog;
 using Sgo.Application.Common;
 using Sgo.Application.Inventory;
+using Sgo.Application.Logistics;
 using Sgo.Application.Organization;
 using Sgo.Application.Security;
 
@@ -77,6 +78,25 @@ public static class OpenApiSetup
         [typeof(CreateConsumptionRequest)] = """
             { "locationId": "0199a1b2-0000-7000-8000-0000000000a1", "businessDate": "2026-09-23", "notes": null,
               "lines": [ { "itemId": "0199a1b2-0000-7000-8000-0000000000d1", "lotId": null, "quantity": 1.5 } ] }
+            """,
+        [typeof(CreateTransferRequest)] = """
+            { "fromLocationId": "0199a1b2-0000-7000-8000-0000000000a9", "toLocationId": "0199a1b2-0000-7000-8000-0000000000a1",
+              "notes": "Reposición semanal", "lines": [ { "itemId": "0199a1b2-0000-7000-8000-0000000000d1", "lotId": null, "quantity": 12 } ] }
+            """,
+        [typeof(UpdateTransferRequest)] = """
+            { "version": 1234, "toLocationId": "0199a1b2-0000-7000-8000-0000000000a1", "notes": null,
+              "lines": [ { "itemId": "0199a1b2-0000-7000-8000-0000000000d1", "lotId": null, "quantity": 15 } ] }
+            """,
+        [typeof(DispatchTransferRequest)] = """
+            { "version": 1234, "vehicleDescription": "Nissan NP300 blanca ABC-123", "driverName": "Juan Pérez",
+              "lines": [ { "lineId": "0199a1b2-0000-7000-8000-0000000000e1",
+                           "lots": [ { "lotId": "0199a1b2-0000-7000-8000-0000000000f1", "quantity": 10 },
+                                     { "lotId": "0199a1b2-0000-7000-8000-0000000000f2", "quantity": 2 } ] } ] }
+            """,
+        [typeof(ReceiveTransferRequest)] = """
+            { "version": 1234, "lines": [
+                { "lineId": "0199a1b2-0000-7000-8000-0000000000e1", "receivedQty": 10, "discrepancyReason": null, "discrepancyNotes": null },
+                { "lineId": "0199a1b2-0000-7000-8000-0000000000e2", "receivedQty": 1, "discrepancyReason": "Damaged", "discrepancyNotes": "Caja aplastada" } ] }
             """,
         [typeof(UpdateLocationRequest)] = """{ "version": 1234, "name": "Sucursal Centro", "address": "Av. Juárez 100, Col. Centro", "isActive": true }""",
     };

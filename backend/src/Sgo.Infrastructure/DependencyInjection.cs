@@ -6,6 +6,7 @@ using Npgsql;
 using Sgo.Application.Catalog;
 using Sgo.Application.Common;
 using Sgo.Application.Inventory;
+using Sgo.Application.Logistics;
 using Sgo.Application.Organization;
 using Sgo.Application.Security;
 using Sgo.Infrastructure.Csv;
@@ -91,6 +92,7 @@ public static class DependencyInjection
         services.AddScoped<IInventorySnapshotReader, InventorySnapshotReader>();
         services.AddScoped<IPhysicalCountService, PhysicalCountService>();
         services.AddScoped<IConsumptionService, ConsumptionService>();
+        services.AddScoped<ITransferService, TransferService>();
 
         services.Configure<SeedOptions>(configuration.GetSection(SeedOptions.Section));
         services.Configure<DatabaseOptions>(configuration.GetSection(DatabaseOptions.Section));
