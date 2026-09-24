@@ -7,6 +7,7 @@ using Sgo.Application.Inventory;
 using Sgo.Application.Logistics;
 using Sgo.Application.Organization;
 using Sgo.Application.Production;
+using Sgo.Application.Purchasing;
 using Sgo.Application.Security;
 
 namespace Sgo.Api.OpenApi;
@@ -119,6 +120,21 @@ public static class OpenApiSetup
               "lines": [ { "componentItemId": "0199a1b2-0000-7000-8000-0000000000d1", "actualQty": 12.5, "lots": null },
                          { "componentItemId": "0199a1b2-0000-7000-8000-0000000000d2", "actualQty": 3,
                            "lots": [ { "lotId": "0199a1b2-0000-7000-8000-0000000000f1", "quantity": 3 } ] } ] }
+            """,
+        [typeof(CreateSupplierRequest)] = """
+            { "taxId": "HPA010203AB1", "name": "Harinas del Pacífico SA de CV", "contactName": "Marta Ríos",
+              "phone": "33 1234 5678", "email": "ventas@harinaspacifico.mx", "paymentTermsDays": 30 }
+            """,
+        [typeof(UpdateSupplierRequest)] = """
+            { "version": 1234, "taxId": "HPA010203AB1", "name": "Harinas del Pacífico SA de CV", "contactName": "Marta Ríos",
+              "phone": "33 1234 5678", "email": "ventas@harinaspacifico.mx", "paymentTermsDays": 45, "isActive": true }
+            """,
+        [typeof(CreateSupplierItemRequest)] = """
+            { "itemId": "0199a1b2-0000-7000-8000-0000000000d1", "supplierSku": "HP-TRIGO-25", "price": 412.5,
+              "leadTimeDays": 3, "isPreferred": true }
+            """,
+        [typeof(UpdateSupplierItemRequest)] = """
+            { "version": 1234, "supplierSku": "HP-TRIGO-25", "price": 425, "leadTimeDays": 2, "isPreferred": true, "isActive": true }
             """,
         [typeof(UpdateLocationRequest)] = """{ "version": 1234, "name": "Sucursal Centro", "address": "Av. Juárez 100, Col. Centro", "isActive": true }""",
     };

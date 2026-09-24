@@ -9,6 +9,7 @@ using Sgo.Application.Inventory;
 using Sgo.Application.Logistics;
 using Sgo.Application.Organization;
 using Sgo.Application.Production;
+using Sgo.Application.Purchasing;
 using Sgo.Application.Security;
 using Sgo.Infrastructure.Csv;
 using Sgo.Infrastructure.Identity;
@@ -96,6 +97,7 @@ public static class DependencyInjection
         services.AddScoped<ITransferService, TransferService>();
         services.AddScoped<IRecipeService, RecipeService>();
         services.AddScoped<IProductionOrderService, ProductionOrderService>();
+        services.AddScoped<ISupplierService, SupplierService>();
 
         services.Configure<SeedOptions>(configuration.GetSection(SeedOptions.Section));
         services.Configure<DatabaseOptions>(configuration.GetSection(DatabaseOptions.Section));

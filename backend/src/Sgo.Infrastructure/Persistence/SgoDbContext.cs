@@ -8,6 +8,7 @@ using Sgo.Domain.Inventory;
 using Sgo.Domain.Logistics;
 using Sgo.Domain.Organization;
 using Sgo.Domain.Production;
+using Sgo.Domain.Purchasing;
 using Sgo.Domain.Security;
 using Sgo.Infrastructure.Identity;
 
@@ -32,6 +33,8 @@ public class SgoDbContext(DbContextOptions<SgoDbContext> options)
     public DbSet<Transfer> Transfers => Set<Transfer>();
     public DbSet<Recipe> Recipes => Set<Recipe>();
     public DbSet<ProductionOrder> ProductionOrders => Set<ProductionOrder>();
+    public DbSet<Supplier> Suppliers => Set<Supplier>();
+    public DbSet<SupplierItem> SupplierItems => Set<SupplierItem>();
     public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
     public DbSet<UserLocation> UserLocations => Set<UserLocation>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
