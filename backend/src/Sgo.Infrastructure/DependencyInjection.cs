@@ -88,6 +88,9 @@ public static class DependencyInjection
         services.AddScoped<IAdjustmentService, AdjustmentService>();
         services.AddScoped<IInitialStockImportService, InitialStockImportService>();
         services.AddScoped<IStockQueries, StockQueries>();
+        services.AddScoped<IInventorySnapshotReader, InventorySnapshotReader>();
+        services.AddScoped<IPhysicalCountService, PhysicalCountService>();
+        services.AddScoped<IConsumptionService, ConsumptionService>();
 
         services.Configure<SeedOptions>(configuration.GetSection(SeedOptions.Section));
         services.Configure<DatabaseOptions>(configuration.GetSection(DatabaseOptions.Section));

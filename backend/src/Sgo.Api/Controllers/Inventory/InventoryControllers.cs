@@ -97,3 +97,95 @@ public sealed class InventoryImportsController(IInitialStockImportService initia
         return await initialStock.ImportAsync(stream, ct);
     }
 }
+
+[ApiController]
+[Route("physical-counts")]
+[Tags("Inventario")]
+[ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+[ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+public sealed class PhysicalCountsController(IPhysicalCountService counts) : ControllerBase
+{
+    [HttpGet]
+    [RequirePermission(Permissions.InventoryView)]
+    public Task<PagedResult<PhysicalCountListItemDto>> List([FromQuery] PhysicalCountListQuery query, CancellationToken ct) =>
+        counts.ListAsync(query, ct);
+
+    [HttpGet("{id:guid}")]
+    [RequirePermission(Permissions.InventoryView)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    public Task<PhysicalCountDto> Get(Guid id, CancellationToken ct) => counts.GetAsync(id, ct);
+
+    /// <summary>Crea un conteo en borrador. Con categoryId es un conteo parcial de esa categoría.</summary>
+    [HttpPost]
+    [RequirePermission(Permissions.InventoryCount)]
+    [ProducesResponseType<PhysicalCountDto>(StatusCodes.Status201Created)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<PhysicalCountDto>> Create(CreatePhysicalCountRequest request, CancellationToken ct)
+    {
+        var count = await counts.CreateAsync(request, ct);
+        return CreatedAtAction(nameof(Get), new { id = count.Id }, count);
+    }
+
+    /// <summary>En borrador: categoría y notas. En curso: notas y cantidades contadas (lineId, o itemId/lote para agregar una línea).</summary>
+    [HttpPut("{id:guid}")]
+    [RequirePermission(Permissions.InventoryCount)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
+    public Task<PhysicalCountDto> Update(Guid id, UpdatePhysicalCountRequest request, CancellationToken ct) =>
+        counts.UpdateAsync(id, request, ct);
+
+    /// <summary>Inicia el conteo y toma el snapshot de existencias (RN-06). Solo un conteo en curso por ubicación.</summary>
+    [HttpPost("{id:guid}/start")]
+    [RequirePermission(Permissions.InventoryCount)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
+    public Task<PhysicalCountDto> Start(Guid id, VersionRequest request, CancellationToken ct) =>
+        counts.StartAsync(id, request.Version, ct);
+
+    /// <summary>Cierra el conteo y registra la diferencia contado − snapshot de cada línea. Todas las líneas deben estar contadas.</summary>
+    [HttpPost("{id:guid}/close")]
+    [RequirePermission(Permissions.InventoryCount)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
+    public Task<PhysicalCountDto> Close(Guid id, VersionRequest request, CancellationToken ct) =>
+        counts.CloseAsync(id, request.Version, ct);
+
+    [HttpPost("{id:guid}/cancel")]
+    [RequirePermission(Permissions.InventoryCount)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
+    public Task<PhysicalCountDto> Cancel(Guid id, VersionRequest request, CancellationToken ct) =>
+        counts.CancelAsync(id, request.Version, ct);
+}
+
+[ApiController]
+[Route("consumptions")]
+[Tags("Inventario")]
+[ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+[ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+public sealed class ConsumptionsController(IConsumptionService consumptions) : ControllerBase
+{
+    [HttpGet]
+    [RequirePermission(Permissions.InventoryView)]
+    public Task<PagedResult<ConsumptionListItemDto>> List([FromQuery] ConsumptionListQuery query, CancellationToken ct) =>
+        consumptions.ListAsync(query, ct);
+
+    [HttpGet("{id:guid}")]
+    [RequirePermission(Permissions.InventoryView)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    public Task<ConsumptionDto> Get(Guid id, CancellationToken ct) => consumptions.GetAsync(id, ct);
+
+    /// <summary>Registra el consumo de una sucursal y lo descuenta de inmediato (FEFO si no se indica lote).</summary>
+    [HttpPost]
+    [RequirePermission(Permissions.InventoryConsumption)]
+    [ProducesResponseType<ConsumptionDto>(StatusCodes.Status201Created)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult<ConsumptionDto>> Create(CreateConsumptionRequest request, CancellationToken ct)
+    {
+        var entry = await consumptions.CreateAsync(request, ct);
+        return CreatedAtAction(nameof(Get), new { id = entry.Id }, entry);
+    }
+}

@@ -67,6 +67,17 @@ public static class OpenApiSetup
                 { "itemId": "0199a1b2-0000-7000-8000-0000000000d2", "lotId": null, "lotNumber": null, "expirationDate": null,
                   "quantity": -2, "unitCost": null, "notes": "Bolsa rota" } ] }
             """,
+        [typeof(CreatePhysicalCountRequest)] = """{ "locationId": "0199a1b2-0000-7000-8000-0000000000a1", "categoryId": null, "notes": "Conteo semanal" }""",
+        [typeof(UpdatePhysicalCountRequest)] = """
+            { "version": 1234, "categoryId": null, "notes": "Conteo semanal",
+              "counts": [
+                { "lineId": "0199a1b2-0000-7000-8000-0000000000e1", "itemId": null, "lotId": null, "lotNumber": null, "expirationDate": null, "countedQty": 7 },
+                { "lineId": null, "itemId": "0199a1b2-0000-7000-8000-0000000000d1", "lotId": null, "lotNumber": "L-2410", "expirationDate": "2027-01-15", "countedQty": 2 } ] }
+            """,
+        [typeof(CreateConsumptionRequest)] = """
+            { "locationId": "0199a1b2-0000-7000-8000-0000000000a1", "businessDate": "2026-09-23", "notes": null,
+              "lines": [ { "itemId": "0199a1b2-0000-7000-8000-0000000000d1", "lotId": null, "quantity": 1.5 } ] }
+            """,
         [typeof(UpdateLocationRequest)] = """{ "version": 1234, "name": "Sucursal Centro", "address": "Av. Juárez 100, Col. Centro", "isActive": true }""",
     };
 

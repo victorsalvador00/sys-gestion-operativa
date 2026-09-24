@@ -25,6 +25,8 @@ public class SgoDbContext(DbContextOptions<SgoDbContext> options)
     public DbSet<ItemLocationCost> ItemLocationCosts => Set<ItemLocationCost>();
     public DbSet<InventoryMovement> InventoryMovements => Set<InventoryMovement>();
     public DbSet<InventoryAdjustment> InventoryAdjustments => Set<InventoryAdjustment>();
+    public DbSet<PhysicalCount> PhysicalCounts => Set<PhysicalCount>();
+    public DbSet<ConsumptionEntry> Consumptions => Set<ConsumptionEntry>();
     public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
     public DbSet<UserLocation> UserLocations => Set<UserLocation>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
@@ -52,6 +54,11 @@ public class SgoDbContext(DbContextOptions<SgoDbContext> options)
         {
             builder.Entity(entityType.ClrType).Property(nameof(IVersioned.Version)).IsRowVersion();
         }
+
+        // Ids are Guid v7 generated in code: a new child added to a loaded aggregate (e.g. a count line)
+        // must be inserted, not mistaken for an existing row because its key is already set.
+        foreach (var entityType in builder.Model.GetEntityTypes().Where(t => typeof(Entity).IsAssignableFrom(t.ClrType)))
+            builder.Entity(entityType.ClrType).Property(nameof(Entity.Id)).ValueGeneratedNever();
     }
 
     private static void ConfigureIdentityTables(ModelBuilder builder)
