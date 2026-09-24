@@ -19,15 +19,15 @@
 | 2 | B-10 Recetas versionadas y explosión teórica | ✅ | `ae9210a` |
 | 2 | B-11 Órdenes de producción (completar transaccional) | ✅ | `e12626f` |
 | 3 | B-12 Proveedores y artículos de proveedor | ✅ | `3671b24` |
-| 3 | B-13 Requisiciones y conversión a OC | ✅ | (ver `git log`) |
-| 3 | B-14 Órdenes de compra, aprobación por umbral, recepción parcial, cierre | ⏭️ siguiente — requiere umbral de OC | |
-| 3 | B-15 Pedidos de sucursal, sugerido mín/máx, aprobación → traspasos, RN-24 | pendiente | |
+| 3 | B-13 Requisiciones y conversión a OC | ✅ | `150b46d` |
+| 3 | B-14 Órdenes de compra, aprobación por umbral, recepción parcial, cierre | ✅ | (ver `git log`) |
+| 3 | B-15 Pedidos de sucursal, sugerido mín/máx, aprobación → traspasos, RN-24 | ⏭️ siguiente | |
 | 3 | B-16 Tablero y `/settings` | pendiente | |
 | 3 | B-17 Endurecimiento (índices, EXPLAIN, bundle de migraciones, compose prod) | pendiente | |
 
-Pruebas al cierre de B-13: **359 en verde** (237 unitarias, 122 de integración), sin warnings.
+Pruebas al cierre de B-14: **419 en verde** (289 unitarias, 130 de integración), sin warnings.
 Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`, `AddCatalog`, `AddInventory`,
-`AddAdjustments`, `AddCountsAndConsumptions`, `AddTransfers`, `AddRecipes`, `AddProductionOrders`, `AddSuppliers`, `AddRequisitionsAndPurchaseOrders`.
+`AddAdjustments`, `AddCountsAndConsumptions`, `AddTransfers`, `AddRecipes`, `AddProductionOrders`, `AddSuppliers`, `AddRequisitionsAndPurchaseOrders`, `AddGoodsReceipts`.
 
 ## Decisiones acordadas con el cliente
 
@@ -36,7 +36,8 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
 - ✅ Costeo: promedio ponderado por ubicación.
 - ✅ Traspasos especiales permitidos con `logistics.transfers.special` (Administrador, Almacén, Gerente de operaciones).
 - ✅ Lotes: por artículo (`TracksLots`).
-- ⏳ **Umbral de OC (MXN): pendiente.** Provisional `0` → toda OC requiere aprobación. **Preguntar antes de B-14.**
+- ✅ Umbral de OC: **configurable** en `AppSetting` (`purchasing.po_approval_threshold`), comparado contra el
+  **subtotal sin IVA**; default `0` (toda OC requiere aprobación) hasta configurarlo en `/settings` (B-16).
 - ⏳ Días de alerta de caducidad: sin confirmar; default 3 (editable).
 
 **Decisiones de implementación aprobadas:**
@@ -68,11 +69,20 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
   fecha esperada = la `NeededBy` más próxima; OC en `Draft`. Todo o nada; proveedor o artículo inactivo lo bloquea.
 - La OC en B-13 es mínima (entidad, líneas, totales a 2 decimales redondeados por línea, `GET /purchase-orders`).
   Editar, enviar, aprobar/rechazar, cancelar, cerrar y recibir llegan en B-14.
+- OC (B-14): estado nuevo **`Rejected`, final** (desde PendingApproval, con motivo). Cancelar solo en Draft,
+  PendingApproval o Approved sin nada recibido; **cerrar solo desde PartiallyReceived**. Solo artículos del
+  **catálogo activo del proveedor**; precio vacío = precio de catálogo (editable). Proveedor fijo al editar; las líneas
+  que conservan `lineId` mantienen su liga con la requisición. Entrega solo en Fábrica/Comisariato.
+- Recepción (B-14): factura opcional; una línea de OC puede repetirse (varios lotes); lote obligatorio si el artículo
+  maneja lotes; sin caducidad → la del lote existente o hoy + vida útil; lotes vencidos se rechazan. Costo base =
+  precio / factor (sin IVA). Tolerancia de sobre-recepción desde `AppSetting` (default 0 %). Se bloquea la OC
+  (`poVersion` + lock de fila): recepciones simultáneas → una 201 y otra 409.
 
 ## Pendientes y notas técnicas
 
 - **B-15:** ligar traspasos con pedido (columna `branch_order_id` ya existe) y RN-24.
-- **B-14:** dos recepciones simultáneas que crean el mismo número de lote nuevo → una falla por índice único (poco probable; revisar ahí).
+- Dos recepciones simultáneas de **OC distintas** que crean el mismo lote nuevo del mismo artículo → una falla por el
+  índice único (500; muy poco probable). Las de la misma OC ya se serializan (409).
 - **B-12:** dos usuarios que marcan al mismo tiempo proveedores preferidos distintos para el mismo artículo → uno
   falla por el índice único parcial (500; muy poco probable). Revisar si se vuelve un problema.
 - Kardex devuelve `userId`, no el nombre del usuario (agregar si la pantalla lo pide).

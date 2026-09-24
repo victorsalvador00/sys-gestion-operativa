@@ -150,6 +150,24 @@ public static class OpenApiSetup
         [typeof(ConvertRequisitionsRequest)] = """
             { "requisitionIds": ["0199a1b2-0000-7000-8000-00000000007a", "0199a1b2-0000-7000-8000-00000000007b"] }
             """,
+        [typeof(CreatePurchaseOrderRequest)] = """
+            { "supplierId": "0199a1b2-0000-7000-8000-00000000005a", "deliveryLocationId": "0199a1b2-0000-7000-8000-0000000000a9",
+              "expectedDate": "2026-10-01", "notes": "Entregar antes de las 10:00",
+              "lines": [ { "itemId": "0199a1b2-0000-7000-8000-0000000000d1", "quantity": 10, "unitPrice": null },
+                         { "itemId": "0199a1b2-0000-7000-8000-0000000000d2", "quantity": 2, "unitPrice": 30.5 } ] }
+            """,
+        [typeof(UpdatePurchaseOrderRequest)] = """
+            { "version": 1234, "deliveryLocationId": "0199a1b2-0000-7000-8000-0000000000a9", "expectedDate": "2026-10-02", "notes": null,
+              "lines": [ { "itemId": "0199a1b2-0000-7000-8000-0000000000d1", "quantity": 12, "unitPrice": 395,
+                           "lineId": "0199a1b2-0000-7000-8000-0000000000e1" } ] }
+            """,
+        [typeof(RejectPurchaseOrderRequest)] = """{ "version": 1234, "reason": "Precio fuera de lo negociado" }""",
+        [typeof(CreateGoodsReceiptRequest)] = """
+            { "purchaseOrderId": "0199a1b2-0000-7000-8000-00000000007c", "poVersion": 1234, "supplierInvoiceNumber": "F-10234",
+              "lines": [ { "poLineId": "0199a1b2-0000-7000-8000-0000000000e1", "quantity": 6, "lotNumber": "L-2410", "expirationDate": "2027-03-31" },
+                         { "poLineId": "0199a1b2-0000-7000-8000-0000000000e1", "quantity": 4, "lotNumber": "L-2411", "expirationDate": null },
+                         { "poLineId": "0199a1b2-0000-7000-8000-0000000000e2", "quantity": 2, "lotNumber": null, "expirationDate": null } ] }
+            """,
         [typeof(UpdateLocationRequest)] = """{ "version": 1234, "name": "Sucursal Centro", "address": "Av. Juárez 100, Col. Centro", "isActive": true }""",
     };
 

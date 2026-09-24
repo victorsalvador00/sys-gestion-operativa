@@ -94,22 +94,3 @@ public sealed class RequisitionsController(IRequisitionService requisitions) : C
     public Task<IReadOnlyList<PurchaseOrderListItemDto>> Convert(ConvertRequisitionsRequest request, CancellationToken ct) =>
         requisitions.ConvertAsync(request, ct);
 }
-
-[ApiController]
-[Route("purchase-orders")]
-[Tags("Compras")]
-[ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
-[ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
-public sealed class PurchaseOrdersController(IPurchaseOrderService orders) : ControllerBase
-{
-    /// <summary>OC con entrega en ubicaciones a tu alcance. Filtros: status, supplierId, locationId, q (folio o proveedor).</summary>
-    [HttpGet]
-    [RequirePermission(Permissions.PurchasingView)]
-    public Task<PagedResult<PurchaseOrderListItemDto>> List([FromQuery] PurchaseOrderListQuery query, CancellationToken ct) =>
-        orders.ListAsync(query, ct);
-
-    [HttpGet("{id:guid}")]
-    [RequirePermission(Permissions.PurchasingView)]
-    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
-    public Task<PurchaseOrderDto> Get(Guid id, CancellationToken ct) => orders.GetAsync(id, ct);
-}

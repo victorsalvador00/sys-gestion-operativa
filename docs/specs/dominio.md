@@ -175,7 +175,8 @@ El código (clases, tablas, endpoints) va en **inglés**; la interfaz de usuario
 
 **PurchaseOrder**
 - Encabezado: `Folio`, `SupplierId`, `DeliveryLocationId`, `ExpectedDate`, `Subtotal`, `TaxTotal`, `Total`, `ApprovedBy`, `ApprovedAt`.
-- `Status`: `Draft → PendingApproval → Approved → PartiallyReceived → Received`; además `Cancelled | Closed`.
+- `Status`: `Draft → PendingApproval → Approved → PartiallyReceived → Received`; además `Rejected | Cancelled | Closed`.
+- `Rejected` es final (acordado en B-14): se rechaza desde `PendingApproval` con motivo; para reintentar se captura una OC nueva.
 - Líneas: `ItemId`, `Quantity` (unidad de compra), `UnitPrice`, `TaxRate`, `ReceivedQty`, `RequisitionLineId` (opcional).
 
 **GoodsReceipt**
@@ -238,14 +239,15 @@ El código (clases, tablas, endpoints) va en **inglés**; la interfaz de usuario
 
 ### Compras
 
-- **RN-30**: El precio de una línea de OC se sugiere desde `SupplierItem.Price` y es editable.
+- **RN-30**: El precio de una línea de OC se sugiere desde `SupplierItem.Price` y es editable. Solo se agregan artículos del catálogo activo del proveedor (acordado en B-14).
 - **RN-31 (aprobación)**:
-  - Al enviar una OC, si `Total ≥ umbral` (`AppSetting`, sin IVA) pasa a `PendingApproval` y requiere el permiso `purchasing.po.approve`.
+  - Al enviar una OC, si `Subtotal ≥ umbral` (monto sin IVA; `AppSetting` configurable) pasa a `PendingApproval` y requiere el permiso `purchasing.po.approve`.
   - Si el total está por debajo del umbral, pasa directamente a `Approved`.
 - **RN-32 (recepción)**:
   - Se permite recepción parcial. La sobre-recepción se permite hasta una tolerancia configurable (default 0%).
   - La OC pasa a `Received` cuando todas sus líneas están completas.
-  - Una OC con saldo pendiente puede cerrarse manualmente (`Closed`).
+  - Una OC con saldo pendiente puede cerrarse manualmente (`Closed`, solo desde `PartiallyReceived`).
+  - Una OC se cancela solo en `Draft`, `PendingApproval` o `Approved` y sin nada recibido (acordado en B-14).
 - **RN-33**: La recepción registra `PurchaseReceipt` con costo base = `UnitPrice / PurchaseToBaseFactor` (sin IVA). Solo pueden recibirse OC en estado `Approved` o `PartiallyReceived`.
 - **RN-34**: Las requisiciones aprobadas pueden convertirse en OC, agrupadas por proveedor sugerido.
 
@@ -286,7 +288,7 @@ El código (clases, tablas, endpoints) va en **inglés**; la interfaz de usuario
 
 1. **Salidas en sucursal.** ✅ Resuelto: captura diaria de consumo (`ConsumptionEntry`, solo en sucursales) más conteo físico; la frecuencia es operativa.
 2. **Método de costeo.** ✅ Resuelto: promedio ponderado por ubicación (RN-04).
-3. **Umbral de aprobación de OC.** ⏳ Pendiente: monto en MXN. Provisionalmente `0` en `AppSetting` (toda OC requiere aprobación); se necesita antes de B-14.
+3. **Umbral de aprobación de OC.** ✅ Resuelto (B-14): configurable en `AppSetting` (`purchasing.po_approval_threshold`), comparado contra el subtotal sin IVA. Default `0` (toda OC requiere aprobación) hasta que se configure en `/settings`.
 4. **Traspasos entre sucursales y entre fábrica y comisariato.** ✅ Resuelto: permitidos con el permiso `logistics.transfers.special` (también devoluciones a fábrica/comisariato).
 5. **Control por lote.** ✅ Resuelto: por artículo (`TracksLots`); si está activo, toda entrada exige lote.
 6. **Días de anticipación** para la alerta de caducidad. ⏳ Sin confirmar: se usa el default de RN-07 (3 días), editable en `AppSetting`.
