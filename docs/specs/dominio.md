@@ -282,11 +282,11 @@ El código (clases, tablas, endpoints) va en **inglés**; la interfaz de usuario
 | Encargado de sucursal | `inventory.view`, `inventory.count`, `inventory.consumption`, `logistics.view`, `logistics.orders.create`, `logistics.transfers.receive` |
 | Consulta | Todos los `*.view` |
 
-## 7. Decisiones abiertas (confirmar con el cliente antes de la Fase 1)
+## 7. Decisiones abiertas (estado al 2026-09-24)
 
-1. **Salidas en sucursal.** Sin integración con punto de venta, ¿cómo baja el inventario de sucursal? Propuesta: captura diaria de consumo (`ConsumptionEntry`) por artículo, más conteo físico semanal.
-2. **Método de costeo.** Promedio ponderado por ubicación (propuesto) o costo estándar.
-3. **Umbral de aprobación de OC.** Monto en MXN.
+1. **Salidas en sucursal.** ✅ Resuelto: captura diaria de consumo (`ConsumptionEntry`, solo en sucursales) más conteo físico; la frecuencia es operativa.
+2. **Método de costeo.** ✅ Resuelto: promedio ponderado por ubicación (RN-04).
+3. **Umbral de aprobación de OC.** ⏳ Pendiente: monto en MXN. Provisionalmente `0` en `AppSetting` (toda OC requiere aprobación); se necesita antes de B-14.
 4. **Traspasos entre sucursales y entre fábrica y comisariato.** ✅ Resuelto: permitidos con el permiso `logistics.transfers.special` (también devoluciones a fábrica/comisariato).
-5. **Control por lote.** ¿Todos los perecederos llevan lote y caducidad?
-6. **Días de anticipación** para la alerta de caducidad.
+5. **Control por lote.** ✅ Resuelto: por artículo (`TracksLots`); si está activo, toda entrada exige lote.
+6. **Días de anticipación** para la alerta de caducidad. ⏳ Sin confirmar: se usa el default de RN-07 (3 días), editable en `AppSetting`.
