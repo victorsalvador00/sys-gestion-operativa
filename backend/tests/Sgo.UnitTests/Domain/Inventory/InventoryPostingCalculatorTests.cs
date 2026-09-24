@@ -243,6 +243,15 @@ public class InventoryPostingCalculatorTests
     }
 
     [Fact]
+    public void Movement_ids_increase_in_posting_order_so_the_database_keeps_that_order()
+    {
+        var movements = Post(Enumerable.Range(1, 20).Select(i => Req(Flour, i, MovementType.Adjustment)).ToArray()).Movements;
+
+        Assert.Equal(movements.Select(m => m.Id), movements.Select(m => m.Id).Order());
+        Assert.Equal(Enumerable.Range(1, 20).Select(i => (decimal)i), movements.Select(m => m.Quantity));
+    }
+
+    [Fact]
     public void Lot_must_belong_to_the_item()
     {
         var otherItemLot = new PostingLot(Guid.NewGuid(), Guid.NewGuid(), "AJENO", null);

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
 using Sgo.Application.Catalog;
 using Sgo.Application.Common;
+using Sgo.Application.Inventory;
 using Sgo.Application.Organization;
 using Sgo.Application.Security;
 
@@ -57,6 +58,14 @@ public static class OpenApiSetup
             { "settings": [
                 { "locationId": "0199a1b2-0000-7000-8000-0000000000a1", "minQty": 10, "maxQty": 40 },
                 { "locationId": "0199a1b2-0000-7000-8000-0000000000a2", "minQty": null, "maxQty": null } ] }
+            """,
+        [typeof(CreateAdjustmentRequest)] = """
+            { "locationId": "0199a1b2-0000-7000-8000-0000000000a1", "reason": "Correction", "notes": "Diferencia en revisión",
+              "lines": [
+                { "itemId": "0199a1b2-0000-7000-8000-0000000000d1", "lotId": null, "lotNumber": "L-2409", "expirationDate": "2027-03-31",
+                  "quantity": 5, "unitCost": 18.5, "notes": null },
+                { "itemId": "0199a1b2-0000-7000-8000-0000000000d2", "lotId": null, "lotNumber": null, "expirationDate": null,
+                  "quantity": -2, "unitCost": null, "notes": "Bolsa rota" } ] }
             """,
         [typeof(UpdateLocationRequest)] = """{ "version": 1234, "name": "Sucursal Centro", "address": "Av. Juárez 100, Col. Centro", "isActive": true }""",
     };

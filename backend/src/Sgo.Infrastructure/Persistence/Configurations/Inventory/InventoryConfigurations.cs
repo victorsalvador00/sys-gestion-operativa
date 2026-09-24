@@ -54,7 +54,10 @@ internal sealed class InventoryMovementConfiguration : IEntityTypeConfiguration<
         builder.Property(m => m.SourceDocType).HasMaxLength(30);
         builder.Property(m => m.SourceDocFolio).HasMaxLength(30);
         builder.Property(m => m.Notes).HasMaxLength(500);
+        builder.Property(m => m.Sequence).UseIdentityAlwaysColumn();
+        builder.HasIndex(m => m.Sequence).IsUnique();
         builder.HasIndex(m => new { m.LocationId, m.ItemId, m.OccurredAt });
+        builder.HasIndex(m => new { m.LocationId, m.ItemId, m.Sequence });
         builder.HasIndex(m => new { m.SourceDocType, m.SourceDocId });
         builder.HasIndex(m => m.ItemId);
         builder.HasOne<Location>().WithMany().HasForeignKey(m => m.LocationId).OnDelete(DeleteBehavior.Restrict);

@@ -18,6 +18,9 @@ public interface IItemService
 
 public sealed class ItemService(ISgoDbContext db, ILocationScope scope) : IItemService
 {
+    public const string ItemHasMovementsMessage =
+        "El artículo ya tiene movimientos de inventario: no puedes cambiar su unidad base ni su control de lotes.";
+
     private static readonly Dictionary<string, Expression<Func<Item, object?>>> SortColumns = new()
     {
         ["sku"] = i => i.Sku,
@@ -70,6 +73,10 @@ public sealed class ItemService(ISgoDbContext db, ILocationScope scope) : IItemS
         db.EnsureVersion(item, request.Version);
         var definition = request.ToDefinition();
         await ValidateReferencesAsync(definition, item, ct);
+
+        if ((definition.BaseUomId != item.BaseUomId || definition.TracksLots != item.TracksLots)
+            && await db.InventoryMovements.AnyAsync(m => m.ItemId == id, ct))
+            throw new BusinessRuleException("item_has_movements", ItemHasMovementsMessage);
 
         item.Update(definition);
         if (request.IsActive) item.Activate(); else item.Deactivate();

@@ -24,6 +24,7 @@ public interface ISgoDbContext
     DbSet<StockBalance> StockBalances { get; }
     DbSet<ItemLocationCost> ItemLocationCosts { get; }
     DbSet<InventoryMovement> InventoryMovements { get; }
+    DbSet<InventoryAdjustment> InventoryAdjustments { get; }
     DbSet<RolePermission> RolePermissions { get; }
     DbSet<UserLocation> UserLocations { get; }
     DbSet<AuditLog> AuditLogs { get; }

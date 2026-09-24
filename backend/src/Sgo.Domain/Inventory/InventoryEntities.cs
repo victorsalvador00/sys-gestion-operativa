@@ -106,10 +106,13 @@ public class InventoryMovement : Entity
 {
     private InventoryMovement() { }
 
+    /// <param name="ordinal">Position within the posting. EF sorts inserts by primary key, so the id is made
+    /// increasing with it: the database sequence (and the kardex) then follows the posting order.</param>
     internal InventoryMovement(
-        DateTimeOffset occurredAt, DateOnly businessDate, MovementRequest request, Guid? lotId,
+        int ordinal, DateTimeOffset occurredAt, DateOnly businessDate, MovementRequest request, Guid? lotId,
         decimal quantity, decimal unitCost, Guid? userId)
     {
+        Id = Guid.CreateVersion7(occurredAt.AddMilliseconds(ordinal));
         OccurredAt = occurredAt;
         BusinessDate = businessDate;
         LocationId = request.LocationId;
@@ -125,6 +128,9 @@ public class InventoryMovement : Entity
         UserId = userId;
         Notes = request.Notes;
     }
+
+    /// <summary>Database-assigned insertion order; the kardex and its running balance follow it.</summary>
+    public long Sequence { get; private set; }
 
     public DateTimeOffset OccurredAt { get; private set; }
     public DateOnly BusinessDate { get; private set; }

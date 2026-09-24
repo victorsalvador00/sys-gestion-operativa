@@ -102,11 +102,22 @@ public sealed class ItemImportService(ISgoDbContext db, ICsvReader reader) : IIt
                 parsed.Add((row.Line, definition!));
         }
 
-        if (errors.Count > 0)
-            throw new ImportValidationException(errors);
-
         var skus = parsed.Select(p => ItemRules.NormalizeSku(p.Definition.Sku)).ToList();
         var existing = await db.Items.Where(i => skus.Contains(i.Sku)).ToDictionaryAsync(i => i.Sku, ct);
+
+        // Same guard as the API: base unit and lot control are fixed once the item has movements.
+        var changing = parsed
+            .Where(p => existing.TryGetValue(ItemRules.NormalizeSku(p.Definition.Sku), out var item)
+                        && (item.BaseUomId != p.Definition.BaseUomId || item.TracksLots != p.Definition.TracksLots))
+            .ToList();
+        var changingIds = changing.Select(p => existing[ItemRules.NormalizeSku(p.Definition.Sku)].Id).ToList();
+        var withMovements = (await db.InventoryMovements.Where(m => changingIds.Contains(m.ItemId))
+            .Select(m => m.ItemId).Distinct().ToListAsync(ct)).ToHashSet();
+        foreach (var (line, definition) in changing.Where(p => withMovements.Contains(existing[ItemRules.NormalizeSku(p.Definition.Sku)].Id)))
+            errors.Add(new ImportError(line, Columns.BaseUom, ItemService.ItemHasMovementsMessage));
+
+        if (errors.Count > 0)
+            throw new ImportValidationException([.. errors.OrderBy(e => e.Row)]);
 
         await using var tx = await db.Database.BeginTransactionAsync(ct);
         int created = 0, updated = 0;

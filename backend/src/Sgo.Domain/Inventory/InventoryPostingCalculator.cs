@@ -65,7 +65,7 @@ public static class InventoryPostingCalculator
                 var balance = BalanceOf(request.LocationId, request.ItemId, request.LotId);
                 TallyOf(balance).Entries += request.Quantity;
                 balance.Add(request.Quantity);
-                movements.Add(new InventoryMovement(state.OccurredAt, state.BusinessDate, request, request.LotId,
+                movements.Add(new InventoryMovement(movements.Count, state.OccurredAt, state.BusinessDate, request, request.LotId,
                     request.Quantity, InventoryMath.Round(unitCost), state.UserId));
                 continue;
             }
@@ -95,7 +95,7 @@ public static class InventoryPostingCalculator
                     var balance = lots.Single(x => x.Lot.Id == allocation.LotId).Balance;
                     TallyOf(balance).Exits += allocation.Quantity;
                     balance.Add(-allocation.Quantity);
-                    movements.Add(new InventoryMovement(state.OccurredAt, state.BusinessDate, request, allocation.LotId,
+                    movements.Add(new InventoryMovement(movements.Count, state.OccurredAt, state.BusinessDate, request, allocation.LotId,
                         -allocation.Quantity, exitCost, state.UserId));
                 }
                 continue;
@@ -108,7 +108,7 @@ public static class InventoryPostingCalculator
             var exitBalance = BalanceOf(request.LocationId, request.ItemId, request.LotId);
             TallyOf(exitBalance).Exits += requested;
             exitBalance.Add(request.Quantity);
-            movements.Add(new InventoryMovement(state.OccurredAt, state.BusinessDate, request, request.LotId,
+            movements.Add(new InventoryMovement(movements.Count, state.OccurredAt, state.BusinessDate, request, request.LotId,
                 request.Quantity, exitCost, state.UserId));
         }
 
