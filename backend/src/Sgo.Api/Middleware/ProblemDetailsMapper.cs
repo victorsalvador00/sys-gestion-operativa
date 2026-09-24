@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Sgo.Domain.Common;
 
 namespace Sgo.Api.Middleware;
@@ -14,6 +15,8 @@ public static class ProblemDetailsMapper
         InsufficientStockException e => WithShortages(
             Create(StatusCodes.Status409Conflict, "insufficient_stock", "Existencia insuficiente", e.Message), e.Shortages),
         ConcurrencyException e => Create(StatusCodes.Status409Conflict, "concurrency", "Conflicto de concurrencia", e.Message),
+        DbUpdateConcurrencyException => Create(StatusCodes.Status409Conflict, "concurrency", "Conflicto de concurrencia",
+            new ConcurrencyException().Message),
         NotFoundException e => Create(StatusCodes.Status404NotFound, "not_found", "No encontrado", e.Message),
         ForbiddenException e => Create(StatusCodes.Status403Forbidden, "forbidden", "Acceso denegado", e.Message),
         _ => Create(StatusCodes.Status500InternalServerError, "internal", "Error interno",

@@ -1,7 +1,13 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using Sgo.Application.Common;
+using Sgo.Infrastructure.Identity;
+using Sgo.Infrastructure.Persistence;
+using Sgo.Infrastructure.Persistence.Interceptors;
+using Sgo.Infrastructure.Persistence.Seed;
 
 namespace Sgo.Infrastructure;
 
@@ -12,12 +18,46 @@ public static class DependencyInjection
         services.AddSingleton(_ =>
         {
             var connectionString = configuration.GetConnectionString("Default");
+            // `dotnet ef migrations add` builds the model without touching the database.
+            if (string.IsNullOrWhiteSpace(connectionString) && EF.IsDesignTime)
+                connectionString = "Host=localhost;Database=sgo_design_time";
             if (string.IsNullOrWhiteSpace(connectionString))
                 throw new InvalidOperationException(
                     "Missing connection string 'Default'. Set SGO__ConnectionStrings__Default.");
             return NpgsqlDataSource.Create(connectionString);
         });
         services.AddSingleton<IClock, SystemClock>();
+
+        services.AddScoped<TimestampsInterceptor>();
+        services.AddScoped<AuditInterceptor>();
+        services.AddDbContext<SgoDbContext>((sp, options) => options
+            .UseNpgsql(sp.GetRequiredService<NpgsqlDataSource>(),
+                npgsql => npgsql.MigrationsHistoryTable("__ef_migrations_history", "public"))
+            .UseSnakeCaseNamingConvention()
+            .AddInterceptors(sp.GetRequiredService<TimestampsInterceptor>(), sp.GetRequiredService<AuditInterceptor>()));
+        services.AddScoped<ISgoDbContext>(sp => sp.GetRequiredService<SgoDbContext>());
+        services.AddScoped<IFolioGenerator, FolioGenerator>();
+
+        services.AddIdentityCore<AppUser>(options =>
+            {
+                options.User.RequireUniqueEmail = true;
+                options.Password.RequiredLength = 10;
+                options.Password.RequireUppercase = true;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireDigit = true;
+                options.Password.RequireNonAlphanumeric = false;
+                // RN-42
+                options.Lockout.MaxFailedAccessAttempts = 5;
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
+                options.Lockout.AllowedForNewUsers = true;
+            })
+            .AddRoles<AppRole>()
+            .AddEntityFrameworkStores<SgoDbContext>();
+
+        services.Configure<SeedOptions>(configuration.GetSection(SeedOptions.Section));
+        services.Configure<DatabaseOptions>(configuration.GetSection(DatabaseOptions.Section));
+        services.AddScoped<DatabaseSeeder>();
+
         return services;
     }
 }

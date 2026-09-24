@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.EntityFrameworkCore;
 using Sgo.Domain.Common;
 
 namespace Sgo.Api.Middleware;
@@ -9,7 +10,7 @@ public sealed class GlobalExceptionHandler(
 {
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
-        if (exception is DomainException)
+        if (exception is DomainException or DbUpdateConcurrencyException)
             logger.LogInformation("Domain error {ExceptionType}: {Message}", exception.GetType().Name, exception.Message);
         else
             logger.LogError(exception, "Unhandled exception");

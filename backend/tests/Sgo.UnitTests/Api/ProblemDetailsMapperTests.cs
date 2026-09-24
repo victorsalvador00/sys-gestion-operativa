@@ -45,6 +45,16 @@ public class ProblemDetailsMapperTests
     }
 
     [Fact]
+    public void EF_concurrency_conflict_maps_to_409_concurrency()
+    {
+        var problem = ProblemDetailsMapper.Map(new Microsoft.EntityFrameworkCore.DbUpdateConcurrencyException("xmin mismatch"));
+
+        Assert.Equal(409, problem.Status);
+        Assert.Equal("concurrency", problem.Extensions["code"]);
+        Assert.DoesNotContain("xmin", problem.Detail);
+    }
+
+    [Fact]
     public void NotFound_maps_to_404()
     {
         var problem = ProblemDetailsMapper.Map(new NotFoundException("Artículo", Guid.Empty));

@@ -2,13 +2,17 @@ using System.Security.Claims;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Options;
 using Scalar.AspNetCore;
 using Serilog;
 using Serilog.Formatting.Compact;
 using Sgo.Api;
+using Sgo.Api.Auth;
 using Sgo.Api.Middleware;
+using Sgo.Application.Common;
 using Sgo.Infrastructure;
 using Sgo.Infrastructure.Health;
+using Sgo.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,6 +52,8 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.KnownProxies.Clear();
 });
 
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUser, HttpCurrentUser>();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddHealthChecks()
@@ -55,6 +61,16 @@ builder.Services.AddHealthChecks()
     .AddCheck<DatabaseHealthCheck>("database", tags: ["ready"]);
 
 var app = builder.Build();
+
+// `dotnet Sgo.Api.dll --seed`: run the idempotent seed and exit (production, after the migration bundle).
+if (args.Contains("--seed"))
+{
+    await DatabaseInitializer.InitializeAsync(app.Services, migrate: false, seed: true);
+    return;
+}
+
+var databaseOptions = app.Services.GetRequiredService<IOptions<DatabaseOptions>>().Value;
+await DatabaseInitializer.InitializeAsync(app.Services, databaseOptions.MigrateOnStartup, databaseOptions.SeedOnStartup);
 
 app.UseForwardedHeaders();
 app.UseExceptionHandler();
