@@ -31,6 +31,7 @@ public interface ISgoDbContext
     DbSet<ConsumptionEntry> Consumptions { get; }
     DbSet<Transfer> Transfers { get; }
     DbSet<Recipe> Recipes { get; }
+    DbSet<ProductionOrder> ProductionOrders { get; }
     DbSet<RolePermission> RolePermissions { get; }
     DbSet<UserLocation> UserLocations { get; }
     DbSet<AuditLog> AuditLogs { get; }

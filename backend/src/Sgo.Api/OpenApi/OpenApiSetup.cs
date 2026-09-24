@@ -109,6 +109,17 @@ public static class OpenApiSetup
               "lines": [ { "componentItemId": "0199a1b2-0000-7000-8000-0000000000d1", "quantity": 1.2, "wastePct": 3 },
                          { "componentItemId": "0199a1b2-0000-7000-8000-0000000000d2", "quantity": 0.2, "wastePct": 0 } ] }
             """,
+        [typeof(CreateProductionOrderRequest)] = """
+            { "locationId": "0199a1b2-0000-7000-8000-0000000000a9", "outputItemId": "0199a1b2-0000-7000-8000-0000000000d9",
+              "plannedQty": 120, "scheduledDate": "2026-09-25", "notes": "Turno matutino" }
+            """,
+        [typeof(UpdateProductionOrderRequest)] = """{ "version": 1234, "plannedQty": 96, "scheduledDate": "2026-09-26", "notes": null }""",
+        [typeof(CompleteProductionOrderRequest)] = """
+            { "version": 1234, "producedQty": 114,
+              "lines": [ { "componentItemId": "0199a1b2-0000-7000-8000-0000000000d1", "actualQty": 12.5, "lots": null },
+                         { "componentItemId": "0199a1b2-0000-7000-8000-0000000000d2", "actualQty": 3,
+                           "lots": [ { "lotId": "0199a1b2-0000-7000-8000-0000000000f1", "quantity": 3 } ] } ] }
+            """,
         [typeof(UpdateLocationRequest)] = """{ "version": 1234, "name": "Sucursal Centro", "address": "Av. Juárez 100, Col. Centro", "isActive": true }""",
     };
 

@@ -31,6 +31,7 @@ public class SgoDbContext(DbContextOptions<SgoDbContext> options)
     public DbSet<ConsumptionEntry> Consumptions => Set<ConsumptionEntry>();
     public DbSet<Transfer> Transfers => Set<Transfer>();
     public DbSet<Recipe> Recipes => Set<Recipe>();
+    public DbSet<ProductionOrder> ProductionOrders => Set<ProductionOrder>();
     public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
     public DbSet<UserLocation> UserLocations => Set<UserLocation>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();

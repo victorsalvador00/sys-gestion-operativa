@@ -222,7 +222,7 @@ El código (clases, tablas, endpoints) va en **inglés**; la interfaz de usuario
   1. Se registran las salidas de componentes por el consumo **real** capturado (por defecto igual al teórico), con asignación de lotes FEFO.
   2. Se registra la entrada del producto por `ProducedQty`, con un lote nuevo. El número de lote es el folio de la OP y la caducidad = fecha de completado + `ShelfLifeDays`.
   3. Costo unitario del producto = costo total consumido / `ProducedQty`.
-- **RN-13**: La merma de producción es la diferencia entre el consumo real y el teórico. Se reporta; no genera movimientos extra.
+- **RN-13**: La merma de producción es la diferencia entre el consumo real y el teórico **calculado sobre `ProducedQty`** (acordado en B-11: si se produce menos de lo planeado, la merma se mide contra lo que realmente salió). El consumo real por defecto es ese teórico. Se reporta; no genera movimientos extra.
 - **RN-14**: Solo se producen en ubicaciones Factory o Commissary. `ProducedQty` debe ser > 0.
 
 ### Logística
