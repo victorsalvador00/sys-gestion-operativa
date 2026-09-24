@@ -47,4 +47,32 @@ public class PurchasingValidatorsTests
         var result = new UpdateSupplierItemRequestValidator().Validate(new UpdateSupplierItemRequest(1, null, 10, 0, true, false));
         Assert.Contains("Un artículo inactivo no puede ser el preferido.", ErrorsOf(result, "IsPreferred"));
     }
+
+    [Fact]
+    public void Requisition_rejects_repeated_items_and_non_positive_quantities()
+    {
+        var item = Guid.NewGuid();
+        var repeated = new CreateRequisitionRequestValidator().Validate(new CreateRequisitionRequest(Guid.NewGuid(), new DateOnly(2026, 10, 1), null,
+            [new RequisitionLineRequest(item, 1, null), new RequisitionLineRequest(item, 2, null)]));
+        Assert.Contains("Hay artículos repetidos en la requisición.", ErrorsOf(repeated, "Lines"));
+
+        var zero = new CreateRequisitionRequestValidator().Validate(new CreateRequisitionRequest(Guid.NewGuid(), new DateOnly(2026, 10, 1), null,
+            [new RequisitionLineRequest(item, 0, null)]));
+        Assert.False(zero.IsValid);
+    }
+
+    [Fact]
+    public void Rejection_needs_a_reason() =>
+        Assert.False(new RejectRequisitionRequestValidator().Validate(new RejectRequisitionRequest(1, " ")).IsValid);
+
+    [Fact]
+    public void Conversion_needs_distinct_requisitions()
+    {
+        var id = Guid.NewGuid();
+        Assert.Contains("Selecciona al menos una requisición.",
+            ErrorsOf(new ConvertRequisitionsRequestValidator().Validate(new ConvertRequisitionsRequest([])), "RequisitionIds"));
+        Assert.Contains("Hay requisiciones repetidas.",
+            ErrorsOf(new ConvertRequisitionsRequestValidator().Validate(new ConvertRequisitionsRequest([id, id])), "RequisitionIds"));
+        Assert.True(new ConvertRequisitionsRequestValidator().Validate(new ConvertRequisitionsRequest([id, Guid.NewGuid()])).IsValid);
+    }
 }

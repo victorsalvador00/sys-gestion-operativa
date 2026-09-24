@@ -136,6 +136,20 @@ public static class OpenApiSetup
         [typeof(UpdateSupplierItemRequest)] = """
             { "version": 1234, "supplierSku": "HP-TRIGO-25", "price": 425, "leadTimeDays": 2, "isPreferred": true, "isActive": true }
             """,
+        [typeof(CreateRequisitionRequest)] = """
+            { "locationId": "0199a1b2-0000-7000-8000-0000000000a9", "neededBy": "2026-10-01", "notes": "Reposición quincenal",
+              "lines": [ { "itemId": "0199a1b2-0000-7000-8000-0000000000d1", "quantity": 8, "suggestedSupplierId": null },
+                         { "itemId": "0199a1b2-0000-7000-8000-0000000000d2", "quantity": 2.5,
+                           "suggestedSupplierId": "0199a1b2-0000-7000-8000-00000000005a" } ] }
+            """,
+        [typeof(UpdateRequisitionRequest)] = """
+            { "version": 1234, "neededBy": "2026-10-02", "notes": null,
+              "lines": [ { "itemId": "0199a1b2-0000-7000-8000-0000000000d1", "quantity": 10, "suggestedSupplierId": null } ] }
+            """,
+        [typeof(RejectRequisitionRequest)] = """{ "version": 1234, "reason": "Hay existencia suficiente en comisariato" }""",
+        [typeof(ConvertRequisitionsRequest)] = """
+            { "requisitionIds": ["0199a1b2-0000-7000-8000-00000000007a", "0199a1b2-0000-7000-8000-00000000007b"] }
+            """,
         [typeof(UpdateLocationRequest)] = """{ "version": 1234, "name": "Sucursal Centro", "address": "Av. Juárez 100, Col. Centro", "isActive": true }""",
     };
 

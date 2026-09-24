@@ -35,6 +35,8 @@ public class SgoDbContext(DbContextOptions<SgoDbContext> options)
     public DbSet<ProductionOrder> ProductionOrders => Set<ProductionOrder>();
     public DbSet<Supplier> Suppliers => Set<Supplier>();
     public DbSet<SupplierItem> SupplierItems => Set<SupplierItem>();
+    public DbSet<PurchaseRequisition> PurchaseRequisitions => Set<PurchaseRequisition>();
+    public DbSet<PurchaseOrder> PurchaseOrders => Set<PurchaseOrder>();
     public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
     public DbSet<UserLocation> UserLocations => Set<UserLocation>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();

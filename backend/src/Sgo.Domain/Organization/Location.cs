@@ -31,6 +31,9 @@ public class Location : AuditableEntity, IVersioned
     public bool CanProduce => Type is LocationType.Factory or LocationType.Commissary;
     public bool CanSupplyBranches => Type is LocationType.Factory or LocationType.Commissary;
 
+    /// <summary>Only the factory and the commissary buy from suppliers; branches order from the commissary.</summary>
+    public bool CanPurchase => Type is LocationType.Factory or LocationType.Commissary;
+
     public void Update(string name, LocationType type, string? address)
     {
         Name = name.Trim();

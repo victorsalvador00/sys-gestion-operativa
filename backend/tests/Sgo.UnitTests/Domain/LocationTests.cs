@@ -8,11 +8,12 @@ public class LocationTests
     [InlineData(LocationType.Branch, false)]
     [InlineData(LocationType.Factory, true)]
     [InlineData(LocationType.Commissary, true)]
-    public void Only_factory_and_commissary_produce_and_supply(LocationType type, bool expected)
+    public void Only_factory_and_commissary_produce_supply_and_purchase(LocationType type, bool expected)
     {
         var location = new Location("X", "X", type);
         Assert.Equal(expected, location.CanProduce);
         Assert.Equal(expected, location.CanSupplyBranches);
+        Assert.Equal(expected, location.CanPurchase);
     }
 
     [Fact]

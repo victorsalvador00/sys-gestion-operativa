@@ -98,6 +98,8 @@ public static class DependencyInjection
         services.AddScoped<IRecipeService, RecipeService>();
         services.AddScoped<IProductionOrderService, ProductionOrderService>();
         services.AddScoped<ISupplierService, SupplierService>();
+        services.AddScoped<IRequisitionService, RequisitionService>();
+        services.AddScoped<IPurchaseOrderService, PurchaseOrderService>();
 
         services.Configure<SeedOptions>(configuration.GetSection(SeedOptions.Section));
         services.Configure<DatabaseOptions>(configuration.GetSection(DatabaseOptions.Section));

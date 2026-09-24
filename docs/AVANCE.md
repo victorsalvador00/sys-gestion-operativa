@@ -18,16 +18,16 @@
 | 1 | B-09 Traspasos directos (despacho, tránsito, recepción con discrepancias) | ✅ | `64bdfcb` |
 | 2 | B-10 Recetas versionadas y explosión teórica | ✅ | `ae9210a` |
 | 2 | B-11 Órdenes de producción (completar transaccional) | ✅ | `e12626f` |
-| 3 | B-12 Proveedores y artículos de proveedor | ✅ | (ver `git log`) |
-| 3 | B-13 Requisiciones y conversión a OC | ⏭️ siguiente | |
-| 3 | B-14 Órdenes de compra, aprobación por umbral, recepción parcial, cierre | pendiente — requiere umbral de OC | |
+| 3 | B-12 Proveedores y artículos de proveedor | ✅ | `3671b24` |
+| 3 | B-13 Requisiciones y conversión a OC | ✅ | (ver `git log`) |
+| 3 | B-14 Órdenes de compra, aprobación por umbral, recepción parcial, cierre | ⏭️ siguiente — requiere umbral de OC | |
 | 3 | B-15 Pedidos de sucursal, sugerido mín/máx, aprobación → traspasos, RN-24 | pendiente | |
 | 3 | B-16 Tablero y `/settings` | pendiente | |
 | 3 | B-17 Endurecimiento (índices, EXPLAIN, bundle de migraciones, compose prod) | pendiente | |
 
-Pruebas al cierre de B-12: **340 en verde** (224 unitarias, 116 de integración), sin warnings.
+Pruebas al cierre de B-13: **359 en verde** (237 unitarias, 122 de integración), sin warnings.
 Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`, `AddCatalog`, `AddInventory`,
-`AddAdjustments`, `AddCountsAndConsumptions`, `AddTransfers`, `AddRecipes`, `AddProductionOrders`, `AddSuppliers`.
+`AddAdjustments`, `AddCountsAndConsumptions`, `AddTransfers`, `AddRecipes`, `AddProductionOrders`, `AddSuppliers`, `AddRequisitionsAndPurchaseOrders`.
 
 ## Decisiones acordadas con el cliente
 
@@ -59,6 +59,15 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
 - **Un solo proveedor preferido por artículo** (índice único parcial): marcar uno desmarca el anterior. Una fila
   inactiva nunca es preferida; desactivar un proveedor quita su preferencia en todos sus artículos, y sus artículos
   no se editan hasta reactivarlo. B-13 usará el preferido como proveedor sugerido.
+- Requisiciones (B-13): solo **Fábrica y Comisariato** (`Location.CanPurchase`); `NeededBy` no puede ser pasada;
+  cantidades en unidad de compra. Línea sin proveedor → toma el **preferido**; un proveedor indicado debe estar activo
+  y tener el artículo activo en su catálogo. **Enviar exige proveedor en todas las líneas.** Aprobar y rechazar
+  requieren `purchasing.po.approve`; rechazar pide motivo. Cancelar: en Draft, Submitted o Approved.
+- Conversión (RN-34): OC agrupadas por **proveedor + ubicación de entrega**; **una línea de OC por línea de
+  requisición** (sin sumar, conserva `RequisitionLineId`); precio = `SupplierItem.Price`, IVA = el del artículo;
+  fecha esperada = la `NeededBy` más próxima; OC en `Draft`. Todo o nada; proveedor o artículo inactivo lo bloquea.
+- La OC en B-13 es mínima (entidad, líneas, totales a 2 decimales redondeados por línea, `GET /purchase-orders`).
+  Editar, enviar, aprobar/rechazar, cancelar, cerrar y recibir llegan en B-14.
 
 ## Pendientes y notas técnicas
 
