@@ -7,6 +7,7 @@ using Sgo.Domain.Common;
 using Sgo.Domain.Inventory;
 using Sgo.Domain.Logistics;
 using Sgo.Domain.Organization;
+using Sgo.Domain.Production;
 using Sgo.Domain.Security;
 using Sgo.Infrastructure.Identity;
 
@@ -29,6 +30,7 @@ public class SgoDbContext(DbContextOptions<SgoDbContext> options)
     public DbSet<PhysicalCount> PhysicalCounts => Set<PhysicalCount>();
     public DbSet<ConsumptionEntry> Consumptions => Set<ConsumptionEntry>();
     public DbSet<Transfer> Transfers => Set<Transfer>();
+    public DbSet<Recipe> Recipes => Set<Recipe>();
     public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
     public DbSet<UserLocation> UserLocations => Set<UserLocation>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();

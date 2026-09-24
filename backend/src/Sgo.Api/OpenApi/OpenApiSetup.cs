@@ -6,6 +6,7 @@ using Sgo.Application.Common;
 using Sgo.Application.Inventory;
 using Sgo.Application.Logistics;
 using Sgo.Application.Organization;
+using Sgo.Application.Production;
 using Sgo.Application.Security;
 
 namespace Sgo.Api.OpenApi;
@@ -97,6 +98,16 @@ public static class OpenApiSetup
             { "version": 1234, "lines": [
                 { "lineId": "0199a1b2-0000-7000-8000-0000000000e1", "receivedQty": 10, "discrepancyReason": null, "discrepancyNotes": null },
                 { "lineId": "0199a1b2-0000-7000-8000-0000000000e2", "receivedQty": 1, "discrepancyReason": "Damaged", "discrepancyNotes": "Caja aplastada" } ] }
+            """,
+        [typeof(CreateRecipeRequest)] = """
+            { "outputItemId": "0199a1b2-0000-7000-8000-0000000000d9", "yieldQty": 12, "notes": "Pan de muerto, charola de 12",
+              "lines": [ { "componentItemId": "0199a1b2-0000-7000-8000-0000000000d1", "quantity": 1.2, "wastePct": 3 },
+                         { "componentItemId": "0199a1b2-0000-7000-8000-0000000000d2", "quantity": 0.25, "wastePct": 0 } ] }
+            """,
+        [typeof(UpdateRecipeRequest)] = """
+            { "version": 1234, "yieldQty": 12, "notes": "Menos azúcar", "isActive": true,
+              "lines": [ { "componentItemId": "0199a1b2-0000-7000-8000-0000000000d1", "quantity": 1.2, "wastePct": 3 },
+                         { "componentItemId": "0199a1b2-0000-7000-8000-0000000000d2", "quantity": 0.2, "wastePct": 0 } ] }
             """,
         [typeof(UpdateLocationRequest)] = """{ "version": 1234, "name": "Sucursal Centro", "address": "Av. Juárez 100, Col. Centro", "isActive": true }""",
     };

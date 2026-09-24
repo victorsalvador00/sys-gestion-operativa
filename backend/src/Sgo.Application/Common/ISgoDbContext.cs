@@ -5,6 +5,7 @@ using Sgo.Domain.Catalog;
 using Sgo.Domain.Inventory;
 using Sgo.Domain.Logistics;
 using Sgo.Domain.Organization;
+using Sgo.Domain.Production;
 using Sgo.Domain.Security;
 
 namespace Sgo.Application.Common;
@@ -29,6 +30,7 @@ public interface ISgoDbContext
     DbSet<PhysicalCount> PhysicalCounts { get; }
     DbSet<ConsumptionEntry> Consumptions { get; }
     DbSet<Transfer> Transfers { get; }
+    DbSet<Recipe> Recipes { get; }
     DbSet<RolePermission> RolePermissions { get; }
     DbSet<UserLocation> UserLocations { get; }
     DbSet<AuditLog> AuditLogs { get; }
