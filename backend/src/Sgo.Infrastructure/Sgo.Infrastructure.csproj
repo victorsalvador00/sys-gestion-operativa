@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Npgsql" Version="10.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Sgo.Application\Sgo.Application.csproj" />
+    <ProjectReference Include="..\Sgo.Domain\Sgo.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

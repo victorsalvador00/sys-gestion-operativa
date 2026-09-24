@@ -1,0 +1,49 @@
+# Local development: Postgres + API with hot reload.
+#   docker compose -f deploy/docker-compose.dev.yml up            (everything)
+#   docker compose -f deploy/docker-compose.dev.yml up -d postgres (only the DB; run the API with `dotnet run`)
+# Variables are read from deploy/.env (copy .env.example).
+
+name: sgo-dev
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-sgo}
+      POSTGRES_USER: ${POSTGRES_USER:-sgo}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in deploy/.env}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    image: mcr.microsoft.com/dotnet/sdk:10.0
+    working_dir: /src
+    command: ["dotnet", "watch", "--project", "src/Sgo.Api", "run", "--no-launch-profile"]
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://0.0.0.0:8080
+      SGO_CONTAINER_BUILD: "1"
+      DOTNET_USE_POLLING_FILE_WATCHER: "1"
+      DOTNET_WATCH_RESTART_ON_RUDE_EDIT: "1"
+      SGO__ConnectionStrings__Default: Host=postgres;Port=5432;Database=${POSTGRES_DB:-sgo};Username=${POSTGRES_USER:-sgo};Password=${POSTGRES_PASSWORD}
+    ports:
+      - "${API_PORT:-8080}:8080"
+    volumes:
+      - ../backend:/src
+      - nuget:/root/.nuget/packages
+      - build:/build
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  nuget:
+  build:
