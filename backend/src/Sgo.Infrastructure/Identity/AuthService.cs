@@ -105,8 +105,8 @@ public sealed class AuthService(
     public async Task<MeDto> GetMeAsync(Guid userId, CancellationToken ct = default)
     {
         var user = await db.Users.AsNoTracking().SingleOrDefaultAsync(u => u.Id == userId, ct)
-                   ?? throw new NotFoundException("usuario", userId);
-        var access = await userAccess.GetAsync(userId, ct) ?? throw new NotFoundException("usuario", userId);
+                   ?? throw new NotFoundException("el usuario", userId);
+        var access = await userAccess.GetAsync(userId, ct) ?? throw new NotFoundException("el usuario", userId);
 
         var locations = await db.Locations.AsNoTracking()
             .Where(l => access.LocationIds.Contains(l.Id))
@@ -120,7 +120,7 @@ public sealed class AuthService(
 
     public async Task ChangePasswordAsync(Guid userId, ChangePasswordRequest request, CancellationToken ct = default)
     {
-        var user = await userManager.FindByIdAsync(userId.ToString()) ?? throw new NotFoundException("usuario", userId);
+        var user = await userManager.FindByIdAsync(userId.ToString()) ?? throw new NotFoundException("el usuario", userId);
 
         var result = await userManager.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword);
         if (!result.Succeeded)

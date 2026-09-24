@@ -6,6 +6,16 @@ namespace Sgo.IntegrationTests.Support;
 
 public static class HttpExtensions
 {
+    /// <summary>Same JSON contract as the API (camelCase, enums as strings).</summary>
+    public static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web)
+    {
+        Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() },
+    };
+
+    public static Task<T?> GetJsonAsync<T>(this HttpClient client, string url) => client.GetFromJsonAsync<T>(url, Json);
+
+    public static Task<T?> ReadJsonAsync<T>(this HttpResponseMessage response) => response.Content.ReadFromJsonAsync<T>(Json);
+
     /// <summary>The refresh token set by the response, or null.</summary>
     public static string? RefreshCookieValue(this HttpResponseMessage response) =>
         response.RefreshCookieHeader()?.Split(';')[0][(RefreshTokenCookie.Name.Length + 1)..] is { Length: > 0 } value ? value : null;

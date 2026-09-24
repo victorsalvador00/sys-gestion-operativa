@@ -57,6 +57,8 @@ public class SgoDbContext(DbContextOptions<SgoDbContext> options)
         {
             e.ToTable("role", schema);
             e.Property(r => r.Description).HasMaxLength(500);
+            e.Property(r => r.SystemKey).HasMaxLength(50);
+            e.HasIndex(r => r.SystemKey).IsUnique();
         });
         builder.Entity<IdentityUserRole<Guid>>().ToTable("user_role", schema);
         builder.Entity<IdentityUserClaim<Guid>>().ToTable("user_claim", schema);

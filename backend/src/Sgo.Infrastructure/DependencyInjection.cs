@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using Sgo.Application.Common;
+using Sgo.Application.Organization;
 using Sgo.Application.Security;
 using Sgo.Infrastructure.Identity;
 using Sgo.Infrastructure.Persistence;
@@ -67,6 +68,11 @@ public static class DependencyInjection
         services.AddScoped<ILocationScope, LocationScope>();
         services.AddScoped<TokenService>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<PrivilegeGuard>();
+        services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IRoleService, RoleService>();
+        services.AddScoped<IAuditLogQueries, AuditLogQueries>();
+        services.AddScoped<ILocationService, LocationService>();
 
         services.Configure<SeedOptions>(configuration.GetSection(SeedOptions.Section));
         services.Configure<DatabaseOptions>(configuration.GetSection(DatabaseOptions.Section));

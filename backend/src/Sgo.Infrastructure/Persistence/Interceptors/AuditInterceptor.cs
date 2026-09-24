@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Text.Json;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -21,6 +22,9 @@ public sealed class AuditInterceptor(IClock clock, ICurrentUser currentUser) : S
         "PasswordHash", "SecurityStamp", "ConcurrencyStamp", "AccessFailedCount", nameof(IVersioned.Version),
         "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy",
     ];
+
+    /// <summary>Framework types that cannot carry <see cref="AuditedAttribute"/> but must be audited (RN-41).</summary>
+    private static readonly HashSet<Type> AlsoAudited = [typeof(IdentityUserRole<Guid>)];
 
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
 
@@ -46,13 +50,16 @@ public sealed class AuditInterceptor(IClock clock, ICurrentUser currentUser) : S
 
         var logs = context.ChangeTracker.Entries()
             .Where(e => e.State is EntityState.Added or EntityState.Modified or EntityState.Deleted
-                        && e.Entity.GetType().GetCustomAttribute<AuditedAttribute>() is not null)
+                        && IsAudited(e.Entity.GetType()))
             .Select(CreateLog)
             .OfType<AuditLog>()
             .ToList();
 
         context.AddRange(logs);
     }
+
+    private static bool IsAudited(Type type) =>
+        AlsoAudited.Contains(type) || type.GetCustomAttribute<AuditedAttribute>() is not null;
 
     private AuditLog? CreateLog(EntityEntry entry)
     {

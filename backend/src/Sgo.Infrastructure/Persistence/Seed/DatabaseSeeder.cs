@@ -81,14 +81,14 @@ public sealed class DatabaseSeeder(
     {
         foreach (var definition in SystemRoles.All)
         {
-            var role = await roleManager.FindByNameAsync(definition.Name);
+            var role = await db.Roles.SingleOrDefaultAsync(r => r.SystemKey == definition.Key, ct);
             if (role is null)
             {
-                role = new AppRole(definition.Name, definition.Description, isSystem: true);
+                role = new AppRole(definition.Name, definition.Description, definition.Key);
                 EnsureSucceeded(await roleManager.CreateAsync(role), $"create role {definition.Name}");
                 db.RolePermissions.AddRange(definition.Permissions.Select(p => new RolePermission(role.Id, p)));
             }
-            else if (definition.Name == SystemRoles.Administrator)
+            else if (role.IsAdministrator)
             {
                 // "Todos": the administrator also receives permissions added in later versions.
                 var granted = await db.RolePermissions.Where(rp => rp.RoleId == role.Id)
@@ -114,7 +114,8 @@ public sealed class DatabaseSeeder(
 
         var admin = new AppUser(email, "Administrador") { EmailConfirmed = true };
         EnsureSucceeded(await userManager.CreateAsync(admin, password), "create administrator");
-        EnsureSucceeded(await userManager.AddToRoleAsync(admin, SystemRoles.Administrator), "assign administrator role");
+        var adminRole = await db.Roles.SingleAsync(r => r.SystemKey == SystemRoles.AdministratorKey);
+        EnsureSucceeded(await userManager.AddToRoleAsync(admin, adminRole.Name!), "assign administrator role");
         logger.LogInformation("Administrator user created");
     }
 
