@@ -24,6 +24,17 @@ public sealed class LocationsController(ILocationService locations) : Controller
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public Task<LocationDto> Get(Guid id, CancellationToken ct) => locations.GetAsync(id, ct);
 
+    /// <summary>Da de alta una ubicación (sucursal, fábrica o comisariato).</summary>
+    [HttpPost]
+    [RequirePermission(Permissions.LocationsManage)]
+    [ProducesResponseType<LocationDto>(StatusCodes.Status201Created)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<LocationDto>> Create(CreateLocationRequest request, CancellationToken ct)
+    {
+        var location = await locations.CreateAsync(request, ct);
+        return CreatedAtAction(nameof(Get), new { id = location.Id }, location);
+    }
+
     /// <summary>Edita nombre, dirección y estado. El código y el tipo no cambian.</summary>
     [HttpPut("{id:guid}")]
     [RequirePermission(Permissions.LocationsManage)]

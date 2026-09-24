@@ -16,6 +16,9 @@ public class SgoDbContext(DbContextOptions<SgoDbContext> options)
     public DbSet<Location> Locations => Set<Location>();
     public DbSet<AppSetting> AppSettings => Set<AppSetting>();
     public DbSet<UnitOfMeasure> UnitsOfMeasure => Set<UnitOfMeasure>();
+    public DbSet<ItemCategory> ItemCategories => Set<ItemCategory>();
+    public DbSet<Item> Items => Set<Item>();
+    public DbSet<ItemLocationSetting> ItemLocationSettings => Set<ItemLocationSetting>();
     public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
     public DbSet<UserLocation> UserLocations => Set<UserLocation>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();

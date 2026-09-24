@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Sgo.Application.Common;
+using Sgo.Application.Security;
 using Sgo.Domain.Common;
 using Sgo.Domain.Organization;
 
@@ -23,6 +24,20 @@ public sealed record LocationDto(
     bool CanProduce,
     bool CanSupplyBranches,
     uint Version);
+
+public sealed record CreateLocationRequest(string Code, string Name, LocationType Type, string? Address);
+
+public sealed class CreateLocationRequestValidator : AbstractValidator<CreateLocationRequest>
+{
+    public CreateLocationRequestValidator()
+    {
+        RuleFor(x => x.Code).NotEmpty().MaximumLength(20).Matches("^[A-Za-z0-9-]+$")
+            .WithMessage("El código solo admite letras, números y guion (ej. SUC-11).").WithName("Código");
+        RuleFor(x => x.Name).NotEmpty().MaximumLength(150).WithName("Nombre");
+        RuleFor(x => x.Type).IsInEnum().WithName("Tipo");
+        RuleFor(x => x.Address).MaximumLength(500).WithName("Dirección");
+    }
+}
 
 /// <summary>Code and type are fixed once created: documents and rules (RN-14, RN-20) depend on them.</summary>
 public sealed record UpdateLocationRequest(uint Version, string Name, string? Address, bool IsActive);
@@ -46,10 +61,11 @@ public interface ILocationService
 {
     Task<PagedResult<LocationDto>> ListAsync(LocationListQuery query, CancellationToken ct = default);
     Task<LocationDto> GetAsync(Guid id, CancellationToken ct = default);
+    Task<LocationDto> CreateAsync(CreateLocationRequest request, CancellationToken ct = default);
     Task<LocationDto> UpdateAsync(Guid id, UpdateLocationRequest request, CancellationToken ct = default);
 }
 
-public sealed class LocationService(ISgoDbContext db, ILocationScope scope) : ILocationService
+public sealed class LocationService(ISgoDbContext db, ILocationScope scope, IUserAccessService userAccess) : ILocationService
 {
     private static readonly Dictionary<string, Expression<Func<Location, object?>>> SortColumns = new()
     {
@@ -77,6 +93,18 @@ public sealed class LocationService(ISgoDbContext db, ILocationScope scope) : IL
 
     public async Task<LocationDto> GetAsync(Guid id, CancellationToken ct = default) =>
         (await FindAsync(id, ct)).ToDto();
+
+    public async Task<LocationDto> CreateAsync(CreateLocationRequest request, CancellationToken ct = default)
+    {
+        var location = new Location(request.Code, request.Name, request.Type, request.Address);
+        if (await db.Locations.AnyAsync(l => l.Code == location.Code, ct))
+            throw new RequestValidationException(new Dictionary<string, string[]> { ["code"] = [$"La ubicación '{location.Code}' ya existe."] });
+
+        db.Locations.Add(location);
+        await db.SaveChangesAsync(ct);
+        userAccess.InvalidateAll(); // users with locations.all must see the new location right away
+        return location.ToDto();
+    }
 
     public async Task<LocationDto> UpdateAsync(Guid id, UpdateLocationRequest request, CancellationToken ct = default)
     {

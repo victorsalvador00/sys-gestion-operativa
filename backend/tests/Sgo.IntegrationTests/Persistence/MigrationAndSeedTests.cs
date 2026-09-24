@@ -32,7 +32,8 @@ public class MigrationAndSeedTests(SgoApiFactory factory)
         Assert.Contains("COM", codes);
         Assert.Equal(LocationType.Commissary, (await db.Locations.SingleAsync(l => l.Code == "COM")).Type);
 
-        Assert.Equal(DatabaseSeeder.UnitsOfMeasure.Count, await db.UnitsOfMeasure.CountAsync());
+        var uomCodes = await db.UnitsOfMeasure.Select(u => u.Code).ToListAsync();
+        Assert.All(DatabaseSeeder.UnitsOfMeasure, u => Assert.Contains(u.Code, uomCodes));
         Assert.Equal("0", (await db.AppSettings.SingleAsync(s => s.Key == AppSettingKeys.PoApprovalThreshold)).Value);
         Assert.Equal("3", (await db.AppSettings.SingleAsync(s => s.Key == AppSettingKeys.ExpirationAlertDays)).Value);
 

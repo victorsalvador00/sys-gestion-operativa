@@ -1,6 +1,7 @@
 using System.Text.Json.Nodes;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
+using Sgo.Application.Catalog;
 using Sgo.Application.Common;
 using Sgo.Application.Organization;
 using Sgo.Application.Security;
@@ -34,6 +35,28 @@ public static class OpenApiSetup
         [typeof(UpdateRoleRequest)] = """
             { "version": 1234, "name": "Supervisor de sucursales", "description": "Consulta y aprobación de pedidos",
               "permissions": ["inventory.view", "logistics.view", "logistics.orders.approve", "locations.view"] }
+            """,
+        [typeof(CreateLocationRequest)] = """{ "code": "SUC-11", "name": "Sucursal Plaza Sur", "type": "Branch", "address": "Av. Sur 200" }""",
+        [typeof(CreateUnitOfMeasureRequest)] = """{ "code": "bolsa", "name": "Bolsa", "kind": "Unit" }""",
+        [typeof(UpdateUnitOfMeasureRequest)] = """{ "version": 1234, "name": "Bolsa", "kind": "Unit", "isActive": true }""",
+        [typeof(CreateItemCategoryRequest)] = """{ "name": "Lácteos" }""",
+        [typeof(UpdateItemCategoryRequest)] = """{ "version": 1234, "name": "Lácteos y derivados", "isActive": true }""",
+        [typeof(CreateItemRequest)] = """
+            { "sku": "HAR-001", "name": "Harina de trigo", "type": "RawMaterial",
+              "categoryId": "0199a1b2-0000-7000-8000-0000000000c1", "baseUomId": "0199a1b2-0000-7000-8000-0000000000b1",
+              "purchaseUomId": "0199a1b2-0000-7000-8000-0000000000b2", "purchaseToBaseFactor": 25,
+              "tracksLots": true, "shelfLifeDays": 180, "storageCondition": "Ambient", "taxRate": 0 }
+            """,
+        [typeof(UpdateItemRequest)] = """
+            { "version": 1234, "sku": "HAR-001", "name": "Harina de trigo 25 kg", "type": "RawMaterial",
+              "categoryId": "0199a1b2-0000-7000-8000-0000000000c1", "baseUomId": "0199a1b2-0000-7000-8000-0000000000b1",
+              "purchaseUomId": "0199a1b2-0000-7000-8000-0000000000b2", "purchaseToBaseFactor": 25,
+              "tracksLots": true, "shelfLifeDays": 180, "storageCondition": "Ambient", "taxRate": 0, "isActive": true }
+            """,
+        [typeof(UpdateItemLocationSettingsRequest)] = """
+            { "settings": [
+                { "locationId": "0199a1b2-0000-7000-8000-0000000000a1", "minQty": 10, "maxQty": 40 },
+                { "locationId": "0199a1b2-0000-7000-8000-0000000000a2", "minQty": null, "maxQty": null } ] }
             """,
         [typeof(UpdateLocationRequest)] = """{ "version": 1234, "name": "Sucursal Centro", "address": "Av. Juárez 100, Col. Centro", "isActive": true }""",
     };

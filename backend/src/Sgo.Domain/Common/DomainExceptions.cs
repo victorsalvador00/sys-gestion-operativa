@@ -34,6 +34,16 @@ public sealed class RequestValidationException(IReadOnlyDictionary<string, strin
     public IReadOnlyDictionary<string, string[]> Errors { get; } = errors;
 }
 
+/// <summary>An error in an imported file. <paramref name="Row"/> is the spreadsheet line (header = 1).</summary>
+public sealed record ImportError(int Row, string? Column, string Message);
+
+/// <summary>An import file failed validation; nothing was saved. Maps to 400.</summary>
+public sealed class ImportValidationException(IReadOnlyList<ImportError> errors)
+    : DomainException($"El archivo tiene {errors.Count} error(es). No se importó nada.")
+{
+    public IReadOnlyList<ImportError> Errors { get; } = errors;
+}
+
 /// <summary>User lacks permission or location scope. Maps to 403.</summary>
 public sealed class ForbiddenException(string message = "No tienes permiso para realizar esta acción.")
     : DomainException(message);

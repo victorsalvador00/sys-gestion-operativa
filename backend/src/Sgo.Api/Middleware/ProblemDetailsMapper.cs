@@ -19,6 +19,8 @@ public static class ProblemDetailsMapper
             new ConcurrencyException().Message),
         NotFoundException e => Create(StatusCodes.Status404NotFound, "not_found", "No encontrado", e.Message),
         AuthenticationFailedException e => Create(StatusCodes.Status401Unauthorized, e.Code, "No autenticado", e.Message),
+        ImportValidationException e => WithRowErrors(
+            Create(StatusCodes.Status400BadRequest, "import_invalid", "Archivo con errores", e.Message), e.Errors),
         RequestValidationException e => WithErrors(
             Create(StatusCodes.Status400BadRequest, "validation", "Solicitud inválida", e.Message), e.Errors),
         ForbiddenException e => Create(StatusCodes.Status403Forbidden, "forbidden", "Acceso denegado", e.Message),
@@ -70,6 +72,12 @@ public static class ProblemDetailsMapper
     private static ProblemDetails WithErrors(ProblemDetails problem, IReadOnlyDictionary<string, string[]> errors)
     {
         problem.Extensions["errors"] = errors;
+        return problem;
+    }
+
+    private static ProblemDetails WithRowErrors(ProblemDetails problem, IReadOnlyList<ImportError> errors)
+    {
+        problem.Extensions["rowErrors"] = errors;
         return problem;
     }
 

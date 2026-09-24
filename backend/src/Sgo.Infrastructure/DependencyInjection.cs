@@ -3,9 +3,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
+using Sgo.Application.Catalog;
 using Sgo.Application.Common;
 using Sgo.Application.Organization;
 using Sgo.Application.Security;
+using Sgo.Infrastructure.Csv;
 using Sgo.Infrastructure.Identity;
 using Sgo.Infrastructure.Persistence;
 using Sgo.Infrastructure.Persistence.Interceptors;
@@ -73,6 +75,11 @@ public static class DependencyInjection
         services.AddScoped<IRoleService, RoleService>();
         services.AddScoped<IAuditLogQueries, AuditLogQueries>();
         services.AddScoped<ILocationService, LocationService>();
+        services.AddScoped<IUnitOfMeasureService, UnitOfMeasureService>();
+        services.AddScoped<IItemCategoryService, ItemCategoryService>();
+        services.AddScoped<IItemService, ItemService>();
+        services.AddScoped<IItemImportService, ItemImportService>();
+        services.AddSingleton<ICsvReader, CsvFileReader>();
 
         services.Configure<SeedOptions>(configuration.GetSection(SeedOptions.Section));
         services.Configure<DatabaseOptions>(configuration.GetSection(DatabaseOptions.Section));
