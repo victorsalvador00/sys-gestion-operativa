@@ -33,6 +33,9 @@ services:
       DOTNET_USE_POLLING_FILE_WATCHER: "1"
       DOTNET_WATCH_RESTART_ON_RUDE_EDIT: "1"
       SGO__ConnectionStrings__Default: Host=postgres;Port=5432;Database=${POSTGRES_DB:-sgo};Username=${POSTGRES_USER:-sgo};Password=${POSTGRES_PASSWORD}
+      SGO__Jwt__Key: ${SGO__Jwt__Key:?Set SGO__Jwt__Key in deploy/.env (32+ bytes)}
+      SGO__Jwt__Issuer: ${SGO__Jwt__Issuer:-sgo}
+      SGO__Jwt__Audience: ${SGO__Jwt__Audience:-sgo}
       SGO__Seed__AdminEmail: ${SGO__Seed__AdminEmail:-}
       SGO__Seed__AdminPassword: ${SGO__Seed__AdminPassword:-}
     ports:

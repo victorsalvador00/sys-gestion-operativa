@@ -21,6 +21,19 @@ public sealed class NotFoundException(string entityName, object key)
 public sealed class ConcurrencyException()
     : DomainException("El registro fue modificado por otro usuario. Recarga e intenta de nuevo.");
 
+/// <summary>Login, refresh or session failure. Maps to 401.</summary>
+public sealed class AuthenticationFailedException(string code, string message) : DomainException(message)
+{
+    public string Code { get; } = code;
+}
+
+/// <summary>Input errors detected outside FluentValidation (e.g. password policy). Maps to 400.</summary>
+public sealed class RequestValidationException(IReadOnlyDictionary<string, string[]> errors)
+    : DomainException("La solicitud contiene datos inválidos.")
+{
+    public IReadOnlyDictionary<string, string[]> Errors { get; } = errors;
+}
+
 /// <summary>User lacks permission or location scope. Maps to 403.</summary>
 public sealed class ForbiddenException(string message = "No tienes permiso para realizar esta acción.")
     : DomainException(message);

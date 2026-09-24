@@ -18,7 +18,7 @@ public sealed class AuditInterceptor(IClock clock, ICurrentUser currentUser) : S
     /// <summary>Never written to the audit log.</summary>
     private static readonly HashSet<string> SensitiveProperties =
     [
-        "PasswordHash", "SecurityStamp", "ConcurrencyStamp", nameof(IVersioned.Version),
+        "PasswordHash", "SecurityStamp", "ConcurrencyStamp", "AccessFailedCount", nameof(IVersioned.Version),
         "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy",
     ];
 

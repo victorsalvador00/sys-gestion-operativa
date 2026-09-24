@@ -19,6 +19,7 @@ public interface ISgoDbContext
     DbSet<RolePermission> RolePermissions { get; }
     DbSet<UserLocation> UserLocations { get; }
     DbSet<AuditLog> AuditLogs { get; }
+    DbSet<RefreshToken> RefreshTokens { get; }
 
     DatabaseFacade Database { get; }
 

@@ -1,5 +1,6 @@
-using System.Security.Claims;
+using System.Globalization;
 using System.Text.Json.Serialization;
+using FluentValidation;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
@@ -9,7 +10,10 @@ using Serilog.Formatting.Compact;
 using Sgo.Api;
 using Sgo.Api.Auth;
 using Sgo.Api.Middleware;
+using Sgo.Api.OpenApi;
+using Sgo.Api.Validation;
 using Sgo.Application.Common;
+using Sgo.Application.Security;
 using Sgo.Infrastructure;
 using Sgo.Infrastructure.Health;
 using Sgo.Infrastructure.Persistence;
@@ -31,7 +35,11 @@ builder.Services.AddSerilog((services, logger) =>
 });
 
 builder.Services
-    .AddControllers(options => options.Conventions.Add(new ApiRoutePrefixConvention()))
+    .AddControllers(options =>
+    {
+        options.Conventions.Add(new ApiRoutePrefixConvention());
+        options.Filters.Add<ValidationFilter>();
+    })
     .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 builder.Services.AddProblemDetails(options =>
@@ -42,7 +50,10 @@ builder.Services.AddProblemDetails(options =>
     });
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
-builder.Services.AddOpenApi();
+ValidatorOptions.Global.LanguageManager.Culture = new CultureInfo("es");
+builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
+
+builder.Services.AddSgoOpenApi();
 
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
@@ -55,6 +66,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUser, HttpCurrentUser>();
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddSgoAuth(builder.Configuration);
 
 builder.Services.AddHealthChecks()
     .AddCheck("self", () => HealthCheckResult.Healthy(), tags: ["live"])
@@ -79,18 +91,23 @@ app.UseStatusCodePages();
 app.UseSerilogRequestLogging(options =>
     options.EnrichDiagnosticContext = (diagnostics, http) =>
     {
-        diagnostics.Set("UserId", http.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "anonymous");
+        diagnostics.Set("UserId", http.User.FindFirst("sub")?.Value ?? "anonymous");
         diagnostics.Set("TraceId", http.TraceIdentifier);
     });
 
+app.UseRateLimiter();
+app.UseAuthentication();
+app.UseMiddleware<UserAccessMiddleware>();
+app.UseAuthorization();
+
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
-    app.MapScalarApiReference();
+    app.MapOpenApi().AllowAnonymous();
+    app.MapScalarApiReference().AllowAnonymous();
 }
 
-app.MapHealthChecks("/health/live", new() { Predicate = check => check.Tags.Contains("live") });
-app.MapHealthChecks("/health/ready", new() { Predicate = check => check.Tags.Contains("ready") });
+app.MapHealthChecks("/health/live", new() { Predicate = check => check.Tags.Contains("live") }).AllowAnonymous();
+app.MapHealthChecks("/health/ready", new() { Predicate = check => check.Tags.Contains("ready") }).AllowAnonymous();
 
 app.MapControllers();
 

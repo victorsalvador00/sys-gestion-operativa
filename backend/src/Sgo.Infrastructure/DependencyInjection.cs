@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using Sgo.Application.Common;
+using Sgo.Application.Security;
 using Sgo.Infrastructure.Identity;
 using Sgo.Infrastructure.Persistence;
 using Sgo.Infrastructure.Persistence.Interceptors;
@@ -52,7 +53,20 @@ public static class DependencyInjection
                 options.Lockout.AllowedForNewUsers = true;
             })
             .AddRoles<AppRole>()
+            .AddErrorDescriber<SpanishIdentityErrorDescriber>()
             .AddEntityFrameworkStores<SgoDbContext>();
+
+        services.AddOptions<JwtOptions>()
+            .Bind(configuration.GetSection(JwtOptions.Section))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+        services.AddMemoryCache();
+        services.AddSingleton<UserAccessCacheSignal>();
+        services.AddScoped<IUserAccessService, UserAccessService>();
+        services.AddScoped<UserAccessContext>();
+        services.AddScoped<ILocationScope, LocationScope>();
+        services.AddScoped<TokenService>();
+        services.AddScoped<IAuthService, AuthService>();
 
         services.Configure<SeedOptions>(configuration.GetSection(SeedOptions.Section));
         services.Configure<DatabaseOptions>(configuration.GetSection(DatabaseOptions.Section));

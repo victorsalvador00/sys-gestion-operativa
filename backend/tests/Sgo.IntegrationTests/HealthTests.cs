@@ -26,9 +26,19 @@ public class HealthTests(SgoApiFactory factory)
     }
 
     [Fact]
-    public async Task Unknown_api_route_returns_problem_details()
+    public async Task Unknown_api_route_without_session_returns_401_to_avoid_route_discovery()
     {
         var response = await _client.GetAsync("/api/v1/does-not-exist");
+
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Unknown_api_route_returns_problem_details()
+    {
+        var client = await factory.CreateAuthenticatedClientAsync(SgoApiFactory.AdminEmail, SgoApiFactory.AdminPassword);
+
+        var response = await client.GetAsync("/api/v1/does-not-exist");
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
