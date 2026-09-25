@@ -1,24 +1,49 @@
+import { HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { provideRouter, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { App } from './app';
 import { routes } from './app.routes';
+import { provideHttpTesting, signIn } from './core/auth/testing';
 import { provideAppLocale } from './core/i18n/locale';
 
 describe('App', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [App],
-      providers: [provideRouter(routes), provideAppLocale()],
+      providers: [...provideHttpTesting(routes), provideAppLocale()],
     }).compileComponents();
   });
 
-  it('muestra el shell con la marca y el tablero', async () => {
-    const fixture = TestBed.createComponent(App);
-    await TestBed.inject(Router).navigateByUrl('/');
-    await fixture.whenStable();
+  afterEach(() => TestBed.inject(HttpTestingController).verify());
 
-    const el = fixture.nativeElement as HTMLElement;
+  async function open(url: string): Promise<HTMLElement> {
+    const fixture = TestBed.createComponent(App);
+    await TestBed.inject(Router).navigateByUrl(url);
+    await fixture.whenStable();
+    return fixture.nativeElement as HTMLElement;
+  }
+
+  it('sin sesión muestra el login', async () => {
+    const el = await open('/');
+    expect(TestBed.inject(Router).url).toBe('/login');
+    expect(el.querySelector('h1')?.textContent).toBe('SGO');
+    expect(el.querySelector('button[type=submit]')?.textContent).toContain('Iniciar sesión');
+  });
+
+  it('con sesión muestra el shell con el menú filtrado por permisos', async () => {
+    signIn({ permissions: ['inventory.view', 'logistics.view'] });
+
+    const el = await open('/');
+
     expect(el.querySelector('.brand-name')?.textContent).toBe('SGO');
-    expect(el.querySelector('h1')?.textContent).toContain('Tablero');
+    expect(el.querySelector('main h1')?.textContent).toContain('Tablero');
+    const menu = Array.from(el.querySelectorAll('nav a')).map((a) => a.textContent?.trim());
+    expect(menu).toEqual([
+      'dashboardTablero',
+      'inventory_2Existencias',
+      'receipt_longKardex',
+      'shopping_cartPedidos',
+      'local_shippingTraspasos',
+    ]);
   });
 });

@@ -1,11 +1,94 @@
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
+
 <mat-toolbar class="topbar" role="banner">
+  @if (isMobile()) {
+    <button mat-icon-button type="button" (click)="toggleMenu()" aria-label="Abrir menú">
+      <mat-icon>menu</mat-icon>
+    </button>
+  }
   <a class="brand" routerLink="/" aria-label="SGO, ir al tablero">
     <mat-icon aria-hidden="true">storefront</mat-icon>
     <span class="brand-name">SGO</span>
     <span class="brand-subtitle">Sistema de Gestión Operativa</span>
   </a>
+
+  <span class="sgo-spacer"></span>
+
+  @if (locationContext.showSelector()) {
+    <mat-form-field class="location-select" appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Ubicación</mat-label>
+      <mat-select
+        [value]="locationContext.activeLocationId()"
+        (valueChange)="locationContext.select($event)"
+      >
+        @for (location of locationContext.locations(); track location.id) {
+          <mat-option [value]="location.id">{{ location.code }} · {{ location.name }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  } @else if (locationContext.activeLocation(); as location) {
+    <span class="location-label">{{ location.name }}</span>
+  }
+
+  <button
+    mat-icon-button
+    type="button"
+    [matMenuTriggerFor]="userMenu"
+    [attr.aria-label]="'Menú de ' + (auth.user()?.fullName ?? 'usuario')"
+  >
+    <mat-icon>account_circle</mat-icon>
+  </button>
+  <mat-menu #userMenu="matMenu" xPosition="before">
+    <div class="user-info" role="presentation">
+      <strong>{{ auth.user()?.fullName }}</strong>
+      <span>{{ auth.user()?.email }}</span>
+    </div>
+    <mat-divider />
+    <a mat-menu-item routerLink="/perfil">
+      <mat-icon>key</mat-icon>
+      <span>Cambiar contraseña</span>
+    </a>
+    <button mat-menu-item type="button" (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      <span>Cerrar sesión</span>
+    </button>
+  </mat-menu>
 </mat-toolbar>
 
-<main class="content" id="contenido">
-  <router-outlet />
-</main>
+<mat-sidenav-container class="container">
+  <mat-sidenav
+    class="sidenav"
+    [mode]="isMobile() ? 'over' : 'side'"
+    [opened]="menuOpened()"
+    (closedStart)="closeMobileMenu()"
+  >
+    <nav aria-label="Menú principal">
+      @for (section of menu(); track section.label) {
+        <h2 class="section-label">{{ section.label }}</h2>
+        <mat-nav-list>
+          @for (item of section.items; track item.route) {
+            <a
+              mat-list-item
+              [routerLink]="item.route"
+              routerLinkActive
+              #rla="routerLinkActive"
+              [routerLinkActiveOptions]="{ exact: item.route === '/' }"
+              [activated]="rla.isActive"
+              [attr.aria-current]="rla.isActive ? 'page' : null"
+              (click)="closeMobileMenu()"
+            >
+              <mat-icon matListItemIcon aria-hidden="true">{{ item.icon }}</mat-icon>
+              <span matListItemTitle>{{ item.label }}</span>
+            </a>
+          }
+        </mat-nav-list>
+      }
+    </nav>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <main class="content" id="contenido" tabindex="-1">
+      <router-outlet />
+    </main>
+  </mat-sidenav-content>
+</mat-sidenav-container>

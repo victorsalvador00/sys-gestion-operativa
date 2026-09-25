@@ -67,7 +67,7 @@ frontend/
 - **Estado:** servicios `*.store.ts` con `signal`/`computed` por feature. No se usa NgRx. Para lecturas se puede usar `httpResource`/`resource` si es estable en la versión elegida; si no, `HttpClient` + signals.
 - Componentes `ChangeDetectionStrategy.OnPush`, con `input()`/`output()` basados en signals.
 - **Formularios:** Reactive Forms tipados. Las líneas de documentos usan `FormArray`.
-- **Tipos:** el script `npm run api:types` genera `core/api/schema.d.ts`. Los servicios `*.api.ts` usan esos tipos; no se duplican interfaces a mano.
+- **Tipos:** el script `npm run api:types` genera `core/api/schema.d.ts` desde `SGO_API_URL` (por defecto `http://localhost:8090`) y se versiona. Los servicios `*.api.ts` usan esos tipos; no se duplican interfaces a mano.
 - **Textos:** toda la interfaz está en español. Centralizar etiquetas de estados y enums en `shared/pipes/status-label.pipe.ts`.
 
 ## 4. UI y experiencia

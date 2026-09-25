@@ -32,7 +32,7 @@
 | Fase | Tarea | Estado | Commit |
 |---|---|---|---|
 | 1 | F-01 Proyecto Angular 22, Angular Material, es-MX, ESLint/Prettier, proxy, carpetas, Dockerfile | ✅ | (ver `git log`) |
-| 1 | F-02 api:types, interceptores, AuthService, login, guardas, `*hasPermission`, ubicación activa | ⏳ | |
+| 1 | F-02 api:types, interceptores, AuthService, login, guardas, `*hasPermission`, ubicación activa | ✅ | (ver `git log`) |
 | 1 | F-03 Layout y componentes compartidos | ⏳ | |
 | 1 | F-04 Administración | ⏳ | |
 | 1 | F-05 Catálogos | ⏳ | |
@@ -122,6 +122,19 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
 - `frontend/Dockerfile` (node:24-alpine → caddy:2-alpine con `/srv`) probado; el compose de producción **no se cambió**
   (sigue montando `frontend/dist/sgo/browser`). Decidir al contratar DigitalOcean si `web` se construye del Dockerfile.
 
+**Frontend (F-02):**
+- **Backend `fix(api)`:** MVC y el serializador de OpenAPI (`ConfigureHttpJsonOptions`) comparten opciones JSON:
+  números estrictos (antes 215 campos salían `number | string`) y enums como texto (antes el OpenAPI los documentaba como
+  enteros aunque la API manda texto). La API ya no acepta números entre comillas (400). Prueba `JsonOptionsTests`.
+- `openapi-typescript` 7.13 declara peer `typescript@^5`; se usa `overrides` en package.json para TS 6 (genera bien).
+  `schema.d.ts` se versiona. .NET 10 agrega `null` a la unión de cada enum: usar `ApiEnum<'X'>` (quita el null).
+- Menú y rutas de todas las secciones con su permiso real; las que no existen muestran "Esta sección estará disponible
+  pronto" (`placeholderRoute`). Cada F-xx reemplaza su placeholder.
+- `/perfil` (cambiar contraseña) incluido. Tras cambiarla el backend cierra las sesiones → login con aviso.
+- La traducción del paginador (`SpanishPaginatorIntl`) **no** se provee global (sumaba ~150 kB al arranque): la debe
+  proveer `app-data-table` en F-03. Shell y login se cargan en diferido; carga inicial ≈ 121 kB comprimidos.
+- 409 (`concurrency`, `insufficient_stock`): el interceptor los reenvía; los diálogos se hacen en F-03.
+
 ## Pendientes y notas técnicas
 
 - Dos recepciones simultáneas de **OC distintas** que crean el mismo lote nuevo del mismo artículo → una falla por el
@@ -135,6 +148,8 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
 - **Frontend:** la fuente de Material Symbols pesa ~4 MB (se descarga una vez y queda en caché). Si pesa en celulares
   de sucursal, en F-16 generar un subconjunto con solo los íconos usados.
 - **Frontend:** el datepicker (formato dd/MM/yyyy) necesita un `DateAdapter` es-MX; se resuelve en F-03.
+- **Backend:** los errores de *model binding* (JSON mal formado o tipo incorrecto) salen con mensajes técnicos en inglés
+  (`"The request field is required."`). Solo ocurren con peticiones mal armadas, no con el frontend; traducir si molesta.
 
 ## Cómo retomar
 

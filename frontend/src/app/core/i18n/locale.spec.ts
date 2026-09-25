@@ -1,7 +1,7 @@
 import { CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';
 import { TestBed } from '@angular/core/testing';
-import { MatPaginatorIntl } from '@angular/material/paginator';
 import { provideAppLocale } from './locale';
+import { SpanishPaginatorIntl } from './spanish-paginator-intl';
 
 describe('provideAppLocale', () => {
   beforeEach(() => {
@@ -24,7 +24,7 @@ describe('provideAppLocale', () => {
   });
 
   it('traduce el paginador al español', () => {
-    const intl = TestBed.inject(MatPaginatorIntl);
+    const intl = new SpanishPaginatorIntl();
     expect(intl.itemsPerPageLabel).toBe('Registros por página');
     expect(intl.getRangeLabel(1, 20, 45)).toBe('21 – 40 de 45');
     expect(intl.getRangeLabel(0, 20, 0)).toBe('0 de 0');
