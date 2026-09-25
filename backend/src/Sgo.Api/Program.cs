@@ -39,6 +39,7 @@ builder.Services
     .AddControllers(options =>
     {
         options.Conventions.Add(new ApiRoutePrefixConvention());
+        options.Conventions.Add(new DefaultSuccessResponseConvention());
         options.Filters.Add<ValidationFilter>();
     })
     .AddJsonOptions(options => ConfigureJson(options.JsonSerializerOptions));
