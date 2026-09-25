@@ -296,4 +296,4 @@ El código (clases, tablas, endpoints) va en **inglés**; la interfaz de usuario
 3. **Umbral de aprobación de OC.** ✅ Resuelto (B-14): configurable en `AppSetting` (`purchasing.po_approval_threshold`), comparado contra el subtotal sin IVA. Default `0` (toda OC requiere aprobación) hasta que se configure en `/settings`.
 4. **Traspasos entre sucursales y entre fábrica y comisariato.** ✅ Resuelto: permitidos con el permiso `logistics.transfers.special` (también devoluciones a fábrica/comisariato).
 5. **Control por lote.** ✅ Resuelto: por artículo (`TracksLots`); si está activo, toda entrada exige lote.
-6. **Días de anticipación** para la alerta de caducidad. ⏳ Sin confirmar: se usa el default de RN-07 (3 días), editable en `AppSetting`.
+6. **Días de anticipación** para la alerta de caducidad. ✅ Resuelto (B-16): default 3 días (RN-07), editable por el administrador en `/settings`.

@@ -21,11 +21,11 @@
 | 3 | B-12 Proveedores y artículos de proveedor | ✅ | `3671b24` |
 | 3 | B-13 Requisiciones y conversión a OC | ✅ | `150b46d` |
 | 3 | B-14 Órdenes de compra, aprobación por umbral, recepción parcial, cierre | ✅ | `dad493a` |
-| 3 | B-15 Pedidos de sucursal, sugerido mín/máx, aprobación → traspasos, RN-24 | ✅ | (ver `git log`) |
-| 3 | B-16 Tablero y `/settings` | ⏭️ siguiente | |
-| 3 | B-17 Endurecimiento (índices, EXPLAIN, bundle de migraciones, compose prod) | pendiente | |
+| 3 | B-15 Pedidos de sucursal, sugerido mín/máx, aprobación → traspasos, RN-24 | ✅ | `fa25631` |
+| 3 | B-16 Tablero y `/settings` | ✅ | (ver `git log`) |
+| 3 | B-17 Endurecimiento (índices, EXPLAIN, bundle de migraciones, compose prod) | ⏭️ siguiente | |
 
-Pruebas al cierre de B-15: **446 en verde** (311 unitarias, 135 de integración), sin warnings.
+Pruebas al cierre de B-16: **459 en verde** (322 unitarias, 137 de integración), sin warnings.
 Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`, `AddCatalog`, `AddInventory`,
 `AddAdjustments`, `AddCountsAndConsumptions`, `AddTransfers`, `AddRecipes`, `AddProductionOrders`, `AddSuppliers`, `AddRequisitionsAndPurchaseOrders`, `AddGoodsReceipts`, `AddBranchOrders`.
 
@@ -38,7 +38,7 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
 - ✅ Lotes: por artículo (`TracksLots`).
 - ✅ Umbral de OC: **configurable** en `AppSetting` (`purchasing.po_approval_threshold`), comparado contra el
   **subtotal sin IVA**; default `0` (toda OC requiere aprobación) hasta configurarlo en `/settings` (B-16).
-- ⏳ Días de alerta de caducidad: sin confirmar; default 3 (editable).
+- ✅ Días de alerta de caducidad: default 3, editable en `/settings` (B-16).
 
 **Decisiones de implementación aprobadas:**
 - Identity (usuarios/roles) se creó en B-02; los roles de sistema se identifican por `system_key` (se pueden renombrar).
@@ -84,6 +84,12 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
   **despachado** (faltante en tránsito queda en el traspaso) → `Fulfilled`; si se mandó menos → `PartiallyFulfilled`
   (final). Sugerido: proyectado = existencia + en tránsito + pedidos enviados/aprobados sin despachar; si ≤ mín →
   máx − proyectado. Visibilidad: sucursal u origen en alcance; aprobar/rechazar exige alcance sobre el origen.
+- `/settings` (B-16): lista tipada (clave, etiqueta, tipo, límites, decimales, versión) de los 3 parámetros; PUT
+  parcial con versión por parámetro (409). Límites: umbral OC 0–99,999,999 (2 dec.), tolerancia 0–100 % (2 dec.),
+  días de caducidad 0–365 enteros. Sin migración.
+- `/dashboard` (B-16): solo autenticado (spec); cada bloque es `null` sin su permiso (`inventory.view`,
+  `logistics.view`, `logistics.orders.approve`, `logistics.orders.create`, `purchasing.po.approve`, `production.view`);
+  gráfica de bajo mínimo por ubicación solo con `locations.all`. Sin `locationId` suma todas las ubicaciones del alcance.
 
 ## Pendientes y notas técnicas
 

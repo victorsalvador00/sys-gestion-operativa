@@ -183,6 +183,10 @@ public static class OpenApiSetup
                                           { "lineId": "0199a1b2-0000-7000-8000-0000000000e2", "approvedQty": 0 } ] }
             """,
         [typeof(RejectBranchOrderRequest)] = """{ "version": 1234, "reason": "Sin existencia hasta el lunes" }""",
+        [typeof(UpdateSettingsRequest)] = """
+            { "settings": [ { "key": "purchasing.po_approval_threshold", "value": 15000, "version": 1234 },
+                            { "key": "inventory.expiration_alert_days", "value": 5, "version": 1235 } ] }
+            """,
         [typeof(UpdateLocationRequest)] = """{ "version": 1234, "name": "Sucursal Centro", "address": "Av. Juárez 100, Col. Centro", "isActive": true }""",
     };
 

@@ -44,3 +44,35 @@ public static class AppSettingKeys
         new(ExpirationAlertDays, "3", "Días de anticipación para la alerta de lotes por caducar"),
     ];
 }
+
+public enum SettingKind
+{
+    Decimal,
+    Integer,
+}
+
+/// <summary>Type and limits of an editable setting, shared by validation and the settings screen.</summary>
+public sealed record SettingDefinition(string Key, string Label, SettingKind Kind, decimal Min, decimal Max, int Decimals)
+{
+    /// <summary>Spanish message when <paramref name="value"/> is not acceptable; null when it is.</summary>
+    public string? Validate(decimal value)
+    {
+        if (value < Min || value > Max)
+            return $"{Label}: el valor debe estar entre {Min:0.##} y {Max:0.##}.";
+        if (decimal.Round(value, Decimals) != value)
+            return Kind == SettingKind.Integer ? $"{Label}: debe ser un número entero." : $"{Label}: admite máximo {Decimals} decimales.";
+        return null;
+    }
+}
+
+public static class SettingDefinitions
+{
+    public static readonly IReadOnlyList<SettingDefinition> All =
+    [
+        new(AppSettingKeys.PoApprovalThreshold, "Umbral de aprobación de OC", SettingKind.Decimal, 0, 99_999_999, 2),
+        new(AppSettingKeys.ReceiptTolerancePct, "Tolerancia de recepción (%)", SettingKind.Decimal, 0, 100, 2),
+        new(AppSettingKeys.ExpirationAlertDays, "Días de alerta de caducidad", SettingKind.Integer, 0, 365, 0),
+    ];
+
+    public static SettingDefinition? Find(string key) => All.FirstOrDefault(d => d.Key == key);
+}

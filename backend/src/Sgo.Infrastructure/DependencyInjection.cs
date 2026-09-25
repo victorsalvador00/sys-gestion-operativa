@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using Sgo.Application.Catalog;
 using Sgo.Application.Common;
+using Sgo.Application.Dashboard;
 using Sgo.Application.Inventory;
 using Sgo.Application.Logistics;
 using Sgo.Application.Organization;
@@ -102,6 +103,8 @@ public static class DependencyInjection
         services.AddScoped<IRequisitionService, RequisitionService>();
         services.AddScoped<IPurchaseOrderService, PurchaseOrderService>();
         services.AddScoped<IGoodsReceiptService, GoodsReceiptService>();
+        services.AddScoped<ISettingsService, SettingsService>();
+        services.AddScoped<IDashboardService, DashboardService>();
 
         services.Configure<SeedOptions>(configuration.GetSection(SeedOptions.Section));
         services.Configure<DatabaseOptions>(configuration.GetSection(DatabaseOptions.Section));
