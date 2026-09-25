@@ -13,7 +13,8 @@ public enum RefreshTokenRevocation
 
 /// <summary>
 /// Opaque refresh token (backend spec §7). Only its SHA-256 hash is stored. Every use rotates it
-/// within the same family; reusing an already rotated token revokes the whole family.
+/// within the same family; reusing an already rotated token revokes the whole family, except within a short
+/// grace period after the rotation (concurrent refreshes from the same browser).
 /// </summary>
 public class RefreshToken : Entity
 {
@@ -41,8 +42,14 @@ public class RefreshToken : Entity
 
     public bool IsActive(DateTimeOffset now) => RevokedAt is null && now < ExpiresAt;
 
-    /// <summary>A token that was rotated and is presented again signals theft.</summary>
+    /// <summary>A token that was rotated and is presented again signals theft (outside the grace period).</summary>
     public bool WasRotated => RevokedReason == RefreshTokenRevocation.Rotated;
+
+    /// <summary>
+    /// Rotated less than <paramref name="grace"/> ago: presenting it again is most likely a benign race (two tabs
+    /// or two reloads sending the same cookie before the browser stored the new one), not theft.
+    /// </summary>
+    public bool RotatedWithin(DateTimeOffset now, TimeSpan grace) => WasRotated && RevokedAt >= now - grace;
 
     /// <summary>Creates the successor in the same family and revokes this one.</summary>
     public RefreshToken Rotate(string newTokenHash, DateTimeOffset now, DateTimeOffset expiresAt, string? ip)

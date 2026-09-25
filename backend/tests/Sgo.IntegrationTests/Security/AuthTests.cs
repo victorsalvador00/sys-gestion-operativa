@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Sgo.Api.Auth;
 using Sgo.Application.Security;
 using Sgo.Domain.Security;
+using Sgo.Infrastructure.Identity;
 using Sgo.IntegrationTests.Support;
 
 namespace Sgo.IntegrationTests.Security;
@@ -121,7 +122,7 @@ public class AuthTests(SgoApiFactory factory)
     }
 
     [Fact]
-    public async Task Refresh_rotates_the_token_and_reuse_revokes_the_whole_family()
+    public async Task Refresh_rotates_the_token_and_reuse_after_the_grace_period_revokes_the_whole_family()
     {
         var client = factory.CreateApiClient();
         var login = await client.PostAsJsonAsync(Login, new LoginRequest(SgoApiFactory.AdminEmail, SgoApiFactory.AdminPassword));
@@ -134,7 +135,9 @@ public class AuthTests(SgoApiFactory factory)
         Assert.NotNull(second);
         Assert.NotEqual(first, second);
 
-        // The rotated token is presented again: treated as stolen.
+        await RotatedAgoAsync(first!, AuthService.ReuseGracePeriod + TimeSpan.FromSeconds(1));
+
+        // The rotated token is presented again long after the rotation: treated as stolen.
         var reused = await client.PostWithRefreshCookieAsync(Refresh, first);
         Assert.Equal(HttpStatusCode.Unauthorized, reused.StatusCode);
         Assert.Equal("session_expired", await reused.ProblemCodeAsync());
@@ -142,6 +145,67 @@ public class AuthTests(SgoApiFactory factory)
         // ...so the legitimate successor is revoked as well.
         var afterReuse = await client.PostWithRefreshCookieAsync(Refresh, second);
         Assert.Equal(HttpStatusCode.Unauthorized, afterReuse.StatusCode);
+    }
+
+    [Fact]
+    public async Task Reuse_within_the_grace_period_keeps_the_session_alive()
+    {
+        var client = factory.CreateApiClient();
+        var login = await client.PostAsJsonAsync(Login, new LoginRequest(SgoApiFactory.AdminEmail, SgoApiFactory.AdminPassword));
+        var first = login.RefreshCookieValue();
+        var second = (await client.PostWithRefreshCookieAsync(Refresh, first)).RefreshCookieValue();
+
+        // Two tabs / a double reload sent the old cookie again right after the rotation.
+        var again = await client.PostWithRefreshCookieAsync(Refresh, first);
+        Assert.Equal(HttpStatusCode.OK, again.StatusCode);
+        var sibling = again.RefreshCookieValue();
+        Assert.NotNull(sibling);
+        Assert.NotEqual(second, sibling);
+
+        // Neither the successor nor the new sibling was revoked.
+        Assert.Equal(HttpStatusCode.OK, (await client.PostWithRefreshCookieAsync(Refresh, second)).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await client.PostWithRefreshCookieAsync(Refresh, sibling)).StatusCode);
+    }
+
+    [Fact]
+    public async Task Concurrent_refreshes_with_the_same_cookie_both_succeed()
+    {
+        var client = factory.CreateApiClient();
+        var login = await client.PostAsJsonAsync(Login, new LoginRequest(SgoApiFactory.AdminEmail, SgoApiFactory.AdminPassword));
+        var cookie = login.RefreshCookieValue();
+
+        var responses = await Task.WhenAll(Enumerable.Range(0, 3).Select(_ => client.PostWithRefreshCookieAsync(Refresh, cookie)));
+
+        Assert.All(responses, r => Assert.Equal(HttpStatusCode.OK, r.StatusCode));
+    }
+
+    [Fact]
+    public async Task Reuse_within_the_grace_period_after_logout_is_rejected()
+    {
+        var client = factory.CreateApiClient();
+        var login = await client.PostAsJsonAsync(Login, new LoginRequest(SgoApiFactory.AdminEmail, SgoApiFactory.AdminPassword));
+        var first = login.RefreshCookieValue();
+        var refreshed = await client.PostWithRefreshCookieAsync(Refresh, first);
+        var accessToken = (await refreshed.Content.ReadFromJsonAsync<TokenResponse>())!.AccessToken;
+
+        using var logout = new HttpRequestMessage(HttpMethod.Post, Logout);
+        logout.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+        logout.Headers.Add("Cookie", $"{RefreshTokenCookie.Name}={refreshed.RefreshCookieValue()}");
+        Assert.Equal(HttpStatusCode.NoContent, (await client.SendAsync(logout)).StatusCode);
+
+        // The session was closed on purpose: the grace period does not bring it back.
+        var reused = await client.PostWithRefreshCookieAsync(Refresh, first);
+        Assert.Equal(HttpStatusCode.Unauthorized, reused.StatusCode);
+    }
+
+    /// <summary>Moves the rotation of <paramref name="refreshToken"/> into the past (no controllable clock here).</summary>
+    private async Task RotatedAgoAsync(string refreshToken, TimeSpan ago)
+    {
+        await using var scope = factory.CreateScope();
+        var hash = TokenService.Hash(refreshToken);
+        await SgoApiFactory.Db(scope).RefreshTokens
+            .Where(t => t.TokenHash == hash)
+            .ExecuteUpdateAsync(set => set.SetProperty(t => t.RevokedAt, t => t.RevokedAt - ago));
     }
 
     [Fact]

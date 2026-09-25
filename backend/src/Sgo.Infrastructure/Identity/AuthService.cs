@@ -21,6 +21,9 @@ public sealed class AuthService(
     public const string InactiveMessage = "El usuario está inactivo. Contacta al administrador.";
     public const string SessionExpiredMessage = "Tu sesión expiró. Inicia sesión de nuevo.";
 
+    /// <summary>How long a just-rotated refresh token is still accepted (concurrent refreshes, not theft).</summary>
+    public static readonly TimeSpan ReuseGracePeriod = TimeSpan.FromSeconds(30);
+
     private static AuthenticationFailedException InvalidCredentials() => new("invalid_credentials", InvalidCredentialsMessage);
     private static AuthenticationFailedException Locked() => new("account_locked", LockedMessage);
     private static AuthenticationFailedException SessionExpired() => new("session_expired", SessionExpiredMessage);
@@ -56,28 +59,19 @@ public sealed class AuthService(
             throw SessionExpired();
 
         var now = clock.UtcNow;
-        var stored = await db.RefreshTokens.SingleOrDefaultAsync(t => t.TokenHash == TokenService.Hash(refreshToken), ct)
+        var hash = TokenService.Hash(refreshToken);
+        var stored = await db.RefreshTokens.SingleOrDefaultAsync(t => t.TokenHash == hash, ct)
                      ?? throw SessionExpired();
 
         if (stored.WasRotated)
-        {
-            // A rotated token came back: assume it was stolen and kill the whole session family.
-            await RevokeFamilyAsync(stored.FamilyId, RefreshTokenRevocation.ReuseDetected, ct);
-            throw SessionExpired();
-        }
+            return await RefreshRotatedAsync(stored, now, ct);
 
         if (!stored.IsActive(now))
             throw SessionExpired();
 
-        var user = await userManager.FindByIdAsync(stored.UserId.ToString());
-        if (user is null || !user.IsActive || await userManager.IsLockedOutAsync(user))
-        {
-            await RevokeFamilyAsync(stored.FamilyId, RefreshTokenRevocation.UserUnavailable, ct);
-            throw SessionExpired();
-        }
-
-        var (newToken, hash, expiresAt) = tokens.CreateRefreshToken();
-        db.RefreshTokens.Add(stored.Rotate(hash, now, expiresAt, currentUser.IpAddress));
+        var user = await ActiveUserAsync(stored, ct);
+        var (newToken, newHash, expiresAt) = tokens.CreateRefreshToken();
+        db.RefreshTokens.Add(stored.Rotate(newHash, now, expiresAt, currentUser.IpAddress));
 
         try
         {
@@ -85,11 +79,48 @@ public sealed class AuthService(
         }
         catch (DbUpdateConcurrencyException)
         {
-            // Another request rotated the same token first.
-            throw SessionExpired();
+            // Another request rotated the same token first (same race as a reuse within the grace period).
+            db.ChangeTracker.Clear();
+            var rotated = await db.RefreshTokens.SingleOrDefaultAsync(t => t.TokenHash == hash, ct) ?? throw SessionExpired();
+            return await RefreshRotatedAsync(rotated, now, ct);
         }
 
         return new AuthResult(tokens.CreateAccessToken(user), newToken, expiresAt);
+    }
+
+    /// <summary>
+    /// A rotated token came back. Within <see cref="ReuseGracePeriod"/> and while the session is still alive it is a
+    /// benign race (two tabs, double reload): issue a sibling token in the same family. Otherwise assume it was
+    /// stolen and kill the whole family.
+    /// </summary>
+    private async Task<AuthResult> RefreshRotatedAsync(RefreshToken stored, DateTimeOffset now, CancellationToken ct)
+    {
+        var familyAlive = await db.RefreshTokens.AnyAsync(
+            t => t.FamilyId == stored.FamilyId && t.RevokedAt == null && t.ExpiresAt > now, ct);
+
+        if (!stored.RotatedWithin(now, ReuseGracePeriod) || !familyAlive)
+        {
+            await RevokeFamilyAsync(stored.FamilyId, RefreshTokenRevocation.ReuseDetected, ct);
+            throw SessionExpired();
+        }
+
+        var user = await ActiveUserAsync(stored, ct);
+        var (newToken, newHash, expiresAt) = tokens.CreateRefreshToken();
+        db.RefreshTokens.Add(new RefreshToken(stored.UserId, newHash, stored.FamilyId, now, expiresAt, currentUser.IpAddress));
+        await db.SaveChangesAsync(ct);
+
+        return new AuthResult(tokens.CreateAccessToken(user), newToken, expiresAt);
+    }
+
+    private async Task<AppUser> ActiveUserAsync(RefreshToken stored, CancellationToken ct)
+    {
+        var user = await userManager.FindByIdAsync(stored.UserId.ToString());
+        if (user is null || !user.IsActive || await userManager.IsLockedOutAsync(user))
+        {
+            await RevokeFamilyAsync(stored.FamilyId, RefreshTokenRevocation.UserUnavailable, ct);
+            throw SessionExpired();
+        }
+        return user;
     }
 
     public async Task LogoutAsync(string? refreshToken, CancellationToken ct = default)

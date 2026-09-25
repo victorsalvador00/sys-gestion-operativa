@@ -53,4 +53,25 @@ public class RefreshTokenTests
         Assert.Equal(RefreshTokenRevocation.Rotated, token.RevokedReason);
         Assert.Equal(Now, token.RevokedAt);
     }
+
+    [Fact]
+    public void Rotated_within_the_grace_period_only_right_after_the_rotation()
+    {
+        var token = NewToken();
+        token.Rotate("hash-2", Now, Now.AddDays(7), null);
+        var grace = TimeSpan.FromSeconds(30);
+
+        Assert.True(token.RotatedWithin(Now.AddSeconds(29), grace));
+        Assert.True(token.RotatedWithin(Now.AddSeconds(30), grace));
+        Assert.False(token.RotatedWithin(Now.AddSeconds(31), grace));
+    }
+
+    [Fact]
+    public void Token_revoked_for_another_reason_is_never_within_the_grace_period()
+    {
+        var token = NewToken();
+        token.Revoke(Now, RefreshTokenRevocation.Logout);
+
+        Assert.False(token.RotatedWithin(Now, TimeSpan.FromSeconds(30)));
+    }
 }

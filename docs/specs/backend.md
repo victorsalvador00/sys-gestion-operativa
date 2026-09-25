@@ -263,7 +263,7 @@ Todos requieren autenticación excepto los de `auth`. Entre corchetes, el permis
 - **Autenticación:**
   - ASP.NET Core Identity para usuarios y contraseñas. Política: mínimo 10 caracteres, con mayúscula, minúscula y número. Bloqueo según RN-42.
   - **Access token JWT** de 15 minutos (HS256; clave desde variable de entorno de al menos 32 bytes).
-  - **Refresh token** opaco de 7 días. Se guarda hasheado en `security.refresh_token`, se entrega en cookie `HttpOnly; Secure; SameSite=Strict; Path=/api/v1/auth` y **rota en cada uso**. Si se detecta reutilización de un token ya rotado, se revoca toda la familia.
+  - **Refresh token** opaco de 7 días. Se guarda hasheado en `security.refresh_token`, se entrega en cookie `HttpOnly; Secure; SameSite=Strict; Path=/api/v1/auth` y **rota en cada uso**. Si se detecta reutilización de un token ya rotado, se revoca toda la familia, salvo dentro de una **ventana de gracia de 30 s** tras la rotación mientras la sesión siga viva (renovaciones simultáneas del mismo navegador: dos pestañas, doble recarga): ahí se emite un token hermano de la misma familia.
 - **Autorización por permiso:**
   - Atributo `[RequirePermission("purchasing.po.approve")]`, implementado con un `IAuthorizationPolicyProvider` dinámico.
   - Los permisos efectivos del usuario se resuelven por request desde `IMemoryCache` (TTL 5 min; se invalidan al editar roles o usuarios). No se meten todos los permisos al JWT.

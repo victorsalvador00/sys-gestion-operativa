@@ -4,6 +4,9 @@ import { Router } from '@angular/router';
 import { finalize, firstValueFrom, map, Observable, shareReplay, switchMap, tap } from 'rxjs';
 import type { ChangePasswordRequest, LoginRequest, MeDto, TokenResponse } from '../api/api-types';
 import { SKIP_ERROR_TOAST } from '../http/error.interceptor';
+import { withLock } from './with-lock';
+
+const REFRESH_LOCK = 'sgo-auth-refresh';
 
 /**
  * Sesión del usuario (spec frontend §5). El access token vive solo en memoria; el refresh token
@@ -39,14 +42,15 @@ export class AuthService {
    * una sola petición: el backend rota el refresh token en cada uso.
    */
   refreshAccessToken(): Observable<string> {
-    this.refreshInFlight ??= this.http
-      .post<TokenResponse>('/auth/refresh', null, { context: silent() })
-      .pipe(
-        map((response) => response.accessToken),
-        tap((accessToken) => this.token.set(accessToken)),
-        finalize(() => (this.refreshInFlight = null)),
-        shareReplay({ bufferSize: 1, refCount: false }),
-      );
+    // Dentro de la pestaña se comparte la petición; entre pestañas se turnan con un candado.
+    this.refreshInFlight ??= withLock(REFRESH_LOCK, () =>
+      this.http.post<TokenResponse>('/auth/refresh', null, { context: silent() }),
+    ).pipe(
+      map((response) => response.accessToken),
+      tap((accessToken) => this.token.set(accessToken)),
+      finalize(() => (this.refreshInFlight = null)),
+      shareReplay({ bufferSize: 1, refCount: false }),
+    );
     return this.refreshInFlight;
   }
 
