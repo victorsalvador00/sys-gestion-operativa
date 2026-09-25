@@ -231,7 +231,7 @@ Para la gerencia (`locations.all`), se agrega una gráfica de barras de artícul
 | `app-lines-editor` | Tabla editable de líneas de documento (agregar, quitar, validar, totales). En móvil se muestra como tarjetas |
 | `app-confirm-summary` | Diálogo de confirmación con el resumen de lo que se va a registrar |
 | `app-shortages-dialog` | Muestra los faltantes de un 409 `insufficient_stock` |
-| `app-audit-panel` | Historial de cambios de un documento (usa `/audit-log?entityId=`) |
+| `app-audit-panel` | Historial de cambios de un documento (usa `/audit-log?entityId=`). Se implementa en F-04 |
 
 ## 9. Pruebas
 
@@ -286,8 +286,8 @@ Cada tarea debe dejar `npm run lint` y `npm test` en verde. Hacer una tarea por 
 |---|---|---|
 | F-01 | Proyecto Angular, Angular Material + tema, locale `es-MX`, ESLint/Prettier, proxy, estructura de carpetas, Dockerfile | `npm start` muestra el shell vacío con el tema aplicado |
 | F-02 | `api:types`, interceptores (base, auth, error), `AuthService`, login, refresh al iniciar, guardas, `*hasPermission`, `LocationContextService` | Login funcional; el menú se filtra por permisos; tras un refresh (F5) la sesión se conserva |
-| F-03 | Layout (sidebar, topbar, drawer móvil) y componentes compartidos: `page-header`, `data-table`, `status-tag`, `item-picker`, `location-picker`, `qty-input`, `lines-editor`, `confirm-summary`, `shortages-dialog` | Página de demostración interna con todos los componentes |
-| F-04 | Administración: usuarios, roles (matriz de permisos), bitácora, configuración | Admin crea un usuario de sucursal que entra y solo ve su menú |
+| F-03 | Layout (sidebar, topbar, drawer móvil) y componentes compartidos: `page-header`, `data-table`, `status-tag`, `item-picker`, `location-picker`, `qty-input`, `lines-editor`, `confirm-summary`, `shortages-dialog` | Página de demostración interna con todos los componentes (`/demo/componentes`, permiso `settings.manage`) |
+| F-04 | Administración: usuarios, roles (matriz de permisos), bitácora, configuración, `app-audit-panel` | Admin crea un usuario de sucursal que entra y solo ve su menú |
 | F-05 | Catálogos: ubicaciones, categorías, unidades, artículos con mín/máx e importación CSV | Importación con errores muestra la tabla de errores por fila |
 | F-06 | Inventario: existencias con lotes, kardex, ajustes, existencias iniciales | Ajuste sin existencia muestra `shortages-dialog` |
 | F-07 | Conteo físico y consumo (móvil) | Flujo completo en viewport de 390 px sin scroll horizontal |

@@ -9,3 +9,8 @@ html {
     )
   );
 }
+
+// Menú lateral: barra de scroll delgada (el menú colapsado mide 72 px).
+.mat-drawer-inner-container {
+  scrollbar-width: thin;
+}

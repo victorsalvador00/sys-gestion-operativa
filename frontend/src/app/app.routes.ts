@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authGuard, guestGuard } from './core/auth/auth.guards';
+import { authGuard, guestGuard, permissionGuard } from './core/auth/auth.guards';
 
 export const routes: Routes = [
   {
@@ -55,6 +55,15 @@ export const routes: Routes = [
         path: 'catalogos',
         loadChildren: () =>
           import('./features/catalog/catalog.routes').then((m) => m.CATALOG_ROUTES),
+      },
+      {
+        // Catálogo interno de componentes compartidos (F-03); solo administradores.
+        path: 'demo/componentes',
+        title: 'Componentes',
+        canActivate: [permissionGuard],
+        data: { permission: 'settings.manage' },
+        loadComponent: () =>
+          import('./features/demo/pages/components-demo-page').then((m) => m.ComponentsDemoPage),
       },
       {
         path: 'admin',

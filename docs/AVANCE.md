@@ -27,13 +27,13 @@
 
 **Backend completo (B-01..B-17).**
 
-### Frontend (`docs/specs/frontend.md` §11) — rama `feature/frontend-fase1`
+### Frontend (`docs/specs/frontend.md` §11) — desde F-03 se trabaja directo en `main`
 
 | Fase | Tarea | Estado | Commit |
 |---|---|---|---|
 | 1 | F-01 Proyecto Angular 22, Angular Material, es-MX, ESLint/Prettier, proxy, carpetas, Dockerfile | ✅ | (ver `git log`) |
 | 1 | F-02 api:types, interceptores, AuthService, login, guardas, `*hasPermission`, ubicación activa | ✅ | (ver `git log`) |
-| 1 | F-03 Layout y componentes compartidos | ⏳ | |
+| 1 | F-03 Layout y componentes compartidos | ✅ | (ver `git log`) |
 | 1 | F-04 Administración | ⏳ | |
 | 1 | F-05 Catálogos | ⏳ | |
 | 1 | F-06 Inventario | ⏳ | |
@@ -134,6 +134,25 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
 - La traducción del paginador (`SpanishPaginatorIntl`) **no** se provee global (sumaba ~150 kB al arranque): la debe
   proveer `app-data-table` en F-03. Shell y login se cargan en diferido; carga inicial ≈ 121 kB comprimidos.
 - 409 (`concurrency`, `insufficient_stock`): el interceptor los reenvía; los diálogos se hacen en F-03.
+
+**Frontend (F-03):**
+- **Backend `fix(api)`:** `DefaultSuccessResponseConvention` documenta el `200` con el tipo real en toda acción sin
+  respuesta exitosa declarada (el 401/403 a nivel de clase impedía que .NET lo infiriera): 88 operaciones pasaron a
+  tener tipo de respuesta; solo quedan 3 con `204` (correcto). Prueba `OpenApiResponseTests`.
+- Componentes en `shared/components`: `page-header` (migas automáticas por `BreadcrumbsService`), `data-table`
+  (servidor: `ListQuery` → `toHttpParams`; plantillas `appCell`/`appCardDef`; provee el paginador en español),
+  `status-tag`, `item-picker` (valor = `ItemListItemDto`), `location-picker` (valor = id), `qty-input`,
+  `lines-editor` (`appLineColumn` + `[appLineColumnOf]` para tipar la línea; validadores `minLinesValidator`,
+  `uniqueLinesValidator`), `confirm-summary` (`ConfirmService`), `shortages-dialog` y `concurrency-dialog`
+  (`ConflictHandler.handle(error)`). Pipes `qty`, `mxn`, `statusLabel` (etiquetas de todos los enums, tipadas contra el
+  OpenAPI: un enum nuevo rompe la compilación).
+- Controles propios (CVA) muestran el error del control del padre con `outerControlErrorState` (MatInput/MatSelect no
+  recalculan su error sin `NgControl` propio).
+- Fechas `dd/MM/yyyy`: `EsMxDateAdapter` provisto en el shell (`provideAppDates`).
+- Menú lateral colapsable (se recuerda en localStorage). Demo en `/demo/componentes` (menú Administración, permiso
+  `settings.manage`, visible también en producción).
+- `MatSnackBar` se carga al mostrar el primer aviso: carga inicial ≈ 98 kB comprimidos.
+- `app-audit-panel` pasa a F-04 (junto con la bitácora).
 
 ## Pendientes y notas técnicas
 

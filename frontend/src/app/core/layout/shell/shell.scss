@@ -1,3 +1,5 @@
+@use '@angular/material' as mat;
+
 :host {
   display: flex;
   flex-direction: column;
@@ -53,6 +55,8 @@
 
 .location-select {
   width: min(280px, 45vw);
+  // Compacto para que la etiqueta flotante quepa en la barra superior.
+  @include mat.form-field-density(-4);
   font: var(--mat-sys-body-medium);
 }
 
@@ -73,6 +77,23 @@
 .sidenav {
   width: var(--sgo-sidebar-width);
   border-right: 1px solid var(--mat-sys-outline-variant);
+  transition: width 150ms ease;
+
+  &.collapsed {
+    width: var(--sgo-sidebar-collapsed-width);
+  }
+}
+
+// Nombres largos ("Órdenes de producción") en dos líneas en lugar de cortarse.
+.item-label {
+  white-space: normal;
+  line-height: 1.2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidenav {
+    transition: none;
+  }
 }
 
 .section-label {

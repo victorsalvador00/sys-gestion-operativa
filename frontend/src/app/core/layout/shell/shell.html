@@ -1,11 +1,17 @@
 <a class="skip-link" href="#contenido">Saltar al contenido</a>
 
 <mat-toolbar class="topbar" role="banner">
-  @if (isMobile()) {
-    <button mat-icon-button type="button" (click)="toggleMenu()" aria-label="Abrir menú">
-      <mat-icon>menu</mat-icon>
-    </button>
-  }
+  <button
+    mat-icon-button
+    type="button"
+    (click)="toggleMenu()"
+    [attr.aria-label]="
+      isMobile() ? 'Abrir menú' : showCollapsed() ? 'Expandir menú' : 'Contraer menú'
+    "
+    [attr.aria-expanded]="isMobile() ? menuOpened() : !showCollapsed()"
+  >
+    <mat-icon>{{ !isMobile() && showCollapsed() ? 'menu_open' : 'menu' }}</mat-icon>
+  </button>
   <a class="brand" routerLink="/" aria-label="SGO, ir al tablero">
     <mat-icon aria-hidden="true">storefront</mat-icon>
     <span class="brand-name">SGO</span>
@@ -55,16 +61,23 @@
   </mat-menu>
 </mat-toolbar>
 
-<mat-sidenav-container class="container">
+<mat-sidenav-container class="container" autosize>
   <mat-sidenav
     class="sidenav"
+    [class.collapsed]="showCollapsed()"
     [mode]="isMobile() ? 'over' : 'side'"
     [opened]="menuOpened()"
     (closedStart)="closeMobileMenu()"
   >
     <nav aria-label="Menú principal">
       @for (section of menu(); track section.label) {
-        <h2 class="section-label">{{ section.label }}</h2>
+        @if (showCollapsed()) {
+          @if (!$first) {
+            <mat-divider />
+          }
+        } @else {
+          <h2 class="section-label">{{ section.label }}</h2>
+        }
         <mat-nav-list>
           @for (item of section.items; track item.route) {
             <a
@@ -75,10 +88,16 @@
               [routerLinkActiveOptions]="{ exact: item.route === '/' }"
               [activated]="rla.isActive"
               [attr.aria-current]="rla.isActive ? 'page' : null"
+              [attr.aria-label]="showCollapsed() ? item.label : null"
+              [matTooltip]="item.label"
+              [matTooltipDisabled]="!showCollapsed()"
+              matTooltipPosition="right"
               (click)="closeMobileMenu()"
             >
               <mat-icon matListItemIcon aria-hidden="true">{{ item.icon }}</mat-icon>
-              <span matListItemTitle>{{ item.label }}</span>
+              @if (!showCollapsed()) {
+                <span matListItemTitle class="item-label">{{ item.label }}</span>
+              }
             </a>
           }
         </mat-nav-list>

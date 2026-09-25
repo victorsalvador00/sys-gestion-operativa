@@ -1,0 +1,119 @@
+:host {
+  display: block;
+}
+
+.search {
+  width: min(360px, 100%);
+  margin-bottom: var(--sgo-space-3);
+}
+
+.frame {
+  position: relative;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--sgo-radius);
+  overflow: hidden;
+  background: var(--mat-sys-surface);
+}
+
+.scroll {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+}
+
+.end {
+  text-align: end;
+}
+
+tr.clickable {
+  cursor: pointer;
+
+  &:hover {
+    background: var(--mat-sys-surface-container-low);
+  }
+}
+
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: var(--mat-sys-outline-variant);
+}
+
+.card {
+  padding: var(--sgo-space-3) var(--sgo-space-4);
+  background: var(--mat-sys-surface);
+
+  &.clickable {
+    cursor: pointer;
+  }
+}
+
+.skeleton-rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sgo-space-3);
+  padding: var(--sgo-space-4);
+}
+
+.skeleton {
+  display: block;
+  height: 20px;
+  border-radius: 4px;
+  background: linear-gradient(
+    90deg,
+    var(--mat-sys-surface-container) 25%,
+    var(--mat-sys-surface-container-high) 50%,
+    var(--mat-sys-surface-container) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.2s infinite linear;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sgo-space-2);
+  padding: var(--sgo-space-8) var(--sgo-space-4);
+  color: var(--mat-sys-on-surface-variant);
+  text-align: center;
+
+  p {
+    margin: 0;
+  }
+}
+
+.loading-bar {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: var(--mat-sys-primary);
+  animation: pulse 1s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.3;
+  }
+}

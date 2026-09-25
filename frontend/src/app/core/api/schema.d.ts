@@ -29,6 +29,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PagedResultOfAdjustmentListItemDto"];
+                        "text/json": components["schemas"]["PagedResultOfAdjustmentListItemDto"];
+                        "text/plain": components["schemas"]["PagedResultOfAdjustmentListItemDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -165,6 +176,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AdjustmentDto"];
+                        "text/json": components["schemas"]["AdjustmentDto"];
+                        "text/plain": components["schemas"]["AdjustmentDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -227,6 +249,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AlertsDto"];
+                        "text/json": components["schemas"]["AlertsDto"];
+                        "text/plain": components["schemas"]["AlertsDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -506,6 +539,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PagedResultOfBranchOrderListItemDto"];
+                        "text/json": components["schemas"]["PagedResultOfBranchOrderListItemDto"];
+                        "text/plain": components["schemas"]["PagedResultOfBranchOrderListItemDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -628,6 +672,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["BranchOrderDto"];
+                        "text/json": components["schemas"]["BranchOrderDto"];
+                        "text/plain": components["schemas"]["BranchOrderDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -680,6 +735,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["BranchOrderDto"];
+                        "text/json": components["schemas"]["BranchOrderDto"];
+                        "text/plain": components["schemas"]["BranchOrderDto"];
+                    };
+                };
                 /** @description Bad Request */
                 400: {
                     headers: {
@@ -782,6 +848,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["BranchOrderDto"];
+                        "text/json": components["schemas"]["BranchOrderDto"];
+                        "text/plain": components["schemas"]["BranchOrderDto"];
+                    };
+                };
                 /** @description Bad Request */
                 400: {
                     headers: {
@@ -872,6 +949,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["BranchOrderDto"];
+                        "text/json": components["schemas"]["BranchOrderDto"];
+                        "text/plain": components["schemas"]["BranchOrderDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -950,6 +1038,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["BranchOrderDto"];
+                        "text/json": components["schemas"]["BranchOrderDto"];
+                        "text/plain": components["schemas"]["BranchOrderDto"];
+                    };
+                };
                 /** @description Bad Request */
                 400: {
                     headers: {
@@ -1039,6 +1138,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["BranchOrderDto"];
+                        "text/json": components["schemas"]["BranchOrderDto"];
+                        "text/plain": components["schemas"]["BranchOrderDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -1113,6 +1223,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["BranchOrderSuggestionDto"][];
+                        "text/json": components["schemas"]["BranchOrderSuggestionDto"][];
+                        "text/plain": components["schemas"]["BranchOrderSuggestionDto"][];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -1170,6 +1291,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PagedResultOfConsumptionListItemDto"];
+                        "text/json": components["schemas"]["PagedResultOfConsumptionListItemDto"];
+                        "text/plain": components["schemas"]["PagedResultOfConsumptionListItemDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -1303,6 +1435,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ConsumptionDto"];
+                        "text/json": components["schemas"]["ConsumptionDto"];
+                        "text/plain": components["schemas"]["ConsumptionDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -1368,6 +1511,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["DashboardDto"];
+                        "text/json": components["schemas"]["DashboardDto"];
+                        "text/plain": components["schemas"]["DashboardDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -1428,6 +1582,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PagedResultOfGoodsReceiptListItemDto"];
+                        "text/json": components["schemas"]["PagedResultOfGoodsReceiptListItemDto"];
+                        "text/plain": components["schemas"]["PagedResultOfGoodsReceiptListItemDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -1575,6 +1740,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["GoodsReceiptDto"];
+                        "text/json": components["schemas"]["GoodsReceiptDto"];
+                        "text/plain": components["schemas"]["GoodsReceiptDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -1803,6 +1979,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PagedResultOfItemCategoryDto"];
+                        "text/json": components["schemas"]["PagedResultOfItemCategoryDto"];
+                        "text/plain": components["schemas"]["PagedResultOfItemCategoryDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -1913,6 +2100,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ItemCategoryDto"];
+                        "text/json": components["schemas"]["ItemCategoryDto"];
+                        "text/plain": components["schemas"]["ItemCategoryDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -1966,6 +2164,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ItemCategoryDto"];
+                        "text/json": components["schemas"]["ItemCategoryDto"];
+                        "text/plain": components["schemas"]["ItemCategoryDto"];
+                    };
+                };
                 /** @description Bad Request */
                 400: {
                     headers: {
@@ -2056,6 +2265,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PagedResultOfItemListItemDto"];
+                        "text/json": components["schemas"]["PagedResultOfItemListItemDto"];
+                        "text/plain": components["schemas"]["PagedResultOfItemListItemDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -2166,6 +2386,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ItemDto"];
+                        "text/json": components["schemas"]["ItemDto"];
+                        "text/plain": components["schemas"]["ItemDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -2218,6 +2449,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ItemDto"];
+                        "text/json": components["schemas"]["ItemDto"];
+                        "text/plain": components["schemas"]["ItemDto"];
+                    };
+                };
                 /** @description Bad Request */
                 400: {
                     headers: {
@@ -2301,6 +2543,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ItemLocationSettingDto"][];
+                        "text/json": components["schemas"]["ItemLocationSettingDto"][];
+                        "text/plain": components["schemas"]["ItemLocationSettingDto"][];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -2354,6 +2607,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ItemLocationSettingDto"][];
+                        "text/json": components["schemas"]["ItemLocationSettingDto"][];
+                        "text/plain": components["schemas"]["ItemLocationSettingDto"][];
+                    };
+                };
                 /** @description Bad Request */
                 400: {
                     headers: {
@@ -2432,6 +2696,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PagedResultOfLocationDto"];
+                        "text/json": components["schemas"]["PagedResultOfLocationDto"];
+                        "text/plain": components["schemas"]["PagedResultOfLocationDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -2543,6 +2818,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["LocationDto"];
+                        "text/json": components["schemas"]["LocationDto"];
+                        "text/plain": components["schemas"]["LocationDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -2596,6 +2882,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["LocationDto"];
+                        "text/json": components["schemas"]["LocationDto"];
+                        "text/plain": components["schemas"]["LocationDto"];
+                    };
+                };
                 /** @description Bad Request */
                 400: {
                     headers: {
@@ -2799,6 +3096,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PagedResultOfKardexEntryDto"];
+                        "text/json": components["schemas"]["PagedResultOfKardexEntryDto"];
+                        "text/plain": components["schemas"]["PagedResultOfKardexEntryDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -2893,6 +3201,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PagedResultOfPhysicalCountListItemDto"];
+                        "text/json": components["schemas"]["PagedResultOfPhysicalCountListItemDto"];
+                        "text/plain": components["schemas"]["PagedResultOfPhysicalCountListItemDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -3004,6 +3323,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PhysicalCountDto"];
+                        "text/json": components["schemas"]["PhysicalCountDto"];
+                        "text/plain": components["schemas"]["PhysicalCountDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -3057,6 +3387,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PhysicalCountDto"];
+                        "text/json": components["schemas"]["PhysicalCountDto"];
+                        "text/plain": components["schemas"]["PhysicalCountDto"];
+                    };
+                };
                 /** @description Bad Request */
                 400: {
                     headers: {
@@ -3147,6 +3488,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PhysicalCountDto"];
+                        "text/json": components["schemas"]["PhysicalCountDto"];
+                        "text/plain": components["schemas"]["PhysicalCountDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -3226,6 +3578,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PhysicalCountDto"];
+                        "text/json": components["schemas"]["PhysicalCountDto"];
+                        "text/plain": components["schemas"]["PhysicalCountDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -3305,6 +3668,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PhysicalCountDto"];
+                        "text/json": components["schemas"]["PhysicalCountDto"];
+                        "text/plain": components["schemas"]["PhysicalCountDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -3385,6 +3759,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PagedResultOfProductionOrderListItemDto"];
+                        "text/json": components["schemas"]["PagedResultOfProductionOrderListItemDto"];
+                        "text/plain": components["schemas"]["PagedResultOfProductionOrderListItemDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -3507,6 +3892,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProductionOrderDto"];
+                        "text/json": components["schemas"]["ProductionOrderDto"];
+                        "text/plain": components["schemas"]["ProductionOrderDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -3560,6 +3956,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProductionOrderDto"];
+                        "text/json": components["schemas"]["ProductionOrderDto"];
+                        "text/plain": components["schemas"]["ProductionOrderDto"];
+                    };
+                };
                 /** @description Bad Request */
                 400: {
                     headers: {
@@ -3650,6 +4057,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProductionOrderDto"];
+                        "text/json": components["schemas"]["ProductionOrderDto"];
+                        "text/plain": components["schemas"]["ProductionOrderDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -3732,6 +4150,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProductionOrderDto"];
+                        "text/json": components["schemas"]["ProductionOrderDto"];
+                        "text/plain": components["schemas"]["ProductionOrderDto"];
+                    };
+                };
                 /** @description Bad Request */
                 400: {
                     headers: {
@@ -3821,6 +4250,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProductionOrderDto"];
+                        "text/json": components["schemas"]["ProductionOrderDto"];
+                        "text/plain": components["schemas"]["ProductionOrderDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -3899,6 +4339,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PagedResultOfPurchaseOrderListItemDto"];
+                        "text/json": components["schemas"]["PagedResultOfPurchaseOrderListItemDto"];
+                        "text/plain": components["schemas"]["PagedResultOfPurchaseOrderListItemDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -4024,6 +4475,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PurchaseOrderDto"];
+                        "text/json": components["schemas"]["PurchaseOrderDto"];
+                        "text/plain": components["schemas"]["PurchaseOrderDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -4077,6 +4539,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PurchaseOrderDto"];
+                        "text/json": components["schemas"]["PurchaseOrderDto"];
+                        "text/plain": components["schemas"]["PurchaseOrderDto"];
+                    };
+                };
                 /** @description Bad Request */
                 400: {
                     headers: {
@@ -4178,6 +4651,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PurchaseOrderDto"];
+                        "text/json": components["schemas"]["PurchaseOrderDto"];
+                        "text/plain": components["schemas"]["PurchaseOrderDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -4257,6 +4741,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PurchaseOrderDto"];
+                        "text/json": components["schemas"]["PurchaseOrderDto"];
+                        "text/plain": components["schemas"]["PurchaseOrderDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -4336,6 +4831,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PurchaseOrderDto"];
+                        "text/json": components["schemas"]["PurchaseOrderDto"];
+                        "text/plain": components["schemas"]["PurchaseOrderDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -4415,6 +4921,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PurchaseOrderDto"];
+                        "text/json": components["schemas"]["PurchaseOrderDto"];
+                        "text/plain": components["schemas"]["PurchaseOrderDto"];
+                    };
+                };
                 /** @description Bad Request */
                 400: {
                     headers: {
@@ -4505,6 +5022,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PurchaseOrderDto"];
+                        "text/json": components["schemas"]["PurchaseOrderDto"];
+                        "text/plain": components["schemas"]["PurchaseOrderDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -4582,6 +5110,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PagedResultOfRecipeListItemDto"];
+                        "text/json": components["schemas"]["PagedResultOfRecipeListItemDto"];
+                        "text/plain": components["schemas"]["PagedResultOfRecipeListItemDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -4704,6 +5243,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["RecipeDto"];
+                        "text/json": components["schemas"]["RecipeDto"];
+                        "text/plain": components["schemas"]["RecipeDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -4760,6 +5310,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["RecipeDto"];
+                        "text/json": components["schemas"]["RecipeDto"];
+                        "text/plain": components["schemas"]["RecipeDto"];
+                    };
+                };
                 /** @description Bad Request */
                 400: {
                     headers: {
@@ -4857,6 +5418,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ExplosionDto"];
+                        "text/json": components["schemas"]["ExplosionDto"];
+                        "text/plain": components["schemas"]["ExplosionDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -4936,6 +5508,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PagedResultOfRequisitionListItemDto"];
+                        "text/json": components["schemas"]["PagedResultOfRequisitionListItemDto"];
+                        "text/plain": components["schemas"]["PagedResultOfRequisitionListItemDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -5061,6 +5644,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["RequisitionDto"];
+                        "text/json": components["schemas"]["RequisitionDto"];
+                        "text/plain": components["schemas"]["RequisitionDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -5114,6 +5708,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["RequisitionDto"];
+                        "text/json": components["schemas"]["RequisitionDto"];
+                        "text/plain": components["schemas"]["RequisitionDto"];
+                    };
+                };
                 /** @description Bad Request */
                 400: {
                     headers: {
@@ -5215,6 +5820,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["RequisitionDto"];
+                        "text/json": components["schemas"]["RequisitionDto"];
+                        "text/plain": components["schemas"]["RequisitionDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -5294,6 +5910,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["RequisitionDto"];
+                        "text/json": components["schemas"]["RequisitionDto"];
+                        "text/plain": components["schemas"]["RequisitionDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -5373,6 +6000,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["RequisitionDto"];
+                        "text/json": components["schemas"]["RequisitionDto"];
+                        "text/plain": components["schemas"]["RequisitionDto"];
+                    };
+                };
                 /** @description Bad Request */
                 400: {
                     headers: {
@@ -5463,6 +6101,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["RequisitionDto"];
+                        "text/json": components["schemas"]["RequisitionDto"];
+                        "text/plain": components["schemas"]["RequisitionDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -5543,6 +6192,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PurchaseOrderListItemDto"][];
+                        "text/json": components["schemas"]["PurchaseOrderListItemDto"][];
+                        "text/plain": components["schemas"]["PurchaseOrderListItemDto"][];
+                    };
+                };
                 /** @description Bad Request */
                 400: {
                     headers: {
@@ -5639,6 +6299,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PagedResultOfRoleListItemDto"];
+                        "text/json": components["schemas"]["PagedResultOfRoleListItemDto"];
+                        "text/plain": components["schemas"]["PagedResultOfRoleListItemDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -5750,6 +6421,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["RoleDto"];
+                        "text/json": components["schemas"]["RoleDto"];
+                        "text/plain": components["schemas"]["RoleDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -5803,6 +6485,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["RoleDto"];
+                        "text/json": components["schemas"]["RoleDto"];
+                        "text/plain": components["schemas"]["RoleDto"];
+                    };
+                };
                 /** @description Bad Request */
                 400: {
                     headers: {
@@ -5895,6 +6588,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AppSettingDto"][];
+                        "text/json": components["schemas"]["AppSettingDto"][];
+                        "text/plain": components["schemas"]["AppSettingDto"][];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -5935,6 +6639,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AppSettingDto"][];
+                        "text/json": components["schemas"]["AppSettingDto"][];
+                        "text/plain": components["schemas"]["AppSettingDto"][];
+                    };
+                };
                 /** @description Bad Request */
                 400: {
                     headers: {
@@ -6015,6 +6730,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PagedResultOfStockLevelDto"];
+                        "text/json": components["schemas"]["PagedResultOfStockLevelDto"];
+                        "text/plain": components["schemas"]["PagedResultOfStockLevelDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -6067,6 +6793,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["LotStockDto"][];
+                        "text/json": components["schemas"]["LotStockDto"][];
+                        "text/plain": components["schemas"]["LotStockDto"][];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -6123,6 +6860,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PagedResultOfSupplierDto"];
+                        "text/json": components["schemas"]["PagedResultOfSupplierDto"];
+                        "text/plain": components["schemas"]["PagedResultOfSupplierDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -6234,6 +6982,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SupplierDto"];
+                        "text/json": components["schemas"]["SupplierDto"];
+                        "text/plain": components["schemas"]["SupplierDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -6287,6 +7046,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SupplierDto"];
+                        "text/json": components["schemas"]["SupplierDto"];
+                        "text/plain": components["schemas"]["SupplierDto"];
+                    };
+                };
                 /** @description Bad Request */
                 400: {
                     headers: {
@@ -6378,6 +7148,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PagedResultOfSupplierItemDto"];
+                        "text/json": components["schemas"]["PagedResultOfSupplierItemDto"];
+                        "text/plain": components["schemas"]["PagedResultOfSupplierItemDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -6525,6 +7306,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SupplierItemDto"];
+                        "text/json": components["schemas"]["SupplierItemDto"];
+                        "text/plain": components["schemas"]["SupplierItemDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -6579,6 +7371,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SupplierItemDto"];
+                        "text/json": components["schemas"]["SupplierItemDto"];
+                        "text/plain": components["schemas"]["SupplierItemDto"];
+                    };
+                };
                 /** @description Bad Request */
                 400: {
                     headers: {
@@ -6683,6 +7486,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PagedResultOfTransferListItemDto"];
+                        "text/json": components["schemas"]["PagedResultOfTransferListItemDto"];
+                        "text/plain": components["schemas"]["PagedResultOfTransferListItemDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -6805,6 +7619,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["TransferDto"];
+                        "text/json": components["schemas"]["TransferDto"];
+                        "text/plain": components["schemas"]["TransferDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -6858,6 +7683,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["TransferDto"];
+                        "text/json": components["schemas"]["TransferDto"];
+                        "text/plain": components["schemas"]["TransferDto"];
+                    };
+                };
                 /** @description Bad Request */
                 400: {
                     headers: {
@@ -6949,6 +7785,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["TransferDto"];
+                        "text/json": components["schemas"]["TransferDto"];
+                        "text/plain": components["schemas"]["TransferDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -7028,6 +7875,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["TransferDto"];
+                        "text/json": components["schemas"]["TransferDto"];
+                        "text/plain": components["schemas"]["TransferDto"];
+                    };
+                };
                 /** @description Bad Request */
                 400: {
                     headers: {
@@ -7118,6 +7976,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["TransferDto"];
+                        "text/json": components["schemas"]["TransferDto"];
+                        "text/plain": components["schemas"]["TransferDto"];
+                    };
+                };
                 /** @description Bad Request */
                 400: {
                     headers: {
@@ -7200,6 +8069,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["TransferListItemDto"][];
+                        "text/json": components["schemas"]["TransferListItemDto"][];
+                        "text/plain": components["schemas"]["TransferListItemDto"][];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -7256,6 +8136,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PagedResultOfUnitOfMeasureDto"];
+                        "text/json": components["schemas"]["PagedResultOfUnitOfMeasureDto"];
+                        "text/plain": components["schemas"]["PagedResultOfUnitOfMeasureDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -7366,6 +8257,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UnitOfMeasureDto"];
+                        "text/json": components["schemas"]["UnitOfMeasureDto"];
+                        "text/plain": components["schemas"]["UnitOfMeasureDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -7419,6 +8321,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UnitOfMeasureDto"];
+                        "text/json": components["schemas"]["UnitOfMeasureDto"];
+                        "text/plain": components["schemas"]["UnitOfMeasureDto"];
+                    };
+                };
                 /** @description Bad Request */
                 400: {
                     headers: {
@@ -7509,6 +8422,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PagedResultOfUserListItemDto"];
+                        "text/json": components["schemas"]["PagedResultOfUserListItemDto"];
+                        "text/plain": components["schemas"]["PagedResultOfUserListItemDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -7620,6 +8544,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UserDto"];
+                        "text/json": components["schemas"]["UserDto"];
+                        "text/plain": components["schemas"]["UserDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -7672,6 +8607,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UserDto"];
+                        "text/json": components["schemas"]["UserDto"];
+                        "text/plain": components["schemas"]["UserDto"];
+                    };
+                };
                 /** @description Bad Request */
                 400: {
                     headers: {
@@ -7773,6 +8719,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UserDto"];
+                        "text/json": components["schemas"]["UserDto"];
+                        "text/plain": components["schemas"]["UserDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -7852,6 +8809,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UserDto"];
+                        "text/json": components["schemas"]["UserDto"];
+                        "text/plain": components["schemas"]["UserDto"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -8054,10 +9022,34 @@ export interface components {
             /** Format: double */
             unitCost: null | number;
         };
+        AdjustmentListItemDto: {
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: uuid */
+            createdBy: null | string;
+            folio: string;
+            /** Format: uuid */
+            id: string;
+            /** Format: int32 */
+            lineCount: number;
+            locationCode: string;
+            /** Format: uuid */
+            locationId: string;
+            reason: components["schemas"]["AdjustmentReason"];
+            status: components["schemas"]["AdjustmentStatus"];
+            /** Format: double */
+            totalCost: number;
+        };
         /** @enum {unknown} */
-        AdjustmentReason: "Correction" | "Waste" | "Expired" | "Damaged" | "InternalUse" | null;
+        AdjustmentReason: "Correction" | "Waste" | "Expired" | "Damaged" | "InternalUse";
         /** @enum {unknown} */
         AdjustmentStatus: "Posted" | "Cancelled";
+        AlertsDto: {
+            /** Format: int32 */
+            expirationAlertDays: number;
+            expiringLots: components["schemas"]["ExpiringLotAlertDto"][];
+            lowStock: components["schemas"]["LowStockAlertDto"][];
+        };
         /**
          * @example {
          *       "version": 1234,
@@ -8083,6 +9075,26 @@ export interface components {
             approvedQty: number;
             /** Format: uuid */
             lineId: string;
+        };
+        AppSettingDto: {
+            /** Format: int32 */
+            decimals: number;
+            description: string;
+            key: string;
+            kind: components["schemas"]["SettingKind"];
+            label: string;
+            /** Format: double */
+            max: number;
+            /** Format: double */
+            min: number;
+            /** Format: date-time */
+            updatedAt: null | string;
+            /** Format: uuid */
+            updatedBy: null | string;
+            /** Format: double */
+            value: number;
+            /** Format: uint32 */
+            version: number;
         };
         AuditLogDto: {
             action: string;
@@ -8155,8 +9167,41 @@ export interface components {
             /** Format: double */
             requestedQty: number;
         };
+        BranchOrderListItemDto: {
+            /** Format: date-time */
+            createdAt: string;
+            folio: string;
+            /** Format: uuid */
+            id: string;
+            /** Format: int32 */
+            lineCount: number;
+            requestingLocation: components["schemas"]["TransferLocationDto"];
+            /** Format: date */
+            requiredDate: string;
+            status: components["schemas"]["BranchOrderStatus"];
+            supplyingLocation: components["schemas"]["TransferLocationDto"];
+        };
         /** @enum {unknown} */
-        BranchOrderStatus: "Draft" | "Submitted" | "Approved" | "PartiallyFulfilled" | "Fulfilled" | "Rejected" | "Cancelled" | null;
+        BranchOrderStatus: "Draft" | "Submitted" | "Approved" | "PartiallyFulfilled" | "Fulfilled" | "Rejected" | "Cancelled";
+        BranchOrderSuggestionDto: {
+            baseUomCode: string;
+            /** Format: double */
+            inTransit: number;
+            /** Format: uuid */
+            itemId: string;
+            itemName: string;
+            /** Format: double */
+            maxQty: number;
+            /** Format: double */
+            minQty: number;
+            /** Format: double */
+            onHand: number;
+            /** Format: double */
+            pending: number;
+            sku: string;
+            /** Format: double */
+            suggestedQty: number;
+        };
         BranchOrderTransferDto: {
             folio: string;
             /** Format: uuid */
@@ -8258,6 +9303,25 @@ export interface components {
             lotId: null | string;
             /** Format: double */
             quantity: number;
+        };
+        ConsumptionListItemDto: {
+            /** Format: date */
+            businessDate: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: uuid */
+            createdBy: null | string;
+            folio: string;
+            /** Format: uuid */
+            id: string;
+            /** Format: int32 */
+            lineCount: number;
+            locationCode: string;
+            /** Format: uuid */
+            locationId: string;
+            status: components["schemas"]["ConsumptionStatus"];
+            /** Format: double */
+            totalCost: number;
         };
         /** @enum {unknown} */
         ConsumptionStatus: "Posted" | "Cancelled";
@@ -8689,6 +9753,21 @@ export interface components {
             password: string;
             roleIds: string[];
         };
+        DashboardDto: {
+            /** Format: int32 */
+            branchOrdersInProgress: null | number;
+            /** Format: int32 */
+            branchOrdersToApprove: null | number;
+            inventory: null | components["schemas"]["InventoryBlockDto"];
+            /** Format: uuid */
+            locationId: null | string;
+            lowStockByLocation: null | components["schemas"]["LocationCountDto"][];
+            /** Format: int32 */
+            productionOrdersToday: null | number;
+            /** Format: int32 */
+            purchaseOrdersToApprove: null | number;
+            transfers: null | components["schemas"]["TransfersBlockDto"];
+        };
         /** @enum {unknown} */
         DiscrepancyReason: "Missing" | "Damaged" | "Other" | null;
         DispatchLineRequest: {
@@ -8724,6 +9803,69 @@ export interface components {
             vehicleDescription: string;
             /** Format: uint32 */
             version: number;
+        };
+        ExpiringLotAlertDto: {
+            /** Format: int32 */
+            daysToExpire: number;
+            /** Format: date */
+            expirationDate: string;
+            isExpired: boolean;
+            /** Format: uuid */
+            itemId: string;
+            itemName: string;
+            locationCode: string;
+            /** Format: uuid */
+            locationId: string;
+            /** Format: uuid */
+            lotId: string;
+            lotNumber: string;
+            /** Format: double */
+            quantity: number;
+            sku: string;
+        };
+        ExplosionDto: {
+            canProduce: null | boolean;
+            /** Format: double */
+            estimatedTotalCost: null | number;
+            /** Format: double */
+            estimatedUnitCost: null | number;
+            lines: components["schemas"]["ExplosionLineDto"][];
+            /** Format: uuid */
+            locationId: null | string;
+            /** Format: uuid */
+            outputItemId: string;
+            outputName: string;
+            outputSku: string;
+            /** Format: double */
+            quantity: number;
+            /** Format: uuid */
+            recipeId: string;
+            /** Format: int32 */
+            recipeVersion: number;
+            /** Format: double */
+            yieldQty: number;
+        };
+        ExplosionLineDto: {
+            /** Format: double */
+            available: null | number;
+            /** Format: double */
+            averageCost: null | number;
+            baseUomCode: string;
+            /** Format: uuid */
+            componentItemId: string;
+            /** Format: double */
+            estimatedCost: null | number;
+            hasRecipe: boolean;
+            name: string;
+            /** Format: double */
+            quantityPerYield: number;
+            /** Format: double */
+            shortage: null | number;
+            sku: string;
+            /** Format: double */
+            theoreticalQty: number;
+            /** Format: double */
+            wastePct: number;
         };
         GoodsReceiptDto: {
             folio: string;
@@ -8776,6 +9918,21 @@ export interface components {
             /** Format: double */
             quantity: number;
         };
+        GoodsReceiptListItemDto: {
+            folio: string;
+            /** Format: uuid */
+            id: string;
+            /** Format: int32 */
+            lineCount: number;
+            location: components["schemas"]["PurchasingLocationDto"];
+            purchaseOrder: components["schemas"]["GoodsReceiptOrderDto"];
+            /** Format: date-time */
+            receivedAt: string;
+            supplier: components["schemas"]["PurchaseOrderSupplierDto"];
+            supplierInvoiceNumber: null | string;
+            /** Format: double */
+            totalCost: number;
+        };
         GoodsReceiptOrderDto: {
             folio: string;
             /** Format: uuid */
@@ -8787,6 +9944,16 @@ export interface components {
             adjustmentFolios: string[];
             /** Format: int32 */
             lines: number;
+        };
+        InventoryBlockDto: {
+            /** Format: int32 */
+            expirationAlertDays: number;
+            /** Format: int32 */
+            expiredLots: number;
+            /** Format: int32 */
+            expiringLots: number;
+            /** Format: int32 */
+            lowStock: number;
         };
         ItemCategoryDto: {
             /** Format: uuid */
@@ -8826,6 +9993,30 @@ export interface components {
             /** Format: int32 */
             updated: number;
         };
+        ItemListItemDto: {
+            baseUomCode: string;
+            /** Format: uuid */
+            categoryId: string;
+            categoryName: string;
+            /** Format: uuid */
+            id: string;
+            isActive: boolean;
+            name: string;
+            sku: string;
+            storageCondition: components["schemas"]["StorageCondition"];
+            tracksLots: boolean;
+            type: components["schemas"]["ItemType"];
+        };
+        ItemLocationSettingDto: {
+            locationCode: string;
+            /** Format: uuid */
+            locationId: string;
+            locationName: string;
+            /** Format: double */
+            maxQty: null | number;
+            /** Format: double */
+            minQty: null | number;
+        };
         ItemLocationSettingInput: {
             /** Format: uuid */
             locationId: string;
@@ -8837,6 +10028,40 @@ export interface components {
         /** @enum {unknown} */
         ItemType: "RawMaterial" | "Intermediate" | "FinishedGood";
         JsonElement: unknown;
+        KardexEntryDto: {
+            /** Format: double */
+            balanceAfter: null | number;
+            /** Format: date */
+            businessDate: string;
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            itemId: string;
+            itemName: string;
+            locationCode: string;
+            /** Format: uuid */
+            locationId: string;
+            /** Format: uuid */
+            lotId: null | string;
+            lotNumber: null | string;
+            notes: null | string;
+            /** Format: date-time */
+            occurredAt: string;
+            /** Format: double */
+            quantity: number;
+            sku: string;
+            sourceDocFolio: string;
+            /** Format: uuid */
+            sourceDocId: string;
+            sourceDocType: string;
+            /** Format: double */
+            totalCost: number;
+            type: components["schemas"]["MovementType"];
+            /** Format: double */
+            unitCost: number;
+            /** Format: uuid */
+            userId: null | string;
+        };
         LineLotDto: {
             /** Format: date */
             expirationDate: null | string;
@@ -8845,6 +10070,14 @@ export interface components {
             lotNumber: string;
             /** Format: double */
             quantity: number;
+        };
+        LocationCountDto: {
+            /** Format: int32 */
+            count: number;
+            locationCode: string;
+            /** Format: uuid */
+            locationId: string;
+            locationName: string;
         };
         LocationDto: {
             address: null | string;
@@ -8860,7 +10093,7 @@ export interface components {
             version: number;
         };
         /** @enum {unknown} */
-        LocationType: "Branch" | "Factory" | "Commissary" | null;
+        LocationType: "Branch" | "Factory" | "Commissary";
         /**
          * @example {
          *       "email": "encargado.suc01@ejemplo.mx",
@@ -8876,6 +10109,34 @@ export interface components {
             lotId: string;
             /** Format: double */
             quantity: number;
+        };
+        LotStockDto: {
+            /** Format: int32 */
+            daysToExpire: null | number;
+            /** Format: date */
+            expirationDate: null | string;
+            isExpired: boolean;
+            /** Format: uuid */
+            lotId: null | string;
+            lotNumber: null | string;
+            /** Format: double */
+            quantity: number;
+        };
+        LowStockAlertDto: {
+            baseUomCode: string;
+            /** Format: uuid */
+            itemId: string;
+            itemName: string;
+            locationCode: string;
+            /** Format: uuid */
+            locationId: string;
+            /** Format: double */
+            maxQty: number;
+            /** Format: double */
+            minQty: number;
+            /** Format: double */
+            onHand: number;
+            sku: string;
         };
         MeDto: {
             allLocations: boolean;
@@ -8897,9 +10158,189 @@ export interface components {
             type: string;
         };
         /** @enum {unknown} */
-        MovementType: "PurchaseReceipt" | "ProductionConsumption" | "ProductionOutput" | "TransferOut" | "TransferIn" | "Adjustment" | "Waste" | "PhysicalCountAdjustment" | "Consumption" | null;
+        MovementType: "PurchaseReceipt" | "ProductionConsumption" | "ProductionOutput" | "TransferOut" | "TransferIn" | "Adjustment" | "Waste" | "PhysicalCountAdjustment" | "Consumption";
+        PagedResultOfAdjustmentListItemDto: {
+            items: components["schemas"]["AdjustmentListItemDto"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            pageSize: number;
+            /** Format: int32 */
+            total: number;
+        };
         PagedResultOfAuditLogDto: {
             items: components["schemas"]["AuditLogDto"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            pageSize: number;
+            /** Format: int32 */
+            total: number;
+        };
+        PagedResultOfBranchOrderListItemDto: {
+            items: components["schemas"]["BranchOrderListItemDto"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            pageSize: number;
+            /** Format: int32 */
+            total: number;
+        };
+        PagedResultOfConsumptionListItemDto: {
+            items: components["schemas"]["ConsumptionListItemDto"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            pageSize: number;
+            /** Format: int32 */
+            total: number;
+        };
+        PagedResultOfGoodsReceiptListItemDto: {
+            items: components["schemas"]["GoodsReceiptListItemDto"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            pageSize: number;
+            /** Format: int32 */
+            total: number;
+        };
+        PagedResultOfItemCategoryDto: {
+            items: components["schemas"]["ItemCategoryDto"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            pageSize: number;
+            /** Format: int32 */
+            total: number;
+        };
+        PagedResultOfItemListItemDto: {
+            items: components["schemas"]["ItemListItemDto"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            pageSize: number;
+            /** Format: int32 */
+            total: number;
+        };
+        PagedResultOfKardexEntryDto: {
+            items: components["schemas"]["KardexEntryDto"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            pageSize: number;
+            /** Format: int32 */
+            total: number;
+        };
+        PagedResultOfLocationDto: {
+            items: components["schemas"]["LocationDto"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            pageSize: number;
+            /** Format: int32 */
+            total: number;
+        };
+        PagedResultOfPhysicalCountListItemDto: {
+            items: components["schemas"]["PhysicalCountListItemDto"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            pageSize: number;
+            /** Format: int32 */
+            total: number;
+        };
+        PagedResultOfProductionOrderListItemDto: {
+            items: components["schemas"]["ProductionOrderListItemDto"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            pageSize: number;
+            /** Format: int32 */
+            total: number;
+        };
+        PagedResultOfPurchaseOrderListItemDto: {
+            items: components["schemas"]["PurchaseOrderListItemDto"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            pageSize: number;
+            /** Format: int32 */
+            total: number;
+        };
+        PagedResultOfRecipeListItemDto: {
+            items: components["schemas"]["RecipeListItemDto"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            pageSize: number;
+            /** Format: int32 */
+            total: number;
+        };
+        PagedResultOfRequisitionListItemDto: {
+            items: components["schemas"]["RequisitionListItemDto"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            pageSize: number;
+            /** Format: int32 */
+            total: number;
+        };
+        PagedResultOfRoleListItemDto: {
+            items: components["schemas"]["RoleListItemDto"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            pageSize: number;
+            /** Format: int32 */
+            total: number;
+        };
+        PagedResultOfStockLevelDto: {
+            items: components["schemas"]["StockLevelDto"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            pageSize: number;
+            /** Format: int32 */
+            total: number;
+        };
+        PagedResultOfSupplierDto: {
+            items: components["schemas"]["SupplierDto"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            pageSize: number;
+            /** Format: int32 */
+            total: number;
+        };
+        PagedResultOfSupplierItemDto: {
+            items: components["schemas"]["SupplierItemDto"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            pageSize: number;
+            /** Format: int32 */
+            total: number;
+        };
+        PagedResultOfTransferListItemDto: {
+            items: components["schemas"]["TransferListItemDto"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            pageSize: number;
+            /** Format: int32 */
+            total: number;
+        };
+        PagedResultOfUnitOfMeasureDto: {
+            items: components["schemas"]["UnitOfMeasureDto"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            pageSize: number;
+            /** Format: int32 */
+            total: number;
+        };
+        PagedResultOfUserListItemDto: {
+            items: components["schemas"]["UserListItemDto"][];
             /** Format: int32 */
             page: number;
             /** Format: int32 */
@@ -8957,8 +10398,29 @@ export interface components {
             /** Format: double */
             snapshotQty: number;
         };
+        PhysicalCountListItemDto: {
+            /** Format: uuid */
+            categoryId: null | string;
+            /** Format: date-time */
+            closedAt: null | string;
+            /** Format: int32 */
+            countedLines: number;
+            /** Format: date-time */
+            createdAt: string;
+            folio: string;
+            /** Format: uuid */
+            id: string;
+            /** Format: int32 */
+            lineCount: number;
+            locationCode: string;
+            /** Format: uuid */
+            locationId: string;
+            /** Format: date-time */
+            startedAt: null | string;
+            status: components["schemas"]["PhysicalCountStatus"];
+        };
         /** @enum {unknown} */
-        PhysicalCountStatus: "Draft" | "InProgress" | "Closed" | "Cancelled" | null;
+        PhysicalCountStatus: "Draft" | "InProgress" | "Closed" | "Cancelled";
         PostedMovementDto: {
             /** Format: uuid */
             itemId: string;
@@ -9055,8 +10517,31 @@ export interface components {
             /** Format: double */
             wasteQty: null | number;
         };
+        ProductionOrderListItemDto: {
+            /** Format: date-time */
+            createdAt: string;
+            folio: string;
+            /** Format: uuid */
+            id: string;
+            locationCode: string;
+            /** Format: uuid */
+            locationId: string;
+            /** Format: uuid */
+            outputItemId: string;
+            outputName: string;
+            outputSku: string;
+            /** Format: double */
+            plannedQty: number;
+            /** Format: double */
+            producedQty: null | number;
+            /** Format: date */
+            scheduledDate: string;
+            status: components["schemas"]["ProductionOrderStatus"];
+            /** Format: double */
+            unitCost: null | number;
+        };
         /** @enum {unknown} */
-        ProductionOrderStatus: "Draft" | "Released" | "Completed" | "Cancelled" | null;
+        ProductionOrderStatus: "Draft" | "Released" | "Completed" | "Cancelled";
         PurchaseOrderDto: {
             approvalRequired: boolean;
             /** Format: date-time */
@@ -9140,8 +10625,24 @@ export interface components {
             /** Format: double */
             unitPrice: null | number;
         };
+        PurchaseOrderListItemDto: {
+            /** Format: date-time */
+            createdAt: string;
+            deliveryLocation: components["schemas"]["PurchasingLocationDto"];
+            /** Format: date */
+            expectedDate: null | string;
+            folio: string;
+            /** Format: uuid */
+            id: string;
+            /** Format: int32 */
+            lineCount: number;
+            status: components["schemas"]["PurchaseOrderStatus"];
+            supplier: components["schemas"]["PurchaseOrderSupplierDto"];
+            /** Format: double */
+            total: number;
+        };
         /** @enum {unknown} */
-        PurchaseOrderStatus: "Draft" | "PendingApproval" | "Approved" | "PartiallyReceived" | "Received" | "Rejected" | "Cancelled" | "Closed" | null;
+        PurchaseOrderStatus: "Draft" | "PendingApproval" | "Approved" | "PartiallyReceived" | "Received" | "Rejected" | "Cancelled" | "Closed";
         PurchaseOrderSupplierDto: {
             /** Format: uuid */
             id: string;
@@ -9231,6 +10732,27 @@ export interface components {
             quantity: number;
             /** Format: double */
             wastePct: number;
+        };
+        RecipeListItemDto: {
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: uuid */
+            id: string;
+            isActive: boolean;
+            isUsed: boolean;
+            /** Format: int32 */
+            lineCount: number;
+            /** Format: uuid */
+            outputItemId: string;
+            outputName: string;
+            outputSku: string;
+            outputUomCode: string;
+            /** Format: int32 */
+            recipeVersion: number;
+            /** Format: date-time */
+            updatedAt: null | string;
+            /** Format: double */
+            yieldQty: number;
         };
         /**
          * @example {
@@ -9322,13 +10844,26 @@ export interface components {
             /** Format: uuid */
             suggestedSupplierId: null | string;
         };
+        RequisitionListItemDto: {
+            /** Format: date-time */
+            createdAt: string;
+            folio: string;
+            /** Format: uuid */
+            id: string;
+            /** Format: int32 */
+            lineCount: number;
+            location: components["schemas"]["PurchasingLocationDto"];
+            /** Format: date */
+            neededBy: string;
+            status: components["schemas"]["RequisitionStatus"];
+        };
         RequisitionPurchaseOrderDto: {
             folio: string;
             /** Format: uuid */
             id: string;
         };
         /** @enum {unknown} */
-        RequisitionStatus: "Draft" | "Submitted" | "Approved" | "Converted" | "Rejected" | "Cancelled" | null;
+        RequisitionStatus: "Draft" | "Submitted" | "Approved" | "Converted" | "Rejected" | "Cancelled";
         RequisitionSupplierDto: {
             /** Format: uuid */
             id: string;
@@ -9353,12 +10888,48 @@ export interface components {
             /** Format: uint32 */
             version: number;
         };
+        RoleListItemDto: {
+            description: string;
+            /** Format: uuid */
+            id: string;
+            isSystem: boolean;
+            name: string;
+            /** Format: int32 */
+            permissionCount: number;
+            /** Format: int32 */
+            userCount: number;
+        };
+        /** @enum {unknown} */
+        SettingKind: "Decimal" | "Integer";
         SettingValueRequest: {
             key: string;
             /** Format: double */
             value: number;
             /** Format: uint32 */
             version: number;
+        };
+        StockLevelDto: {
+            /** Format: double */
+            averageCost: number;
+            baseUomCode: string;
+            belowMin: boolean;
+            /** Format: uuid */
+            categoryId: string;
+            /** Format: uuid */
+            itemId: string;
+            itemName: string;
+            locationCode: string;
+            /** Format: uuid */
+            locationId: string;
+            /** Format: double */
+            maxQty: null | number;
+            /** Format: double */
+            minQty: null | number;
+            /** Format: double */
+            onHand: number;
+            sku: string;
+            /** Format: double */
+            stockValue: number;
         };
         /** @enum {unknown} */
         StorageCondition: "Ambient" | "Refrigerated" | "Frozen";
@@ -9469,11 +11040,35 @@ export interface components {
             /** Format: double */
             quantity: number;
         };
+        TransferListItemDto: {
+            /** Format: uuid */
+            branchOrderId: null | string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            dispatchedAt: null | string;
+            folio: string;
+            from: components["schemas"]["TransferLocationDto"];
+            /** Format: uuid */
+            id: string;
+            /** Format: int32 */
+            lineCount: number;
+            /** Format: date-time */
+            receivedAt: null | string;
+            status: components["schemas"]["TransferStatus"];
+            to: components["schemas"]["TransferLocationDto"];
+        };
         TransferLocationDto: {
             code: string;
             /** Format: uuid */
             id: string;
             name: string;
+        };
+        TransfersBlockDto: {
+            /** Format: int32 */
+            toDispatch: number;
+            /** Format: int32 */
+            toReceive: number;
         };
         /** @enum {unknown} */
         TransferStatus: "Draft" | "Dispatched" | "Received" | "ReceivedWithDiscrepancies" | "Cancelled";
@@ -9887,6 +11482,16 @@ export interface components {
             updatedAt: null | string;
             /** Format: uint32 */
             version: number;
+        };
+        UserListItemDto: {
+            email: string;
+            fullName: string;
+            /** Format: uuid */
+            id: string;
+            isActive: boolean;
+            isLockedOut: boolean;
+            locationCodes: string[];
+            roles: string[];
         };
         /**
          * @example {

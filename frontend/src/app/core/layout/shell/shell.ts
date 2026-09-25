@@ -10,10 +10,12 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { map } from 'rxjs';
 import { AuthService } from '../../auth/auth.service';
 import { LocationContextService } from '../../context/location-context.service';
+import { provideAppDates } from '../../i18n/date-adapter';
 import { filterMenu, MENU } from '../menu';
 
 /** Estructura base: barra superior, menú lateral filtrado por permisos y contenido. */
@@ -32,7 +34,10 @@ import { filterMenu, MENU } from '../menu';
     MatDividerModule,
     MatFormFieldModule,
     MatSelectModule,
+    MatTooltipModule,
   ],
+  // Fechas dd/MM/yyyy para todas las pantallas (aquí y no en app.config: no pesa en el arranque).
+  providers: [provideAppDates()],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './shell.html',
   styleUrl: './shell.scss',
@@ -49,11 +54,23 @@ export class Shell {
   );
   private readonly mobileMenuOpen = signal(false);
   protected readonly menuOpened = computed(() => !this.isMobile() || this.mobileMenuOpen());
+  /** En escritorio el menú se reduce a íconos; se recuerda entre sesiones. */
+  protected readonly collapsed = signal(readCollapsed());
+  protected readonly showCollapsed = computed(() => this.collapsed() && !this.isMobile());
 
   protected readonly menu = computed(() => filterMenu(MENU, (p) => this.auth.can(p)));
 
   protected toggleMenu(): void {
-    this.mobileMenuOpen.update((open) => !open);
+    if (this.isMobile()) {
+      this.mobileMenuOpen.update((open) => !open);
+      return;
+    }
+    this.collapsed.update((collapsed) => !collapsed);
+    try {
+      localStorage.setItem(COLLAPSED_KEY, String(this.collapsed()));
+    } catch {
+      // Sin almacenamiento: el estado dura lo que dure la pestaña.
+    }
   }
 
   protected closeMobileMenu(): void {
@@ -62,5 +79,15 @@ export class Shell {
 
   protected logout(): void {
     this.auth.logout();
+  }
+}
+
+const COLLAPSED_KEY = 'sgo.sidebarCollapsed';
+
+function readCollapsed(): boolean {
+  try {
+    return localStorage.getItem(COLLAPSED_KEY) === 'true';
+  } catch {
+    return false;
   }
 }

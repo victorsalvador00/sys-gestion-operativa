@@ -1,16 +1,23 @@
-import { inject, Injectable } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { EnvironmentInjector, inject, Injectable } from '@angular/core';
 
-/** Avisos breves (toasts) en la parte inferior de la pantalla. */
+/**
+ * Avisos breves (toasts) en la parte inferior de la pantalla. `MatSnackBar` se carga la primera vez
+ * que se usa: arrastra overlay, botón y animaciones, y no hace falta en el arranque.
+ */
 @Injectable({ providedIn: 'root' })
 export class Notifier {
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly injector = inject(EnvironmentInjector);
 
   success(message: string): void {
-    this.snackBar.open(message, 'Cerrar', { duration: 4000, panelClass: 'sgo-toast-success' });
+    void this.open(message, 4000, 'sgo-toast-success');
   }
 
   error(message: string): void {
-    this.snackBar.open(message, 'Cerrar', { duration: 8000, panelClass: 'sgo-toast-error' });
+    void this.open(message, 8000, 'sgo-toast-error');
+  }
+
+  private async open(message: string, duration: number, panelClass: string): Promise<void> {
+    const { MatSnackBar } = await import('@angular/material/snack-bar');
+    this.injector.get(MatSnackBar).open(message, 'Cerrar', { duration, panelClass });
   }
 }

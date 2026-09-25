@@ -176,6 +176,12 @@ export const MENU: MenuSection[] = [
         route: '/admin/configuracion',
         permission: 'settings.manage',
       },
+      {
+        label: 'Componentes (demo)',
+        icon: 'widgets',
+        route: '/demo/componentes',
+        permission: 'settings.manage',
+      },
     ],
   },
 ];
