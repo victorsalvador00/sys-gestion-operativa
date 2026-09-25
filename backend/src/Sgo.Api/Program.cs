@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using FluentValidation;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -40,7 +41,10 @@ builder.Services
         options.Conventions.Add(new ApiRoutePrefixConvention());
         options.Filters.Add<ValidationFilter>();
     })
-    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+    .AddJsonOptions(options => ConfigureJson(options.JsonSerializerOptions));
+
+// Same options for the minimal-API/OpenAPI serializer, so the documented schema matches the wire format.
+builder.Services.ConfigureHttpJsonOptions(options => ConfigureJson(options.SerializerOptions));
 
 builder.Services.AddProblemDetails(options =>
     options.CustomizeProblemDetails = context =>
@@ -112,5 +116,13 @@ app.MapHealthChecks("/health/ready", new() { Predicate = check => check.Tags.Con
 app.MapControllers();
 
 app.Run();
+
+// Enums travel as strings and numbers must be JSON numbers (not "12.5"): the OpenAPI schema then documents
+// string enums and plain `number`, which the frontend's generated types rely on.
+static void ConfigureJson(JsonSerializerOptions options)
+{
+    options.Converters.Add(new JsonStringEnumConverter());
+    options.NumberHandling = JsonNumberHandling.Strict;
+}
 
 public partial class Program;
