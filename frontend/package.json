@@ -10,7 +10,7 @@
     "lint": "ng lint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "e2e": "node -e \"console.log('E2E (Playwright) se configura en F-08.')\"",
+    "e2e": "playwright test",
     "api:types": "node scripts/api-types.mjs"
   },
   "private": true,
@@ -34,6 +34,7 @@
     "@angular/cli": "^22.2.0",
     "@angular/compiler-cli": "^22.2.0",
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "1.63.0",
     "angular-eslint": "22.5.0",
     "eslint": "^10.9.1",
     "eslint-config-prettier": "10.1.8",

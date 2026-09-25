@@ -29,12 +29,15 @@ export function statusColor(status: string): StatusColor {
   return STATUS_COLORS[status] ?? 'gray';
 }
 
-/** `<app-status-tag status="PendingApproval" kind="PurchaseOrderStatus" />` → etiqueta amarilla "Por aprobar". */
+/**
+ * `<app-status-tag status="PendingApproval" kind="PurchaseOrderStatus" />` → etiqueta amarilla "Por aprobar".
+ * Para estados que no son enums del backend: `<app-status-tag label="Bloqueado" color="red" />`.
+ */
 @Component({
   selector: 'app-status-tag',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { '[class]': '"tag tag-" + color()' },
-  template: '{{ label() }}',
+  host: { '[class]': '"tag tag-" + resolvedColor()' },
+  template: '{{ text() }}',
   styles: `
     :host {
       display: inline-flex;
@@ -71,9 +74,15 @@ export function statusColor(status: string): StatusColor {
   `,
 })
 export class StatusTag {
-  readonly status = input.required<string>();
-  readonly kind = input.required<EnumName>();
+  readonly status = input('');
+  readonly kind = input<EnumName>();
+  /** Texto y color explícitos (tienen prioridad sobre `status`/`kind`). */
+  readonly label = input<string>();
+  readonly color = input<StatusColor>();
 
-  protected readonly color = computed(() => statusColor(this.status()));
-  protected readonly label = computed(() => enumLabel(this.kind(), this.status()));
+  protected readonly resolvedColor = computed(() => this.color() ?? statusColor(this.status()));
+  protected readonly text = computed(() => {
+    const kind = this.kind();
+    return this.label() ?? (kind ? enumLabel(kind, this.status()) : this.status());
+  });
 }

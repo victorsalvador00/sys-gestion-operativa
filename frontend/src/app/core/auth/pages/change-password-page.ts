@@ -14,18 +14,8 @@ import { MatInputModule } from '@angular/material/input';
 import { Notifier } from '../../http/notifier.service';
 import { toProblem } from '../../http/problem-details';
 import { applyServerErrors } from '../../http/server-errors';
+import { passwordPolicy } from '../../../shared/forms/password';
 import { AuthService } from '../auth.service';
-
-/** Política del backend (spec backend §7): 10+ caracteres, mayúscula, minúscula y número. */
-export const passwordPolicy: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
-  const value = String(control.value ?? '');
-  if (!value) {
-    return null;
-  }
-  const valid =
-    value.length >= 10 && /[A-Z]/.test(value) && /[a-z]/.test(value) && /\d/.test(value);
-  return valid ? null : { passwordPolicy: true };
-};
 
 const passwordsMatch: ValidatorFn = (group: AbstractControl): ValidationErrors | null => {
   const password = group.get('newPassword')?.value;

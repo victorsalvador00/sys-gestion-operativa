@@ -18,6 +18,10 @@ export class Notifier {
 
   private async open(message: string, duration: number, panelClass: string): Promise<void> {
     const { MatSnackBar } = await import('@angular/material/snack-bar');
-    this.injector.get(MatSnackBar).open(message, 'Cerrar', { duration, panelClass });
+    try {
+      this.injector.get(MatSnackBar).open(message, 'Cerrar', { duration, panelClass });
+    } catch {
+      // La app (o la prueba) se destruyó mientras cargaba el módulo: ya no hay dónde mostrarlo.
+    }
   }
 }

@@ -87,6 +87,13 @@ export class AuthService {
     void this.router.navigate(['/login'], { queryParams: keep ? { returnUrl } : {} });
   }
 
+  /** Recarga `/me` (permisos y ubicaciones) sin tocar el token, ej. tras editar un rol propio. */
+  reloadUser(): void {
+    this.http
+      .get<MeDto>('/me')
+      .subscribe({ next: (me) => this.me.set(me), error: () => undefined });
+  }
+
   clearSession(): void {
     this.token.set(null);
     this.me.set(null);

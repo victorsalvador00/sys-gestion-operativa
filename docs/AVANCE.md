@@ -34,7 +34,7 @@
 | 1 | F-01 Proyecto Angular 22, Angular Material, es-MX, ESLint/Prettier, proxy, carpetas, Dockerfile | ✅ | (ver `git log`) |
 | 1 | F-02 api:types, interceptores, AuthService, login, guardas, `*hasPermission`, ubicación activa | ✅ | (ver `git log`) |
 | 1 | F-03 Layout y componentes compartidos | ✅ | (ver `git log`) |
-| 1 | F-04 Administración | ⏳ | |
+| 1 | F-04 Administración (+ E2E #1 con Playwright) | ✅ | (ver `git log`) |
 | 1 | F-05 Catálogos | ⏳ | |
 | 1 | F-06 Inventario | ⏳ | |
 | 1 | F-07 Conteo físico y consumo (móvil) | ⏳ | |
@@ -154,6 +154,18 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
 - `MatSnackBar` se carga al mostrar el primer aviso: carga inicial ≈ 98 kB comprimidos.
 - `app-audit-panel` pasa a F-04 (junto con la bitácora).
 
+**Frontend (F-04):**
+- Pantallas en `features/admin`: usuarios (lista con filtros, alta/edición, activar/desactivar, restablecer contraseña
+  con generador), roles (lista, alta/edición con matriz de permisos; Administrador bloqueado), bitácora (filtros de
+  entidad, usuario y fechas; detalle con cambios formateados) y configuración (formulario armado desde `/settings`).
+- `app-audit-panel` (shared) en el detalle de usuario y de rol. Carga de datos con `rxResource` (estable en Angular 22).
+- Decisiones: sin `security.roles.manage` el campo de roles se deshabilita (la lista de roles exige ese permiso);
+  sin `security.users.manage` la bitácora no filtra por usuario. No hay "cambiar contraseña al entrar" (fuera de alcance).
+- **Playwright 1.63 (Apache-2.0)** configurado: `npm run e2e` (escritorio y celular 390 px). Credenciales del admin de
+  `SGO_E2E_ADMIN_EMAIL`/`SGO_E2E_ADMIN_PASSWORD` o, si faltan, de `deploy/.env`. E2E #1 en verde: el admin crea un
+  encargado de sucursal que entra y solo ve su menú. Cada corrida deja un usuario `e2e.encargado.*@sgo.test`
+  **desactivado** en la base de desarrollo.
+
 ## Pendientes y notas técnicas
 
 - Dos recepciones simultáneas de **OC distintas** que crean el mismo lote nuevo del mismo artículo → una falla por el
@@ -166,7 +178,9 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
 - `docs/specs/dominio.md` §6 ahora tiene 29 permisos (se agregó `logistics.transfers.special`).
 - **Frontend:** la fuente de Material Symbols pesa ~4 MB (se descarga una vez y queda en caché). Si pesa en celulares
   de sucursal, en F-16 generar un subconjunto con solo los íconos usados.
-- **Frontend:** el datepicker (formato dd/MM/yyyy) necesita un `DateAdapter` es-MX; se resuelve en F-03.
+- **Bitácora:** `/audit-log?entityId=` compara exacto. Los cambios de roles/ubicaciones de un usuario y de permisos de
+  un rol se registran con ids compuestos (`usuario|ubicación`, `rol|permiso`) y **no aparecen en el historial** del
+  usuario o rol (sí en la bitácora general). Opción futura: que el backend incluya `entityId LIKE 'id|%'`.
 - **Backend:** los errores de *model binding* (JSON mal formado o tipo incorrecto) salen con mensajes técnicos en inglés
   (`"The request field is required."`). Solo ocurren con peticiones mal armadas, no con el frontend; traducir si molesta.
 
