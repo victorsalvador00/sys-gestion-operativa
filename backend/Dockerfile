@@ -1,10 +1,14 @@
 # syntax=docker/dockerfile:1
+#
+# Targets:
+#   runtime  (default, last stage) - the API.
+#   migrator - EF Core migration bundle, run as an explicit step before starting a new version (B-17).
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
 # Restore first so the layer is cached while only source files change.
-COPY Directory.Build.props Sgo.sln ./
+COPY Directory.Build.props Sgo.sln dotnet-tools.json ./
 COPY src/Sgo.Domain/Sgo.Domain.csproj src/Sgo.Domain/
 COPY src/Sgo.Application/Sgo.Application.csproj src/Sgo.Application/
 COPY src/Sgo.Infrastructure/Sgo.Infrastructure.csproj src/Sgo.Infrastructure/
@@ -13,6 +17,21 @@ RUN dotnet restore src/Sgo.Api/Sgo.Api.csproj
 
 COPY src/ src/
 RUN dotnet publish src/Sgo.Api/Sgo.Api.csproj -c Release -o /app/publish --no-restore /p:UseAppHost=false
+
+FROM build AS bundle
+RUN dotnet tool restore \
+ && dotnet ef migrations bundle \
+      --project src/Sgo.Infrastructure/Sgo.Infrastructure.csproj \
+      --startup-project src/Sgo.Api/Sgo.Api.csproj \
+      --configuration Release --self-contained --target-runtime linux-x64 \
+      --output /app/efbundle
+
+FROM mcr.microsoft.com/dotnet/runtime-deps:10.0 AS migrator
+WORKDIR /app
+COPY --from=bundle /app/efbundle .
+USER $APP_UID
+# The connection string comes from the same variable the API uses.
+ENTRYPOINT ["/bin/sh", "-c", "exec /app/efbundle --connection \"$SGO__ConnectionStrings__Default\" \"$@\"", "efbundle"]
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app

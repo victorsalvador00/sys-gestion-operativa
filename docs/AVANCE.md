@@ -22,12 +22,14 @@
 | 3 | B-13 Requisiciones y conversión a OC | ✅ | `150b46d` |
 | 3 | B-14 Órdenes de compra, aprobación por umbral, recepción parcial, cierre | ✅ | `dad493a` |
 | 3 | B-15 Pedidos de sucursal, sugerido mín/máx, aprobación → traspasos, RN-24 | ✅ | `fa25631` |
-| 3 | B-16 Tablero y `/settings` | ✅ | (ver `git log`) |
-| 3 | B-17 Endurecimiento (índices, EXPLAIN, bundle de migraciones, compose prod) | ⏭️ siguiente | |
+| 3 | B-16 Tablero y `/settings` | ✅ | `3f19163` |
+| 3 | B-17 Endurecimiento (índices, EXPLAIN, bundle de migraciones, compose prod) | ✅ | (ver `git log`) |
 
-Pruebas al cierre de B-16: **459 en verde** (322 unitarias, 137 de integración), sin warnings.
+**Backend completo (B-01..B-17).** Lo siguiente es el frontend (`docs/specs/frontend.md` §12, F-01 en adelante).
+
+Pruebas al cierre de B-17: **460 en verde** (322 unitarias, 138 de integración, incluida la de rendimiento), sin warnings.
 Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`, `AddCatalog`, `AddInventory`,
-`AddAdjustments`, `AddCountsAndConsumptions`, `AddTransfers`, `AddRecipes`, `AddProductionOrders`, `AddSuppliers`, `AddRequisitionsAndPurchaseOrders`, `AddGoodsReceipts`, `AddBranchOrders`.
+`AddAdjustments`, `AddCountsAndConsumptions`, `AddTransfers`, `AddRecipes`, `AddProductionOrders`, `AddSuppliers`, `AddRequisitionsAndPurchaseOrders`, `AddGoodsReceipts`, `AddBranchOrders`, `TuneKardexIndexes`.
 
 ## Decisiones acordadas con el cliente
 
@@ -90,6 +92,11 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
 - `/dashboard` (B-16): solo autenticado (spec); cada bloque es `null` sin su permiso (`inventory.view`,
   `logistics.view`, `logistics.orders.approve`, `logistics.orders.create`, `purchasing.po.approve`, `production.view`);
   gráfica de bajo mínimo por ubicación solo con `locations.all`. Sin `locationId` suma todas las ubicaciones del alcance.
+- Despliegue (B-17): imágenes construidas **en el Droplet** (sin registro); `deploy/docker-compose.yml` con `api`, `web`
+  (Caddy: HTTPS automático, SPA desde `SPA_DIST`, proxy `/api` y `/health`, página de mantenimiento 503 sin build) y
+  `migrate` (bundle de EF, target `migrator` del Dockerfile, perfil `tools`). Procedimiento en `deploy/README.md`.
+- Rendimiento (B-17): prueba `Category=Performance` dentro de `dotnet test`; resultados y EXPLAIN en `docs/rendimiento.md`.
+  Saldo corrido del kardex por SUM sobre índice cubriente (antes ventana sobre todo el historial).
 
 ## Pendientes y notas técnicas
 
@@ -97,6 +104,7 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
   índice único (500; muy poco probable). Las de la misma OC ya se serializan (409).
 - **B-12:** dos usuarios que marcan al mismo tiempo proveedores preferidos distintos para el mismo artículo → uno
   falla por el índice único parcial (500; muy poco probable). Revisar si se vuelve un problema.
+- Vigilar el `COUNT(*)` del kardex si una ubicación llega a millones de movimientos (ver `docs/rendimiento.md`).
 - Kardex devuelve `userId`, no el nombre del usuario (agregar si la pantalla lo pide).
 - Ajustes y consumos no se cancelan (no hay endpoint en el spec); se corrige con otro ajuste.
 - `docs/specs/dominio.md` §6 ahora tiene 29 permisos (se agregó `logistics.transfers.special`).
@@ -106,6 +114,7 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
 ```bash
 # Docker Desktop debe estar abierto.
 # En esta máquina un proceso Java ajeno ocupa puertos entre 8080 y 8082 (varía), por eso API_PORT=8090.
+# Producción: ver deploy/README.md.
 API_PORT=8090 docker compose -f deploy/docker-compose.dev.yml up -d   # Postgres + API con hot reload
 curl http://localhost:8090/health/ready                             # 200 = listo
 # OpenAPI/Scalar: http://localhost:8090/scalar/v1

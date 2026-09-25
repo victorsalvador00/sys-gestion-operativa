@@ -57,7 +57,10 @@ internal sealed class InventoryMovementConfiguration : IEntityTypeConfiguration<
         builder.Property(m => m.Sequence).UseIdentityAlwaysColumn();
         builder.HasIndex(m => m.Sequence).IsUnique();
         builder.HasIndex(m => new { m.LocationId, m.ItemId, m.OccurredAt });
-        builder.HasIndex(m => new { m.LocationId, m.ItemId, m.Sequence });
+        // Kardex of one item: page in sequence order, and the running balance as an index-only SUM (B-17).
+        builder.HasIndex(m => new { m.LocationId, m.ItemId, m.Sequence }).IncludeProperties(m => m.Quantity);
+        // Kardex of a whole location, newest first.
+        builder.HasIndex(m => new { m.LocationId, m.Sequence });
         builder.HasIndex(m => new { m.SourceDocType, m.SourceDocId });
         builder.HasIndex(m => m.ItemId);
         builder.HasOne<Location>().WithMany().HasForeignKey(m => m.LocationId).OnDelete(DeleteBehavior.Restrict);

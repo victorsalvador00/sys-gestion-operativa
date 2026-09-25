@@ -36,12 +36,6 @@ public sealed class StockQueries(SgoDbContext db, ILocationScope scope, IClock c
         public string? LotNumber { get; init; }
     }
 
-    private sealed class RunningBalanceRow
-    {
-        public Guid Id { get; init; }
-        public decimal Balance { get; init; }
-    }
-
     private static readonly Dictionary<string, Expression<Func<StockRow, object?>>> StockSort = new()
     {
         ["sku"] = r => r.Sku,
@@ -156,17 +150,7 @@ public sealed class StockQueries(SgoDbContext db, ILocationScope scope, IClock c
         // Running balance, as a kardex is read, when looking at one item in one location.
         var balances = new Dictionary<Guid, decimal>();
         if (query.LocationId is { } locationId && query.ItemId is { } oneItem && page.Items.Count > 0)
-        {
-            var ids = page.Items.Select(r => r.Movement.Id).ToArray();
-            balances = await db.Database.SqlQuery<RunningBalanceRow>($"""
-                SELECT id, balance FROM (
-                    SELECT id, SUM(quantity) OVER (ORDER BY sequence ROWS UNBOUNDED PRECEDING) AS balance
-                    FROM inventory.inventory_movement
-                    WHERE location_id = {locationId} AND item_id = {oneItem}
-                ) running
-                WHERE id = ANY({ids})
-                """).ToDictionaryAsync(r => r.Id, r => r.Balance, ct);
-        }
+            balances = await RunningBalancesAsync(locationId, oneItem, page.Items.Select(r => r.Movement).ToList(), ct);
 
         return new PagedResult<KardexEntryDto>(page.Items.Select(r =>
         {
@@ -175,6 +159,32 @@ public sealed class StockQueries(SgoDbContext db, ILocationScope scope, IClock c
                 m.LotId, r.LotNumber, m.Type, m.Quantity, m.UnitCost, m.TotalCost, m.SourceDocType, m.SourceDocId, m.SourceDocFolio,
                 m.UserId, m.Notes, balances.TryGetValue(m.Id, out var balance) ? balance : null);
         }).ToList(), page.Page, page.PageSize, page.Total);
+    }
+
+    /// <summary>
+    /// B-17: the balance after the newest movement of the page is one SUM over the covering index
+    /// (location_id, item_id, sequence) INCLUDE (quantity); older rows subtract only the movements inside the page's
+    /// sequence range. A window over the item's whole history grew with it and spilled to disk.
+    /// </summary>
+    private async Task<Dictionary<Guid, decimal>> RunningBalancesAsync(
+        Guid locationId, Guid itemId, IReadOnlyList<InventoryMovement> page, CancellationToken ct)
+    {
+        var newest = page.Max(m => m.Sequence);
+        var oldest = page.Min(m => m.Sequence);
+        var history = db.InventoryMovements.AsNoTracking().Where(m => m.LocationId == locationId && m.ItemId == itemId);
+
+        var balance = await history.Where(m => m.Sequence <= newest).SumAsync(m => m.Quantity, ct);
+        var inRange = await history.Where(m => m.Sequence > oldest && m.Sequence <= newest)
+            .OrderByDescending(m => m.Sequence).Select(m => new { m.Sequence, m.Quantity }).ToListAsync(ct);
+
+        var bySequence = new Dictionary<long, decimal>();
+        foreach (var movement in inRange)
+        {
+            bySequence[movement.Sequence] = balance;
+            balance -= movement.Quantity;
+        }
+        bySequence[oldest] = balance;
+        return page.ToDictionary(m => m.Id, m => bySequence[m.Sequence]);
     }
 
     public async Task<AlertsDto> AlertsAsync(Guid? locationId, CancellationToken ct = default)
