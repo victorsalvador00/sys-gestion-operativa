@@ -1,0 +1,11 @@
+// Ajustes puntuales a componentes de Angular Material.
+// Usa los mixins `mat.<componente>-overrides(...)` en lugar de selectores internos.
+@use '@angular/material' as mat;
+
+html {
+  @include mat.toolbar-overrides(
+    (
+      container-background-color: var(--mat-sys-surface-container),
+    )
+  );
+}

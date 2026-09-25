@@ -1,0 +1,29 @@
+// Tokens de diseño propios del SGO (tamaños, espacios y colores de estado).
+// Los colores base del tema vienen de Material (`--mat-sys-*`, ver _theme.scss).
+:root {
+  --sgo-space-1: 0.25rem;
+  --sgo-space-2: 0.5rem;
+  --sgo-space-3: 0.75rem;
+  --sgo-space-4: 1rem;
+  --sgo-space-6: 1.5rem;
+  --sgo-space-8: 2rem;
+
+  --sgo-topbar-height: 64px;
+  --sgo-sidebar-width: 256px;
+  --sgo-content-max-width: 1440px;
+  --sgo-radius: 8px;
+
+  // Colores de estado (spec frontend §4), usados por app-status-tag.
+  --sgo-status-gray-bg: #eceff1;
+  --sgo-status-gray-fg: #37474f;
+  --sgo-status-blue-bg: #e3f2fd;
+  --sgo-status-blue-fg: #0d47a1;
+  --sgo-status-yellow-bg: #fff8e1;
+  --sgo-status-yellow-fg: #7a5a00;
+  --sgo-status-green-bg: #e8f5e9;
+  --sgo-status-green-fg: #1b5e20;
+  --sgo-status-orange-bg: #fff3e0;
+  --sgo-status-orange-fg: #a64200;
+  --sgo-status-red-bg: #ffebee;
+  --sgo-status-red-fg: #b71c1c;
+}

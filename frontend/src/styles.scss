@@ -1,0 +1,33 @@
+// Estilos globales. Sin Tailwind ni PrimeFlex: layout con CSS propio.
+@use '@angular/material' as mat;
+@use 'styles/theme' as theme;
+
+// Las fuentes (Roboto y Material Symbols) se empaquetan localmente desde angular.json.
+
+@use 'styles/tokens';
+@use 'styles/layout';
+@use 'styles/material-overrides';
+
+html {
+  height: 100%;
+  color-scheme: light;
+  @include mat.theme(
+    (
+      color: (
+        primary: theme.$primary-palette,
+        tertiary: theme.$tertiary-palette,
+        theme-type: light,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
+}
+
+body {
+  margin: 0;
+  height: 100%;
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+}

@@ -1,6 +1,6 @@
-# Avance del backend SGO
+# Avance del SGO (backend y frontend)
 
-> Bitácora de trabajo para retomar entre sesiones. Última actualización: 2026-09-24.
+> Bitácora de trabajo para retomar entre sesiones. Última actualización: 2026-09-25.
 > Fuente de verdad de reglas: `docs/specs/dominio.md`; tareas: `docs/specs/backend.md` §12.
 
 ## Estado por tarea
@@ -25,7 +25,20 @@
 | 3 | B-16 Tablero y `/settings` | ✅ | `3f19163` |
 | 3 | B-17 Endurecimiento (índices, EXPLAIN, bundle de migraciones, compose prod) | ✅ | (ver `git log`) |
 
-**Backend completo (B-01..B-17).** Lo siguiente es el frontend (`docs/specs/frontend.md` §12, F-01 en adelante).
+**Backend completo (B-01..B-17).**
+
+### Frontend (`docs/specs/frontend.md` §11) — rama `feature/frontend-fase1`
+
+| Fase | Tarea | Estado | Commit |
+|---|---|---|---|
+| 1 | F-01 Proyecto Angular 22, Angular Material, es-MX, ESLint/Prettier, proxy, carpetas, Dockerfile | ✅ | (ver `git log`) |
+| 1 | F-02 api:types, interceptores, AuthService, login, guardas, `*hasPermission`, ubicación activa | ⏳ | |
+| 1 | F-03 Layout y componentes compartidos | ⏳ | |
+| 1 | F-04 Administración | ⏳ | |
+| 1 | F-05 Catálogos | ⏳ | |
+| 1 | F-06 Inventario | ⏳ | |
+| 1 | F-07 Conteo físico y consumo (móvil) | ⏳ | |
+| 1 | F-08 Traspasos directos | ⏳ | |
 
 Pruebas al cierre de B-17: **460 en verde** (322 unitarias, 138 de integración, incluida la de rendimiento), sin warnings.
 Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`, `AddCatalog`, `AddInventory`,
@@ -98,6 +111,17 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
 - Rendimiento (B-17): prueba `Category=Performance` dentro de `dotnet test`; resultados y EXPLAIN en `docs/rendimiento.md`.
   Saldo corrido del kardex por SUM sobre índice cubriente (antes ventana sobre todo el historial).
 
+**Frontend (F-01):**
+- **Angular Material en lugar de PrimeNG** (2026-09-25): PrimeNG 22 y `@primeuix/themes` 3 cambiaron a la licencia
+  "PrimeUI" (Community solo para <10 empleados/<1 MDD con clave anual; si no, de pago). PrimeNG 21.1.10 sigue MIT pero
+  es la última versión libre y ata a Angular 21. Se eligió Angular Material/CDK 22 (MIT) + Chart.js para el tablero.
+  Spec y CLAUDE.md actualizados.
+- Angular 22.2 requiere Node ≥ 24.15 (se actualizó Node LTS a 24.19 en esta máquina).
+- Proxy de desarrollo: `SGO_API_URL` o, por defecto, `http://localhost:8090`.
+- Fuentes (Roboto) e íconos (Material Symbols) empaquetados localmente: funciona sin internet.
+- `frontend/Dockerfile` (node:24-alpine → caddy:2-alpine con `/srv`) probado; el compose de producción **no se cambió**
+  (sigue montando `frontend/dist/sgo/browser`). Decidir al contratar DigitalOcean si `web` se construye del Dockerfile.
+
 ## Pendientes y notas técnicas
 
 - Dos recepciones simultáneas de **OC distintas** que crean el mismo lote nuevo del mismo artículo → una falla por el
@@ -108,6 +132,9 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
 - Kardex devuelve `userId`, no el nombre del usuario (agregar si la pantalla lo pide).
 - Ajustes y consumos no se cancelan (no hay endpoint en el spec); se corrige con otro ajuste.
 - `docs/specs/dominio.md` §6 ahora tiene 29 permisos (se agregó `logistics.transfers.special`).
+- **Frontend:** la fuente de Material Symbols pesa ~4 MB (se descarga una vez y queda en caché). Si pesa en celulares
+  de sucursal, en F-16 generar un subconjunto con solo los íconos usados.
+- **Frontend:** el datepicker (formato dd/MM/yyyy) necesita un `DateAdapter` es-MX; se resuelve en F-03.
 
 ## Cómo retomar
 
@@ -123,8 +150,13 @@ curl http://localhost:8090/health/ready                             # 200 = list
 cd backend
 dotnet build
 dotnet test          # usa Testcontainers (Docker)
+
+cd ../frontend       # requiere Node >= 24.15
+npm ci
+npm start            # http://localhost:4200, proxy a la API en :8090
+npm test && npm run lint
 ```
 
 - Credenciales locales (admin, JWT, Postgres) en `deploy/.env` (no se versiona; copia de `deploy/.env.example`).
 - La BD de desarrollo tiene datos de prueba: usuario "Demo Sucursal 3", categoría "Secos", artículos HAR-001 y AZU-001.
-- Flujo por tarea (CLAUDE.md): leer tarea → proponer plan y esperar OK → implementar → pruebas en verde → resumen → commit `feat(...): ... [B-xx]`.
+- Flujo por tarea (CLAUDE.md): leer tarea → proponer plan y esperar OK → implementar → pruebas en verde → resumen → commit `feat(...): ... [B-xx/F-xx]`.

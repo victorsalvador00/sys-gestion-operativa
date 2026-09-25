@@ -14,7 +14,7 @@ Cuando una tarea mencione una regla (ej. "RN-12"), abre la sección correspondie
 
 ```
 /backend    .NET 10 — Sgo.Domain, Sgo.Application, Sgo.Infrastructure, Sgo.Api, tests/
-/frontend   Angular + PrimeNG
+/frontend   Angular + Angular Material
 /deploy     docker-compose.yml (prod), docker-compose.dev.yml (local), Caddyfile, .env.example
 /docs/specs Especificaciones
 ```
@@ -33,7 +33,7 @@ dotnet ef migrations add <Nombre> -p src/Sgo.Infrastructure -s src/Sgo.Api -o Pe
 dotnet ef database update -p src/Sgo.Infrastructure -s src/Sgo.Api
 
 # Frontend (desde /frontend)
-npm start          # con proxy a http://localhost:8080
+npm start          # con proxy a http://localhost:8090 (o a SGO_API_URL si está definida)
 npm test
 npm run lint
 npm run e2e
@@ -58,7 +58,7 @@ npm run api:types  # regenerar tipos desde el OpenAPI del backend en ejecución
 
 ## Reglas estrictas
 
-1. **Cero dependencias con licencia de pago.** Antes de agregar cualquier paquete NuGet o npm, verifica su licencia en la versión exacta y menciónala en el resumen de la tarea. Prohibidos: MediatR, AutoMapper, MassTransit v9+, FluentAssertions v8+, EPPlus v5+, QuestPDF, Duende IdentityServer, Telerik, DevExpress, Syncfusion, AG Grid Enterprise, Kendo, PrimeNG Blocks o plantillas premium.
+1. **Cero dependencias con licencia de pago.** Antes de agregar cualquier paquete NuGet o npm, verifica su licencia en la versión exacta y menciónala en el resumen de la tarea. Prohibidos: MediatR, AutoMapper, MassTransit v9+, FluentAssertions v8+, EPPlus v5+, QuestPDF, Duende IdentityServer, Telerik, DevExpress, Syncfusion, AG Grid Enterprise, Kendo, PrimeNG v22+ y `@primeuix/*` con licencia "PrimeUI" (dejaron de ser MIT), PrimeNG Blocks o plantillas premium.
 2. **El inventario solo se mueve con `IInventoryPostingService`**, dentro de una transacción. Nunca se modifica `StockBalance` directamente.
 3. **Migraciones:** nunca editar una migración existente; crear una nueva. No aplicar migraciones automáticamente al arrancar en producción.
 4. **Seguridad:**

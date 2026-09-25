@@ -16,14 +16,15 @@ SPA en Angular para operar el SGO desde computadora, tableta y celular. La usan 
 | Uso | Tecnología | Licencia |
 |---|---|---|
 | Framework | Angular, última versión estable al iniciar: standalone components, signals, control flow `@if/@for`, `provideZonelessChangeDetection()` si es estable en esa versión | MIT |
-| Componentes UI | PrimeNG (misma versión mayor que Angular) + `@primeuix/themes` (preset Aura) + PrimeIcons | MIT |
-| Gráficas del tablero | `p-chart` de PrimeNG (Chart.js) | MIT |
+| Componentes UI | Angular Material + CDK (misma versión que Angular), tema Material 3 | MIT |
+| Fuentes e íconos | `@fontsource/roboto` y `material-symbols` (empaquetados localmente, sin CDN) | OFL-1.1 / Apache-2.0 |
+| Gráficas del tablero | Chart.js | MIT |
 | Tipos de la API | `openapi-typescript`: genera **solo tipos** desde `/openapi/v1.json` | MIT |
 | Pruebas unitarias | Runner por defecto del Angular CLI (Vitest en versiones recientes) | MIT |
 | Pruebas E2E | Playwright | Apache-2.0 |
 | Calidad | `angular-eslint`, Prettier | MIT |
 
-**Prohibido:** PrimeNG Blocks o plantillas premium de PrimeTek, AG Grid Enterprise, Kendo UI y cualquier paquete con licencia comercial. **No usar Tailwind** salvo que se decida explícitamente; el layout se resuelve con CSS propio y las utilidades de PrimeFlex **no** se usan (está descontinuado).
+**Prohibido:** PrimeNG v22+ y los paquetes `@primeuix/*` con licencia "PrimeUI" (desde 2026 dejaron de ser MIT: licencia Community con límites de tamaño de empresa y clave anual, o comercial), PrimeNG Blocks o plantillas premium de PrimeTek, AG Grid Enterprise, Kendo UI y cualquier paquete con licencia comercial. **No usar Tailwind** salvo que se decida explícitamente; el layout se resuelve con CSS propio y las utilidades de PrimeFlex **no** se usan (está descontinuado).
 
 ## 3. Arquitectura
 
@@ -57,7 +58,7 @@ frontend/
 │   │   ├── app.config.ts
 │   │   └── app.routes.ts
 │   ├── environments/
-│   └── styles/                    # tokens.css, layout.css, overrides de PrimeNG
+│   └── styles/                    # _theme.scss (paleta), _tokens.scss, _layout.scss, _material-overrides.scss
 └── e2e/
 ```
 
@@ -75,7 +76,7 @@ frontend/
   - Sidebar colapsable con el menú por módulo, **filtrado por permisos**.
   - Topbar con el selector de ubicación activa, el nombre del usuario y el menú (cambiar contraseña, salir).
   - En móvil, el sidebar se vuelve un drawer.
-- **Tema:** preset Aura con color primario configurable en `styles/tokens.css`. Neutro y sobrio; soporta modo claro. El modo oscuro es opcional.
+- **Tema:** Material 3 (`mat.theme`) con la paleta primaria configurable en `styles/_theme.scss`; tokens propios en `styles/_tokens.scss`. Neutro y sobrio; soporta modo claro. El modo oscuro es opcional.
 - **Formatos (locale `es-MX`):**
   - Moneda: `$1,234.56`.
   - Cantidades: hasta 4 decimales sin ceros sobrantes, con la unidad al lado (`12.5 kg`).
@@ -222,7 +223,7 @@ Para la gerencia (`locations.all`), se agrega una gráfica de barras de artícul
 | Componente | Responsabilidad |
 |---|---|
 | `app-page-header` | Título, breadcrumbs y botones de acción |
-| `app-data-table` | Envoltura de `p-table` en modo lazy: paginación, orden y filtros de servidor que se traducen a `page/pageSize/sort/q`. Skeleton de carga y estado vacío |
+| `app-data-table` | Envoltura de `mat-table` + `mat-paginator` + `mat-sort` en modo servidor: paginación, orden y filtros de servidor que se traducen a `page/pageSize/sort/q`. Skeleton de carga y estado vacío |
 | `app-status-tag` | Etiqueta con color por estado (tabla sección 4) |
 | `app-item-picker` | Autocomplete de artículos por SKU o nombre. Muestra unidad base y existencia en la ubicación activa (opcional) |
 | `app-location-picker` | Selector de ubicaciones permitidas, filtrable por tipo |
@@ -248,7 +249,7 @@ Para la gerencia (`locations.all`), se agrega una gráfica de barras de artícul
 
 ## 10. Build y despliegue
 
-- **Entornos:** `environment.ts` con `apiBaseUrl: '/api/v1'`. En desarrollo, `proxy.conf.json` redirige `/api` a `http://localhost:8080`.
+- **Entornos:** `environment.ts` con `apiBaseUrl: '/api/v1'`. En desarrollo, `proxy.conf.mjs` redirige `/api` y `/health` a `SGO_API_URL` (por defecto `http://localhost:8090`).
 - **Scripts de `package.json`:** `start`, `build`, `test`, `lint`, `e2e`, `api:types`.
 - **`frontend/Dockerfile`:** multi-stage. Una etapa `node:lts` ejecuta `npm ci && npm run build`; la imagen final es `caddy:2` con `dist/.../browser` en `/srv`.
 - **`deploy/Caddyfile`:**
@@ -283,7 +284,7 @@ Cada tarea debe dejar `npm run lint` y `npm test` en verde. Hacer una tarea por 
 
 | ID | Tarea | Criterio de aceptación |
 |---|---|---|
-| F-01 | Proyecto Angular, PrimeNG + tema, locale `es-MX`, ESLint/Prettier, proxy, estructura de carpetas, Dockerfile | `npm start` muestra el shell vacío con el tema aplicado |
+| F-01 | Proyecto Angular, Angular Material + tema, locale `es-MX`, ESLint/Prettier, proxy, estructura de carpetas, Dockerfile | `npm start` muestra el shell vacío con el tema aplicado |
 | F-02 | `api:types`, interceptores (base, auth, error), `AuthService`, login, refresh al iniciar, guardas, `*hasPermission`, `LocationContextService` | Login funcional; el menú se filtra por permisos; tras un refresh (F5) la sesión se conserva |
 | F-03 | Layout (sidebar, topbar, drawer móvil) y componentes compartidos: `page-header`, `data-table`, `status-tag`, `item-picker`, `location-picker`, `qty-input`, `lines-editor`, `confirm-summary`, `shortages-dialog` | Página de demostración interna con todos los componentes |
 | F-04 | Administración: usuarios, roles (matriz de permisos), bitácora, configuración | Admin crea un usuario de sucursal que entra y solo ve su menú |
