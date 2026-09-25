@@ -22,10 +22,9 @@ import { filter, map, of, switchMap } from 'rxjs';
 import { AuthService } from '../../../core/auth/auth.service';
 import { LocationContextService } from '../../../core/context/location-context.service';
 import { Notifier } from '../../../core/http/notifier.service';
-import { toProblem } from '../../../core/http/problem-details';
-import { applyServerErrors } from '../../../core/http/server-errors';
 import { AuditPanel } from '../../../shared/components/audit-panel/audit-panel';
-import { ConfirmService, ConflictHandler } from '../../../shared/components/dialogs.service';
+import { ConfirmService } from '../../../shared/components/dialogs.service';
+import { FormErrors } from '../../../shared/forms/form-errors.service';
 import { PageHeader } from '../../../shared/components/page-header/page-header';
 import {
   generatePassword,
@@ -60,7 +59,7 @@ import { UserStatusTag } from '../ui/user-status-tag';
     .form {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 0 var(--sgo-space-4);
+      gap: var(--sgo-space-2) var(--sgo-space-4);
     }
     .full {
       grid-column: 1 / -1;
@@ -82,7 +81,7 @@ export class UserFormPage {
   private readonly router = inject(Router);
   private readonly notifier = inject(Notifier);
   private readonly confirmService = inject(ConfirmService);
-  private readonly conflicts = inject(ConflictHandler);
+  private readonly formErrors = inject(FormErrors);
   private readonly dialog = inject(MatDialog);
   private readonly auth = inject(AuthService);
   private readonly destroyRef = inject(DestroyRef);
@@ -279,15 +278,6 @@ export class UserFormPage {
   private onError(error: unknown): void {
     this.saving.set(false);
     const user = this.user();
-    if (this.conflicts.handle(error, { reload: () => user && this.load(user.id) })) {
-      return;
-    }
-    const problem = toProblem(error);
-    if (problem?.status === 400) {
-      const unmapped = applyServerErrors(this.form, problem);
-      if (unmapped.length) {
-        this.notifier.error(unmapped.join(' '));
-      }
-    }
+    this.formErrors.handle(error, this.form, { reload: () => user && this.load(user.id) });
   }
 }

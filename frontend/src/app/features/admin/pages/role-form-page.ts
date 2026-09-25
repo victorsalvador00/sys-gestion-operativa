@@ -16,10 +16,8 @@ import { MatInputModule } from '@angular/material/input';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
 import { Notifier } from '../../../core/http/notifier.service';
-import { toProblem } from '../../../core/http/problem-details';
-import { applyServerErrors } from '../../../core/http/server-errors';
 import { AuditPanel } from '../../../shared/components/audit-panel/audit-panel';
-import { ConflictHandler } from '../../../shared/components/dialogs.service';
+import { FormErrors } from '../../../shared/forms/form-errors.service';
 import { PageHeader } from '../../../shared/components/page-header/page-header';
 import { StatusTag } from '../../../shared/components/status-tag/status-tag';
 import { RoleDto, RolesApi } from '../data-access/roles.api';
@@ -117,7 +115,7 @@ import { PermissionMatrix } from '../ui/permission-matrix';
     .fields {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 0 var(--sgo-space-4);
+      gap: var(--sgo-space-2) var(--sgo-space-4);
     }
     h2 {
       margin: 0 0 var(--sgo-space-3);
@@ -129,7 +127,7 @@ export class RoleFormPage {
   private readonly api = inject(RolesApi);
   private readonly router = inject(Router);
   private readonly notifier = inject(Notifier);
-  private readonly conflicts = inject(ConflictHandler);
+  private readonly formErrors = inject(FormErrors);
   private readonly auth = inject(AuthService);
 
   readonly id = input<string>();
@@ -188,16 +186,7 @@ export class RoleFormPage {
       },
       error: (error: unknown) => {
         this.saving.set(false);
-        if (this.conflicts.handle(error, { reload: () => role && this.load(role.id) })) {
-          return;
-        }
-        const problem = toProblem(error);
-        if (problem?.status === 400) {
-          const unmapped = applyServerErrors(this.form, problem);
-          if (unmapped.length) {
-            this.notifier.error(unmapped.join(' '));
-          }
-        }
+        this.formErrors.handle(error, this.form, { reload: () => role && this.load(role.id) });
       },
     });
   }

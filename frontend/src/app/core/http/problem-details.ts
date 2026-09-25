@@ -11,12 +11,20 @@ export interface StockShortage {
   available: number;
 }
 
+/** Error de una fila de un CSV (400 `import_invalid`, extensión `rowErrors`). */
+export interface ImportRowError {
+  row: number;
+  column: string | null;
+  message: string;
+}
+
 /** ProblemDetails (RFC 9457) con las extensiones que agrega el backend (spec backend §6.1). */
 export type ApiProblem = Schemas['ProblemDetails'] & {
   code?: string;
   traceId?: string;
   errors?: Record<string, string[]>;
   shortages?: StockShortage[];
+  rowErrors?: ImportRowError[];
 };
 
 /** Extrae el ProblemDetails de una respuesta de error, si lo trae. */

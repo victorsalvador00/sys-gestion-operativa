@@ -35,7 +35,7 @@
 | 1 | F-02 api:types, interceptores, AuthService, login, guardas, `*hasPermission`, ubicación activa | ✅ | (ver `git log`) |
 | 1 | F-03 Layout y componentes compartidos | ✅ | (ver `git log`) |
 | 1 | F-04 Administración (+ E2E #1 con Playwright) | ✅ | (ver `git log`) |
-| 1 | F-05 Catálogos | ⏳ | |
+| 1 | F-05 Catálogos (+ E2E de importación con errores) | ✅ | (ver `git log`) |
 | 1 | F-06 Inventario | ⏳ | |
 | 1 | F-07 Conteo físico y consumo (móvil) | ⏳ | |
 | 1 | F-08 Traspasos directos | ⏳ | |
@@ -166,6 +166,15 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
   encargado de sucursal que entra y solo ve su menú. Cada corrida deja un usuario `e2e.encargado.*@sgo.test`
   **desactivado** en la base de desarrollo.
 
+**Frontend (F-05):**
+- `features/catalog`: ubicaciones, categorías y unidades (lista + diálogo), artículos (lista con filtros; formulario con
+  unidades/factor, lotes/vida útil, IVA 0/16 %, pestaña Mín/Máx por ubicación con guardado propio, historial) e
+  importación CSV (plantilla generada en el navegador con BOM, guía de valores, vista previa de 20 filas, tabla de
+  errores por fila que además marca las filas en la vista previa). Detalle de artículo solo con `catalog.manage`.
+- `shared/data-access/csv.ts` (lector RFC 4180 con `,`/`;`) y `FormErrors` (manejo estándar de 400/409 al guardar).
+- E2E `02-item-import-errors`: CSV con errores → tabla por fila; no importa nada. El backend no evalúa las reglas del SKU
+  en filas que ya tienen errores de formato (se reportan en la siguiente corrida).
+
 ## Pendientes y notas técnicas
 
 - Dos recepciones simultáneas de **OC distintas** que crean el mismo lote nuevo del mismo artículo → una falla por el
@@ -178,6 +187,10 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
 - `docs/specs/dominio.md` §6 ahora tiene 29 permisos (se agregó `logistics.transfers.special`).
 - **Frontend:** la fuente de Material Symbols pesa ~4 MB (se descarga una vez y queda en caché). Si pesa en celulares
   de sucursal, en F-16 generar un subconjunto con solo los íconos usados.
+- **Sesión cerrada por "reuse detected" (backend B-03):** si dos peticiones `/auth/refresh` salen casi al mismo tiempo
+  con la misma cookie (dos pestañas abiertas a la vez, F5 dos veces rápido, recarga a mitad de un refresh), la segunda
+  se toma como robo de token y se revoca toda la familia → el usuario queda fuera. Visto en desarrollo el 2026-09-25.
+  Propuesta: ventana de gracia (~30 s) para un token recién rotado + serializar el refresh entre pestañas (Web Locks).
 - **Bitácora:** `/audit-log?entityId=` compara exacto. Los cambios de roles/ubicaciones de un usuario y de permisos de
   un rol se registran con ids compuestos (`usuario|ubicación`, `rol|permiso`) y **no aparecen en el historial** del
   usuario o rol (sí en la bitácora general). Opción futura: que el backend incluya `entityId LIKE 'id|%'`.
