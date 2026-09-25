@@ -95,6 +95,7 @@ public static class DependencyInjection
         services.AddScoped<IPhysicalCountService, PhysicalCountService>();
         services.AddScoped<IConsumptionService, ConsumptionService>();
         services.AddScoped<ITransferService, TransferService>();
+        services.AddScoped<IBranchOrderService, BranchOrderService>();
         services.AddScoped<IRecipeService, RecipeService>();
         services.AddScoped<IProductionOrderService, ProductionOrderService>();
         services.AddScoped<ISupplierService, SupplierService>();

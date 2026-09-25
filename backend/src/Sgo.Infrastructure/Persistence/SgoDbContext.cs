@@ -31,6 +31,7 @@ public class SgoDbContext(DbContextOptions<SgoDbContext> options)
     public DbSet<PhysicalCount> PhysicalCounts => Set<PhysicalCount>();
     public DbSet<ConsumptionEntry> Consumptions => Set<ConsumptionEntry>();
     public DbSet<Transfer> Transfers => Set<Transfer>();
+    public DbSet<BranchOrder> BranchOrders => Set<BranchOrder>();
     public DbSet<Recipe> Recipes => Set<Recipe>();
     public DbSet<ProductionOrder> ProductionOrders => Set<ProductionOrder>();
     public DbSet<Supplier> Suppliers => Set<Supplier>();

@@ -211,6 +211,8 @@ public sealed class TransferService(
         var transfer = await FindForOriginAsync(id, ct);
         db.EnsureVersion(transfer, request.Version);
         await ValidatePlanAsync(transfer.FromLocationId, request.ToLocationId, request.Lines, ct);
+        if (transfer.BranchOrderId is { } orderId)
+            await EnsureWithinOrderAsync(orderId, request.ToLocationId, request.Lines, ct);
 
         transfer.UpdateDraft(request.ToLocationId, request.Notes, ToInputs(request.Lines));
         db.Entry(transfer).State = EntityState.Modified;
@@ -223,6 +225,9 @@ public sealed class TransferService(
         var transfer = await FindForOriginAsync(id, ct);
         db.EnsureVersion(transfer, version);
         transfer.Cancel();
+        // An order's transfer is its only way to be supplied: cancelling it cancels the order.
+        if (transfer.BranchOrderId is { } orderId)
+            (await db.BranchOrders.SingleAsync(o => o.Id == orderId, ct)).CancelWithTransfer();
         await db.SaveChangesAsync(ct);
         return await ToDtoAsync(transfer, ct);
     }
@@ -257,6 +262,12 @@ public sealed class TransferService(
         var receipts = request.Lines.Select(l => new ReceiptInput(l.LineId, l.ReceivedQty, l.DiscrepancyReason, l.DiscrepancyNotes)).ToList();
         var requests = transfer.Receive(receipts, clock.UtcNow, currentUser.UserId);
         await posting.PostAsync(requests, ct);
+        if (transfer.BranchOrderId is { } orderId)
+        {
+            // RN-24: the order counts what was dispatched; a loss in transit stays on the transfer (RN-22).
+            var order = await db.BranchOrders.Include(o => o.Lines).SingleAsync(o => o.Id == orderId, ct);
+            order.RegisterShipment(transfer.Lines.GroupBy(l => l.ItemId).ToDictionary(g => g.Key, g => g.Sum(l => l.ShippedQty)), clock.UtcNow);
+        }
         await db.SaveChangesAsync(ct);
         await tx.CommitAsync(ct);
         return await ToDtoAsync(transfer, ct);
@@ -305,6 +316,18 @@ public sealed class TransferService(
             errors.Add("Un lote indicado no pertenece a su artículo.");
         if (errors.Count > 0)
             throw new RequestValidationException(new Dictionary<string, string[]> { ["lines"] = [.. errors.Distinct()] });
+    }
+
+    /// <summary>An order's transfer goes to the ordering branch and carries at most the approved quantity of approved items.</summary>
+    private async Task EnsureWithinOrderAsync(Guid orderId, Guid toLocationId, IReadOnlyList<TransferLineRequest> lines, CancellationToken ct)
+    {
+        var order = await db.BranchOrders.AsNoTracking().Include(o => o.Lines).SingleAsync(o => o.Id == orderId, ct);
+        if (toLocationId != order.RequestingLocationId)
+            throw new BusinessRuleException("transfer_order_destination", $"El traspaso del pedido {order.Folio} va a la sucursal que lo pidió.");
+        var approved = order.ApprovedByItem();
+        if (lines.GroupBy(l => l.ItemId).Any(g => !approved.TryGetValue(g.Key, out var max) || g.Sum(l => l.Quantity) > max))
+            throw new BusinessRuleException("transfer_exceeds_order",
+                $"El traspaso del pedido {order.Folio} solo lleva artículos aprobados y hasta la cantidad aprobada.");
     }
 
     private async Task<Location> EnsureActiveAsync(Guid locationId, CancellationToken ct)

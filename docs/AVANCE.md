@@ -20,14 +20,14 @@
 | 2 | B-11 Órdenes de producción (completar transaccional) | ✅ | `e12626f` |
 | 3 | B-12 Proveedores y artículos de proveedor | ✅ | `3671b24` |
 | 3 | B-13 Requisiciones y conversión a OC | ✅ | `150b46d` |
-| 3 | B-14 Órdenes de compra, aprobación por umbral, recepción parcial, cierre | ✅ | (ver `git log`) |
-| 3 | B-15 Pedidos de sucursal, sugerido mín/máx, aprobación → traspasos, RN-24 | ⏭️ siguiente | |
-| 3 | B-16 Tablero y `/settings` | pendiente | |
+| 3 | B-14 Órdenes de compra, aprobación por umbral, recepción parcial, cierre | ✅ | `dad493a` |
+| 3 | B-15 Pedidos de sucursal, sugerido mín/máx, aprobación → traspasos, RN-24 | ✅ | (ver `git log`) |
+| 3 | B-16 Tablero y `/settings` | ⏭️ siguiente | |
 | 3 | B-17 Endurecimiento (índices, EXPLAIN, bundle de migraciones, compose prod) | pendiente | |
 
-Pruebas al cierre de B-14: **419 en verde** (289 unitarias, 130 de integración), sin warnings.
+Pruebas al cierre de B-15: **446 en verde** (311 unitarias, 135 de integración), sin warnings.
 Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`, `AddCatalog`, `AddInventory`,
-`AddAdjustments`, `AddCountsAndConsumptions`, `AddTransfers`, `AddRecipes`, `AddProductionOrders`, `AddSuppliers`, `AddRequisitionsAndPurchaseOrders`, `AddGoodsReceipts`.
+`AddAdjustments`, `AddCountsAndConsumptions`, `AddTransfers`, `AddRecipes`, `AddProductionOrders`, `AddSuppliers`, `AddRequisitionsAndPurchaseOrders`, `AddGoodsReceipts`, `AddBranchOrders`.
 
 ## Decisiones acordadas con el cliente
 
@@ -77,10 +77,16 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
   maneja lotes; sin caducidad → la del lote existente o hoy + vida útil; lotes vencidos se rechazan. Costo base =
   precio / factor (sin IVA). Tolerancia de sobre-recepción desde `AppSetting` (default 0 %). Se bloquea la OC
   (`poVersion` + lock de fila): recepciones simultáneas → una 201 y otra 409.
+- Pedidos de sucursal (B-15): solo sucursales piden, a Fábrica o Comisariato; cualquier artículo activo; fecha
+  requerida no pasada; cantidades en unidad base. Aprobar crea **un** traspaso Draft ligado (`branch_order_id`, ahora con
+  FK) con lo aprobado (0..solicitado; todo en 0 → rechazar). El origen puede editar ese traspaso sin cambiar destino,
+  sin artículos ajenos y sin pasar de lo aprobado. Cancelar ese traspaso **cancela el pedido**. RN-24 cuenta lo
+  **despachado** (faltante en tránsito queda en el traspaso) → `Fulfilled`; si se mandó menos → `PartiallyFulfilled`
+  (final). Sugerido: proyectado = existencia + en tránsito + pedidos enviados/aprobados sin despachar; si ≤ mín →
+  máx − proyectado. Visibilidad: sucursal u origen en alcance; aprobar/rechazar exige alcance sobre el origen.
 
 ## Pendientes y notas técnicas
 
-- **B-15:** ligar traspasos con pedido (columna `branch_order_id` ya existe) y RN-24.
 - Dos recepciones simultáneas de **OC distintas** que crean el mismo lote nuevo del mismo artículo → una falla por el
   índice único (500; muy poco probable). Las de la misma OC ya se serializan (409).
 - **B-12:** dos usuarios que marcan al mismo tiempo proveedores preferidos distintos para el mismo artículo → uno

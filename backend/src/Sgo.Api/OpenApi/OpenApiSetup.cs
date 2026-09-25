@@ -168,6 +168,21 @@ public static class OpenApiSetup
                          { "poLineId": "0199a1b2-0000-7000-8000-0000000000e1", "quantity": 4, "lotNumber": "L-2411", "expirationDate": null },
                          { "poLineId": "0199a1b2-0000-7000-8000-0000000000e2", "quantity": 2, "lotNumber": null, "expirationDate": null } ] }
             """,
+        [typeof(CreateBranchOrderRequest)] = """
+            { "requestingLocationId": "0199a1b2-0000-7000-8000-0000000000a1", "supplyingLocationId": "0199a1b2-0000-7000-8000-0000000000a9",
+              "requiredDate": "2026-09-26", "notes": "Fin de semana largo",
+              "lines": [ { "itemId": "0199a1b2-0000-7000-8000-0000000000d9", "requestedQty": 24 },
+                         { "itemId": "0199a1b2-0000-7000-8000-0000000000d1", "requestedQty": 5.5 } ] }
+            """,
+        [typeof(UpdateBranchOrderRequest)] = """
+            { "version": 1234, "supplyingLocationId": "0199a1b2-0000-7000-8000-0000000000a9", "requiredDate": "2026-09-27", "notes": null,
+              "lines": [ { "itemId": "0199a1b2-0000-7000-8000-0000000000d9", "requestedQty": 30 } ] }
+            """,
+        [typeof(ApproveBranchOrderRequest)] = """
+            { "version": 1234, "lines": [ { "lineId": "0199a1b2-0000-7000-8000-0000000000e1", "approvedQty": 20 },
+                                          { "lineId": "0199a1b2-0000-7000-8000-0000000000e2", "approvedQty": 0 } ] }
+            """,
+        [typeof(RejectBranchOrderRequest)] = """{ "version": 1234, "reason": "Sin existencia hasta el lunes" }""",
         [typeof(UpdateLocationRequest)] = """{ "version": 1234, "name": "Sucursal Centro", "address": "Av. Juárez 100, Col. Centro", "isActive": true }""",
     };
 

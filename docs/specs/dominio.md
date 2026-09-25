@@ -229,6 +229,10 @@ El código (clases, tablas, endpoints) va en **inglés**; la interfaz de usuario
 ### Logística
 
 - **RN-20**: La sucursal crea el pedido y lo envía. El origen lo aprueba y puede ajustar `ApprovedQty`. Un pedido aprobado genera uno o más traspasos en `Draft` con lo aprobado.
+  - Acordado en B-15: se genera **un** traspaso con las líneas aprobadas (> 0); `ApprovedQty` va de 0 a lo solicitado y aprobar todo en 0 no se permite (se rechaza). No se reserva existencia.
+  - El origen puede editar ese traspaso antes de despacharlo, sin cambiar el destino, sin artículos ajenos al pedido y sin pasar de lo aprobado.
+  - Cancelar el traspaso en borrador de un pedido **cancela el pedido**. El pedido en sí solo se cancela en `Draft` o `Submitted`.
+  - Sugerido por mín/máx: proyectado = existencia + en tránsito hacia la sucursal + pedidos enviados o aprobados sin despachar; si proyectado ≤ mínimo, se sugiere máximo − proyectado.
 - **RN-21 (despacho)**: al despachar se registra `TransferOut` en el origen (FEFO si no se eligieron lotes). El traspaso queda "en tránsito" hasta su recepción.
 - **RN-22 (recepción)**:
   - El destino captura `ReceivedQty` por línea y se registra `TransferIn` por lo recibido.
@@ -236,6 +240,7 @@ El código (clases, tablas, endpoints) va en **inglés**; la interfaz de usuario
   - `ReceivedQty > ShippedQty` no está permitido.
 - **RN-23**: Un traspaso despachado no se edita ni se cancela.
 - **RN-24**: Al recibir un traspaso ligado a un pedido, se actualizan `ShippedQty` y el estado del pedido (`PartiallyFulfilled` o `Fulfilled`).
+  - Acordado en B-15: `ShippedQty` = lo **despachado** (la pérdida en tránsito queda en el traspaso, RN-22). `PartiallyFulfilled` es final: lo que falte se pide en un pedido nuevo.
 
 ### Compras
 

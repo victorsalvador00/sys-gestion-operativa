@@ -31,6 +31,7 @@ public interface ISgoDbContext
     DbSet<PhysicalCount> PhysicalCounts { get; }
     DbSet<ConsumptionEntry> Consumptions { get; }
     DbSet<Transfer> Transfers { get; }
+    DbSet<BranchOrder> BranchOrders { get; }
     DbSet<Recipe> Recipes { get; }
     DbSet<ProductionOrder> ProductionOrders { get; }
     DbSet<Supplier> Suppliers { get; }
