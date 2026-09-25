@@ -1,3 +1,45 @@
+# Despliegue
+
+## Uso local (situación actual)
+
+Mientras no se contrate DigitalOcean, el sistema corre **solo en una computadora**, para pruebas y capacitación, con el compose de desarrollo y una base Postgres local. Los comandos son para PowerShell, desde la raíz del repositorio. Docker Desktop debe estar abierto.
+
+```powershell
+# Primera vez: copiar deploy/.env.example a deploy/.env y poner contraseñas y clave JWT propias.
+docker compose -f deploy/docker-compose.dev.yml up -d          # base, API (migra y siembra al arrancar) y respaldos
+curl http://localhost:8080/health/ready                         # 200 = listo (o el puerto de API_PORT)
+docker compose -f deploy/docker-compose.dev.yml down            # detener (los datos se conservan)
+```
+
+### Respaldos
+
+- El servicio `backup` hace un `pg_dump` al arrancar y luego cada `BACKUP_INTERVAL_HOURS` (default 24). Solo mientras el stack está encendido.
+- Los archivos quedan en `deploy/backups/sgo-AAAAMMDD-HHMMSS.dump` y se borran después de `BACKUP_RETENTION_DAYS` (default 14).
+- `deploy/backups/` no se sube a git porque contiene datos del negocio. **Copia esa carpeta periódicamente fuera de la computadora** (USB o nube): si el disco falla, se pierden base y respaldos juntos.
+
+```powershell
+# Respaldo inmediato (por ejemplo, antes de una capacitación o de actualizar el sistema)
+docker compose -f deploy/docker-compose.dev.yml exec backup /scripts/backup.sh
+
+# Restaurar: REEMPLAZA todos los datos por los del respaldo
+docker compose -f deploy/docker-compose.dev.yml stop api
+docker compose -f deploy/docker-compose.dev.yml exec backup /scripts/restore.sh sgo-20260925-051400.dump
+docker compose -f deploy/docker-compose.dev.yml start api
+```
+
+Sin nombre de archivo, `restore.sh` lista los respaldos más recientes.
+
+### Pasar después a DigitalOcean
+
+1. Tomar un respaldo inmediato (arriba).
+2. Hacer los pasos 1 a 3 de **Primera instalación** (abajo): base `sgo` vacía, DNS, clonar y llenar `deploy/.env`.
+3. Cargar el respaldo en esa base vacía desde el equipo local (trae esquema, datos e historial de migraciones):
+   ```powershell
+   docker run --rm -v "${PWD}/deploy/backups:/backups" postgres:16 `
+     pg_restore --no-owner --dbname "postgresql://<usuario>:<contraseña>@<host>:25060/sgo?sslmode=require" /backups/<archivo>.dump
+   ```
+4. En el Droplet: `docker compose build`, `docker compose run --rm migrate` (aplica solo las migraciones que falten) y `docker compose up -d`. **No** correr `--seed`: los datos base ya vienen en el respaldo.
+
 # Despliegue en producción
 
 Servidor: un Droplet de DigitalOcean con Docker. Base de datos: Postgres administrado de DigitalOcean (no corre en el Droplet).

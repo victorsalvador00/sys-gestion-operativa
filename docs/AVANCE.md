@@ -114,7 +114,8 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
 ```bash
 # Docker Desktop debe estar abierto.
 # En esta máquina un proceso Java ajeno ocupa puertos entre 8080 y 8082 (varía), por eso API_PORT=8090.
-# Producción: ver deploy/README.md.
+# Producción: ver deploy/README.md. Por ahora (sin DigitalOcean) el sistema corre solo local, con respaldos
+# automáticos en deploy/backups (servicio `backup` del compose de desarrollo; ver "Uso local" en deploy/README.md).
 API_PORT=8090 docker compose -f deploy/docker-compose.dev.yml up -d   # Postgres + API con hot reload
 curl http://localhost:8090/health/ready                             # 200 = listo
 # OpenAPI/Scalar: http://localhost:8090/scalar/v1

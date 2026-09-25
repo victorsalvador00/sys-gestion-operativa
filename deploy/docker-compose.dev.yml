@@ -1,7 +1,8 @@
 # Local development: Postgres + API with hot reload.
 #   docker compose -f deploy/docker-compose.dev.yml up            (everything)
 #   docker compose -f deploy/docker-compose.dev.yml up -d postgres (only the DB; run the API with `dotnet run`)
-# Variables are read from deploy/.env (copy .env.example).
+#   docker compose -f deploy/docker-compose.dev.yml exec backup /scripts/backup.sh   (backup now)
+# Variables are read from deploy/.env (copy .env.example). Backups and restore: deploy/README.md, "Uso local".
 
 name: sgo-dev
 
@@ -21,6 +22,26 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+
+  # Daily compressed pg_dump into deploy/backups (kept BACKUP_RETENTION_DAYS days). Runs while the stack is up;
+  # the first backup is taken at start, then every BACKUP_INTERVAL_HOURS.
+  backup:
+    image: postgres:16
+    environment:
+      PGHOST: postgres
+      PGDATABASE: ${POSTGRES_DB:-sgo}
+      PGUSER: ${POSTGRES_USER:-sgo}
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION_DAYS:-14}
+      BACKUP_INTERVAL_HOURS: ${BACKUP_INTERVAL_HOURS:-24}
+    entrypoint: ["/bin/sh", "-c", "while true; do /scripts/backup.sh || echo 'El respaldo falló' >&2; sleep $$((BACKUP_INTERVAL_HOURS * 3600)); done"]
+    volumes:
+      - ./backup:/scripts:ro
+      - ./backups:/backups
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
 
   api:
     image: mcr.microsoft.com/dotnet/sdk:10.0
