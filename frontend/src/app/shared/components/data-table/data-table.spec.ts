@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { ListQuery } from '../../../core/http/list-query';
 import { toHttpParams } from '../../../core/http/list-query';
-import { CellDef, DataTable, TableColumn } from './data-table';
+import { CellDef, DataTable, RowDetailDef, TableColumn } from './data-table';
 
 interface Row {
   id: number;
@@ -52,7 +52,7 @@ describe('app-data-table', () => {
 
   it('muestra filas, celdas con plantilla y encabezados', async () => {
     const { el } = await render();
-    expect(el.querySelectorAll('tr.mat-mdc-row')).toHaveLength(2);
+    expect(el.querySelectorAll('tr.mat-mdc-row:not(.detail-row)')).toHaveLength(2);
     expect(el.querySelector('tr.mat-mdc-row td:last-child')?.textContent?.trim()).toBe('$ 10');
     expect(el.querySelector('th')?.textContent).toContain('Folio');
   });
@@ -99,6 +99,51 @@ describe('app-data-table', () => {
     await fixture.whenStable();
     expect(el.querySelector('.empty')).toBeNull();
     expect(el.querySelectorAll('.skeleton').length).toBeGreaterThan(0);
+  });
+});
+
+@Component({
+  imports: [DataTable, RowDetailDef],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
+    <app-data-table [columns]="columns" [rows]="rows" [total]="2" [query]="query">
+      <ng-template appRowDetail let-row
+        ><p class="detail">Lotes de {{ row.folio }}</p></ng-template
+      >
+    </app-data-table>
+  `,
+})
+class ExpandHost {
+  readonly columns: TableColumn<Row>[] = [{ key: 'folio', header: 'Folio' }];
+  readonly rows: Row[] = [
+    { id: 1, folio: 'A', total: 1 },
+    { id: 2, folio: 'B', total: 2 },
+  ];
+  readonly query: ListQuery = { page: 1, pageSize: 25 };
+}
+
+describe('app-data-table con detalle expandible', () => {
+  it('expande y contrae una fila con el botón o al tocarla', async () => {
+    const fixture = TestBed.createComponent(ExpandHost);
+    await fixture.whenStable();
+    const el = fixture.nativeElement as HTMLElement;
+    const buttons = () => el.querySelectorAll<HTMLButtonElement>('td.expand-cell button');
+
+    expect(el.querySelector('.detail')).toBeNull();
+    expect(buttons()[0].getAttribute('aria-expanded')).toBe('false');
+
+    buttons()[0].click();
+    await fixture.whenStable();
+    expect(el.querySelector('.detail')?.textContent).toContain('Lotes de A');
+    expect(buttons()[0].getAttribute('aria-expanded')).toBe('true');
+
+    el.querySelectorAll<HTMLElement>('tr.mat-mdc-row:not(.detail-row)')[1].click();
+    await fixture.whenStable();
+    expect(el.querySelectorAll('.detail')).toHaveLength(2);
+
+    buttons()[0].click();
+    await fixture.whenStable();
+    expect(el.querySelectorAll('.detail')).toHaveLength(1);
   });
 });
 

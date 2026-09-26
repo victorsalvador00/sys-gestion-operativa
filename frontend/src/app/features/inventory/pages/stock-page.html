@@ -1,0 +1,90 @@
+<section class="sgo-page">
+  <app-page-header
+    title="Existencias"
+    [subtitle]="location() ? location()!.code + ' · ' + location()!.name : 'Sin ubicación asignada'"
+  />
+
+  @if (!location()) {
+    <p class="notice notice-info">No tienes ubicaciones asignadas. Pide acceso al administrador.</p>
+  } @else {
+    <div class="sgo-row filters">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Categoría</mat-label>
+        <mat-select
+          [value]="filters().categoryId ?? null"
+          (valueChange)="setFilter('categoryId', $event)"
+        >
+          <mat-option [value]="null">Todas</mat-option>
+          @for (category of categories.value() ?? []; track category.id) {
+            <mat-option [value]="category.id">{{ category.name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-slide-toggle
+        [checked]="!!filters().belowMin"
+        (change)="setFilter('belowMin', $event.checked || null)"
+      >
+        Solo bajo mínimo
+      </mat-slide-toggle>
+    </div>
+    @if (alertDays() !== null) {
+      <p class="summary">
+        Toca una fila para ver sus lotes. "Por caducar" = vence en {{ alertDays() }} días o menos.
+      </p>
+    }
+
+    <app-data-table
+      [columns]="columns"
+      [rows]="stock.value()?.items ?? []"
+      [total]="stock.value()?.total ?? 0"
+      [loading]="stock.isLoading()"
+      [query]="query()"
+      [searchable]="true"
+      searchPlaceholder="Buscar por SKU o nombre"
+      emptyMessage="No hay existencias con esos filtros."
+      [trackBy]="trackItem"
+      (queryChange)="query.set($event)"
+    >
+      <ng-template appCell="onHand" let-row>{{ row.onHand | qty: row.baseUomCode }}</ng-template>
+      <ng-template appCell="averageCost" let-row>{{ row.averageCost | mxn: '1.2-4' }}</ng-template>
+      <ng-template appCell="stockValue" let-row>{{ row.stockValue | mxn }}</ng-template>
+      <ng-template appCell="status" let-row>
+        @if (row.belowMin) {
+          <app-status-tag label="Bajo mínimo" color="orange" />
+        }
+      </ng-template>
+      <ng-template appCell="actions" let-row>
+        <a
+          mat-icon-button
+          [routerLink]="['/inventario/kardex']"
+          [queryParams]="{ itemId: row.itemId, locationId: row.locationId }"
+          matTooltip="Ver kardex"
+          [attr.aria-label]="'Kardex de ' + row.itemName"
+          (click)="$event.stopPropagation()"
+        >
+          <mat-icon>receipt_long</mat-icon>
+        </a>
+      </ng-template>
+      <ng-template appRowDetail let-row>
+        <app-lot-list
+          [locationId]="row.locationId"
+          [itemId]="row.itemId"
+          [uom]="row.baseUomCode"
+          [expiringLotIds]="expiringLotIds()"
+        />
+      </ng-template>
+      <ng-template appCardDef let-row>
+        <div class="card-row">
+          <strong>{{ row.sku }} · {{ row.itemName }}</strong>
+          @if (row.belowMin) {
+            <app-status-tag label="Bajo mínimo" color="orange" />
+          }
+        </div>
+        <div class="card-row">
+          <span>{{ row.onHand | qty: row.baseUomCode }}</span>
+          <span class="muted">{{ row.stockValue | mxn }}</span>
+        </div>
+      </ng-template>
+    </app-data-table>
+  }
+</section>

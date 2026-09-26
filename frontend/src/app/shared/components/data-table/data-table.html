@@ -26,6 +26,26 @@
             [ngTemplateOutlet]="cardDef()!.template"
             [ngTemplateOutletContext]="{ $implicit: row }"
           />
+          @if (detailDef(); as detail) {
+            <button
+              mat-button
+              type="button"
+              class="card-toggle"
+              [attr.aria-expanded]="isExpanded(row)"
+              (click)="toggle(row, $event)"
+            >
+              <mat-icon>{{ isExpanded(row) ? 'expand_less' : 'expand_more' }}</mat-icon>
+              {{ isExpanded(row) ? 'Ocultar detalle' : 'Ver detalle' }}
+            </button>
+            @if (isExpanded(row)) {
+              <div class="card-detail">
+                <ng-container
+                  [ngTemplateOutlet]="detail.template"
+                  [ngTemplateOutletContext]="{ $implicit: row }"
+                />
+              </div>
+            }
+          }
         </li>
       }
     </ul>
@@ -33,6 +53,7 @@
     <div class="scroll">
       <table
         mat-table
+        multiTemplateDataRows
         [dataSource]="rows()"
         [trackBy]="$any(trackBy())"
         matSort
@@ -70,14 +91,52 @@
           </ng-container>
         }
 
+        <ng-container [matColumnDef]="expandColumn">
+          <th mat-header-cell *matHeaderCellDef class="expand-cell">
+            <span class="sgo-visually-hidden">Detalle</span>
+          </th>
+          <td mat-cell *matCellDef="let row" class="expand-cell">
+            <button
+              mat-icon-button
+              type="button"
+              [attr.aria-expanded]="isExpanded(row)"
+              [attr.aria-label]="isExpanded(row) ? 'Ocultar detalle' : 'Ver detalle'"
+              (click)="toggle(row, $event)"
+            >
+              <mat-icon>{{ isExpanded(row) ? 'expand_less' : 'expand_more' }}</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="__detail">
+          <td
+            mat-cell
+            *matCellDef="let row"
+            [attr.colspan]="columnKeys().length"
+            class="detail-cell"
+          >
+            @if (isExpanded(row) && detailDef(); as detail) {
+              <ng-container
+                [ngTemplateOutlet]="detail.template"
+                [ngTemplateOutletContext]="{ $implicit: row }"
+              />
+            }
+          </td>
+        </ng-container>
+
         <tr mat-header-row *matHeaderRowDef="columnKeys(); sticky: true"></tr>
         <tr
           mat-row
           *matRowDef="let row; columns: columnKeys()"
-          [class.clickable]="rowClickable()"
+          [class.clickable]="rowClickable() || !!detailDef()"
           [attr.tabindex]="rowClickable() ? 0 : null"
           (click)="onRowClick(row)"
           (keydown.enter)="onRowClick(row)"
+        ></tr>
+        <tr
+          mat-row
+          *matRowDef="let row; columns: ['__detail']"
+          class="detail-row"
+          [class.open]="isExpanded(row)"
         ></tr>
       </table>
 

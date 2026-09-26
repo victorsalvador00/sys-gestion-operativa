@@ -8,7 +8,7 @@ import { changeRows } from '../../shared/components/audit-panel/audit-changes-di
 import { generatePassword, meetsPasswordPolicy } from '../../shared/forms/password';
 import { auditEntityLabel } from '../../shared/pipes/audit-labels';
 import type { AppSetting } from './data-access/settings.api';
-import { dayRange } from './pages/audit-log-page';
+import { dayRange } from '../../shared/forms/date-range';
 import { settingControl, settingError } from './pages/settings-page';
 import { UserFormPage } from './pages/user-form-page';
 import { moduleState, toggleModule } from './ui/permission-matrix';

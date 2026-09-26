@@ -35,7 +35,7 @@ export async function chooseOptions(
   label: string,
   options: (string | RegExp)[],
 ): Promise<void> {
-  const select = page.getByRole('combobox', { name: label });
+  const select = page.getByRole('combobox', { name: label, exact: true });
   await select.focus();
   await page.keyboard.press('Enter');
   for (const option of options) {

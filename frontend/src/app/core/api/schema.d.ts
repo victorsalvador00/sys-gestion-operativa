@@ -2671,6 +2671,74 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/items/lookup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Búsqueda ligera de artículos activos (SKU o nombre) para los selectores de inventario, logística,
+         *     producción y compras. No exige catalog.view: basta ver alguno de esos módulos.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    Id?: string;
+                    Limit?: number;
+                    Q?: string;
+                    Type?: components["schemas"]["ItemType"];
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ItemLookupDto"][];
+                        "text/json": components["schemas"]["ItemLookupDto"][];
+                        "text/plain": components["schemas"]["ItemLookupDto"][];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/locations": {
         parameters: {
             query?: never;
@@ -10024,6 +10092,17 @@ export interface components {
             maxQty: null | number;
             /** Format: double */
             minQty: null | number;
+        };
+        ItemLookupDto: {
+            baseUomCode: string;
+            /** Format: uuid */
+            id: string;
+            name: string;
+            /** Format: int32 */
+            shelfLifeDays: null | number;
+            sku: string;
+            tracksLots: boolean;
+            type: components["schemas"]["ItemType"];
         };
         /** @enum {unknown} */
         ItemType: "RawMaterial" | "Intermediate" | "FinishedGood";

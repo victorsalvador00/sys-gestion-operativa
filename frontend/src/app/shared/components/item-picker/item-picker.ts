@@ -130,6 +130,8 @@ export class ItemPicker implements ControlValueAccessor, OnInit {
   readonly label = input('Artículo');
   readonly type = input<ItemType>();
   readonly showStock = input(false);
+  /** Ubicación de la existencia mostrada; por defecto la activa. */
+  readonly stockLocationId = input<string | null>();
   readonly appearance = input<'outline' | 'fill'>('outline');
   readonly subscriptSizing = input<'fixed' | 'dynamic'>('fixed');
   readonly selected = output<ItemOption | null>();
@@ -219,7 +221,7 @@ export class ItemPicker implements ControlValueAccessor, OnInit {
   }
 
   private search(q: string): Observable<Suggestion[]> {
-    const locationId = this.locationContext.activeLocationId();
+    const locationId = this.stockLocationId() ?? this.locationContext.activeLocationId();
     const items$ = this.lookup.search(q, this.type());
     const stock$ =
       this.showStock() && locationId

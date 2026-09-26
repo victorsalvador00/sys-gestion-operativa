@@ -31,14 +31,8 @@ import {
   auditEntityLabel,
   AuditEntityPipe,
 } from '../../../shared/pipes/audit-labels';
+import { dayRange } from '../../../shared/forms/date-range';
 import { UsersApi } from '../data-access/users.api';
-
-/** Rango de fechas (días completos, hora local) → instantes ISO para `from`/`to`. */
-export function dayRange(from: Date | null, to: Date | null): Pick<AuditLogFilters, 'from' | 'to'> {
-  const start = from ? new Date(from.getFullYear(), from.getMonth(), from.getDate()) : null;
-  const end = to ? new Date(to.getFullYear(), to.getMonth(), to.getDate(), 23, 59, 59, 999) : null;
-  return { from: start?.toISOString() ?? null, to: end?.toISOString() ?? null };
-}
 
 @Component({
   selector: 'app-audit-log-page',

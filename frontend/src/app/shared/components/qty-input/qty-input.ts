@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  effect,
   ElementRef,
   inject,
   input,
@@ -33,7 +34,8 @@ export function parseQty(text: string): number | null {
  * Valida una cantidad: número válido, hasta 4 decimales, y > 0 (o ≠ 0 si `allowNegative`,
  * para ajustes con signo). Vacío no es error aquí: usa `Validators.required` si aplica.
  */
-export function qtyValidator(allowNegative = false): ValidatorFn {
+export function qtyValidator(allowNegative: boolean | (() => boolean) = false): ValidatorFn {
+  const negativeAllowed = typeof allowNegative === 'function' ? allowNegative : () => allowNegative;
   return (control: AbstractControl): ValidationErrors | null => {
     const value = control.value as number | null;
     if (value === null || value === undefined) {
@@ -46,7 +48,7 @@ export function qtyValidator(allowNegative = false): ValidatorFn {
     if (decimals > QTY_MAX_DECIMALS) {
       return { qtyDecimals: true };
     }
-    if (allowNegative ? value === 0 : value <= 0) {
+    if (negativeAllowed() ? value === 0 : value <= 0) {
       return { qtyPositive: true };
     }
     return null;
@@ -157,12 +159,17 @@ export class QtyInput implements ControlValueAccessor, OnInit {
     if (this.ngControl) {
       this.ngControl.valueAccessor = this;
     }
+    effect(() => {
+      this.allowNegative();
+      this.ngControl?.control?.updateValueAndValidity({ emitEvent: false });
+    });
   }
 
   ngOnInit(): void {
     const control = this.ngControl?.control;
     if (control) {
-      control.addValidators(qtyValidator(this.allowNegative()));
+      // Lee `allowNegative` en cada validación: puede cambiar (ej. el motivo de un ajuste).
+      control.addValidators(qtyValidator(() => this.allowNegative()));
       control.updateValueAndValidity({ emitEvent: false });
       this.errorState.connect(() => this.matInput());
     }

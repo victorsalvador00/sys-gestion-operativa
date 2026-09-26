@@ -117,3 +117,31 @@ tr.clickable {
     opacity: 0.3;
   }
 }
+
+.expand-cell {
+  width: 48px;
+  padding-inline: 0 !important;
+}
+
+tr.detail-row {
+  height: 0;
+
+  td {
+    border-bottom-width: 0;
+    padding: 0;
+  }
+
+  &.open td {
+    padding: var(--sgo-space-2) var(--sgo-space-4) var(--sgo-space-4);
+    border-bottom-width: 1px;
+    background: var(--mat-sys-surface-container-lowest);
+  }
+}
+
+.card-toggle {
+  margin-top: var(--sgo-space-1);
+}
+
+.card-detail {
+  padding-top: var(--sgo-space-2);
+}

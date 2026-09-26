@@ -11,6 +11,7 @@ import {
   inject,
   input,
   output,
+  signal,
   TemplateRef,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -43,6 +44,15 @@ export class CellDef {
   readonly template = inject(TemplateRef<{ $implicit: unknown }>);
 }
 
+/**
+ * Detalle expandible de una fila: `<ng-template appRowDetail let-row>...</ng-template>`. Con él, la tabla
+ * agrega un botón para expandir cada fila (y el clic en la fila la expande si no es `rowClickable`).
+ */
+@Directive({ selector: 'ng-template[appRowDetail]' })
+export class RowDetailDef {
+  readonly template = inject(TemplateRef<{ $implicit: unknown }>);
+}
+
 /** Tarjeta por fila en celular: `<ng-template appCardDef let-row>...</ng-template>`. */
 @Directive({ selector: 'ng-template[appCardDef]' })
 export class CardDef {
@@ -50,6 +60,7 @@ export class CardDef {
 }
 
 export const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
+const EXPAND_COLUMN = '__expand';
 
 /**
  * Tabla de listados con paginación, orden y búsqueda del lado del servidor (spec frontend §8).
@@ -92,6 +103,8 @@ export class DataTable<T> {
 
   private readonly cellDefs = contentChildren(CellDef);
   protected readonly cardDef = contentChild(CardDef);
+  protected readonly detailDef = contentChild(RowDetailDef);
+  private readonly expanded = signal<ReadonlySet<unknown>>(new Set());
 
   protected readonly isMobile = toSignal(
     inject(BreakpointObserver)
@@ -101,7 +114,11 @@ export class DataTable<T> {
   );
   protected readonly showCards = computed(() => this.isMobile() && !!this.cardDef());
 
-  protected readonly columnKeys = computed(() => this.columns().map((c) => c.key));
+  protected readonly columnKeys = computed(() => [
+    ...(this.detailDef() ? [EXPAND_COLUMN] : []),
+    ...this.columns().map((c) => c.key),
+  ]);
+  protected readonly expandColumn = EXPAND_COLUMN;
   protected readonly templates = computed(
     () => new Map(this.cellDefs().map((def) => [def.appCell(), def.template])),
   );
@@ -145,6 +162,26 @@ export class DataTable<T> {
   protected onRowClick(row: T): void {
     if (this.rowClickable()) {
       this.rowClick.emit(row);
+    } else if (this.detailDef()) {
+      this.toggle(row);
     }
+  }
+
+  protected isExpanded(row: T): boolean {
+    return this.expanded().has(this.trackBy()(row));
+  }
+
+  protected toggle(row: T, event?: Event): void {
+    event?.stopPropagation();
+    const key = this.trackBy()(row);
+    this.expanded.update((current) => {
+      const next = new Set(current);
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
+      return next;
+    });
   }
 }

@@ -4,8 +4,9 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { provideHttpTesting, signIn } from '../../core/auth/testing';
 import { provideAppLocale } from '../../core/i18n/locale';
 import { detectDelimiter, parseCsv, toCsv } from '../../shared/data-access/csv';
-import { headerProblems, ItemImportPage } from './pages/item-import-page';
-import { ITEM_IMPORT_COLUMNS } from './ui/item-import-template';
+import { headerProblems } from '../../shared/components/csv-import/csv-import';
+import { ItemImportPage } from './pages/item-import-page';
+import { ITEM_IMPORT_COLUMNS, ITEM_IMPORT_REQUIRED } from './ui/item-import-template';
 import { settingRow, toSettingInputs } from './ui/item-location-settings';
 import { minMaxMessage, purchaseFactorValidator } from './ui/item-validators';
 
@@ -41,8 +42,12 @@ describe('CSV', () => {
   });
 
   it('revisa el encabezado contra las columnas del backend', () => {
-    expect(headerProblems([...ITEM_IMPORT_COLUMNS])).toEqual([]);
-    expect(headerProblems(['sku', 'nombre', 'precio'])).toEqual([
+    expect(
+      headerProblems([...ITEM_IMPORT_COLUMNS], ITEM_IMPORT_COLUMNS, ITEM_IMPORT_REQUIRED),
+    ).toEqual([]);
+    expect(
+      headerProblems(['sku', 'nombre', 'precio'], ITEM_IMPORT_COLUMNS, ITEM_IMPORT_REQUIRED),
+    ).toEqual([
       'Faltan columnas obligatorias: tipo, categoria, unidad_base.',
       'Columnas desconocidas: precio.',
     ]);
@@ -176,6 +181,7 @@ describe('ItemImportPage', () => {
     await fixture.whenStable();
 
     expect(el.textContent).toContain('1 artículos creados y 0 actualizados');
+    expect(el.textContent).toContain('Importación terminada.');
   });
 
   it('sin archivo no muestra avisos de columnas', async () => {

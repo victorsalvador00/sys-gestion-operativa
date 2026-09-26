@@ -36,7 +36,7 @@
 | 1 | F-03 Layout y componentes compartidos | ✅ | (ver `git log`) |
 | 1 | F-04 Administración (+ E2E #1 con Playwright) | ✅ | (ver `git log`) |
 | 1 | F-05 Catálogos (+ E2E de importación con errores) | ✅ | (ver `git log`) |
-| 1 | F-06 Inventario | ⏳ | |
+| 1 | F-06 Inventario (+ `/items/lookup` en backend, E2E de faltantes) | ✅ | (ver `git log`) |
 | 1 | F-07 Conteo físico y consumo (móvil) | ⏳ | |
 | 1 | F-08 Traspasos directos | ⏳ | |
 
@@ -175,6 +175,22 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
 - E2E `02-item-import-errors`: CSV con errores → tabla por fila; no importa nada. El backend no evalúa las reglas del SKU
   en filas que ya tienen errores de formato (se reportan en la siguiente corrida).
 
+**Frontend (F-06):**
+- **Backend:** `GET /items/lookup` (búsqueda ligera de artículos activos: id, sku, nombre, tipo, unidad base, lotes,
+  vida útil; `?q=&type=&id=&limit=` ≤ 50) con `[RequireAnyPermission]` (catalog/inventory/logistics/production/
+  purchasing `.view`): Encargado de sucursal y Almacén no tienen `catalog.view`. `app-item-picker` la usa.
+  `PermissionRequirement` ahora es "cualquiera de" (una sola para `[RequirePermission]`).
+- Compose de desarrollo: `SGO__RateLimiting__LoginPermitLimit=60` (producción sigue en 10) para las E2E.
+- `features/inventory`: existencias de la ubicación activa (lotes al expandir, "Por caducar" según `/alerts`,
+  vencidos en rojo, enlace a kardex), kardex (filtros; folio enlaza al documento si su pantalla existe —
+  `shared/data-access/document-links.ts`), ajustes (lista, alta con confirmación y diálogo de faltantes, detalle con
+  movimientos) y existencias iniciales (CSV). Motivos de salida: cantidad positiva que se envía negativa; Corrección
+  con signo, lote/caducidad y costo en entradas; en salidas con lotes, lote elegido o FEFO.
+- `app-data-table` con filas expandibles (`appRowDetail`) y `app-csv-import` compartido (artículos y existencias
+  iniciales). Selector de la barra renombrado "Ubicación activa".
+- E2E `04-adjustment-shortages` (no registra nada). La base de desarrollo no tiene existencias: los lotes, el kardex
+  con datos y un ajuste registrado no se revisaron en pantalla (sí con pruebas unitarias).
+
 ## Pendientes y notas técnicas
 
 - Dos recepciones simultáneas de **OC distintas** que crean el mismo lote nuevo del mismo artículo → una falla por el
@@ -191,8 +207,7 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
   cookie (dos pestañas, doble F5) revocaban la sesión. Ahora: ventana de gracia de 30 s en el backend
   (`AuthService.ReuseGracePeriod`, también cubre la carrera `DbUpdateConcurrencyException`) y el frontend serializa el
   refresh entre pestañas con Web Locks (`withLock`). E2E `03-session-tabs`.
-- **E2E y límite de login (10/min por IP):** la suite completa ya hace ~10 inicios de sesión; al crecer (F-06+) habrá 429.
-  Opciones: hacer configurable el límite en Development o reutilizar sesiones entre pruebas.
+- ✅ **E2E y límite de login:** el compose de desarrollo sube el límite a 60/min.
 - **Bitácora:** `/audit-log?entityId=` compara exacto. Los cambios de roles/ubicaciones de un usuario y de permisos de
   un rol se registran con ids compuestos (`usuario|ubicación`, `rol|permiso`) y **no aparecen en el historial** del
   usuario o rol (sí en la bitácora general). Opción futura: que el backend incluya `entityId LIKE 'id|%'`.

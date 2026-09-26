@@ -22,7 +22,7 @@
 
   @if (locationContext.showSelector()) {
     <mat-form-field class="location-select" appearance="outline" subscriptSizing="dynamic">
-      <mat-label>Ubicación</mat-label>
+      <mat-label>Ubicación activa</mat-label>
       <mat-select
         [value]="locationContext.activeLocationId()"
         (valueChange)="locationContext.select($event)"

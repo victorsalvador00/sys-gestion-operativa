@@ -76,7 +76,7 @@ test.describe('Login y menú filtrado por permisos', () => {
         'Traspasos',
       ]);
       // Con una sola ubicación no hay selector; se muestra su nombre.
-      await expect(page.getByRole('combobox', { name: 'Ubicación' })).toHaveCount(0);
+      await expect(page.getByRole('combobox', { name: 'Ubicación activa' })).toHaveCount(0);
     });
 
     await test.step('una ruta sin permiso manda a "Sin acceso"', async () => {

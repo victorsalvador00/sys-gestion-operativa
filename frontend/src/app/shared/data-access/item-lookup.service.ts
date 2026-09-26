@@ -4,20 +4,28 @@ import { map, Observable } from 'rxjs';
 import type { ApiEnum, Schemas } from '../../core/api/api-types';
 import { toHttpParams } from '../../core/http/list-query';
 
-export type ItemOption = Schemas['ItemListItemDto'];
+export type ItemOption = Schemas['ItemLookupDto'];
 export type ItemType = ApiEnum<'ItemType'>;
 
-/** Consultas ligeras de artículos para los selectores (no es el CRUD del catálogo). */
+/**
+ * Búsqueda ligera de artículos activos para los selectores (`GET /items/lookup`). No exige
+ * `catalog.view`: la usan también sucursal, almacén, producción y compras.
+ */
 @Injectable({ providedIn: 'root' })
 export class ItemLookupService {
   private readonly http = inject(HttpClient);
 
-  search(q: string, type?: ItemType, pageSize = 20): Observable<ItemOption[]> {
+  search(q: string, type?: ItemType, limit = 20): Observable<ItemOption[]> {
+    return this.http.get<ItemOption[]>('/items/lookup', {
+      params: toHttpParams({ q }, { type, limit }),
+    });
+  }
+
+  /** Un artículo por id (ej. el filtro que llega en la URL). */
+  byId(id: string): Observable<ItemOption | null> {
     return this.http
-      .get<Schemas['PagedResultOfItemListItemDto']>('/items', {
-        params: toHttpParams({ q, pageSize, page: 1 }, { type }),
-      })
-      .pipe(map((result) => result.items));
+      .get<ItemOption[]>('/items/lookup', { params: toHttpParams({}, { id }) })
+      .pipe(map((items) => items[0] ?? null));
   }
 
   /** Existencia por artículo en una ubicación, para los artículos que coinciden con `q`. */
