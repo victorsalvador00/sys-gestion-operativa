@@ -1,6 +1,6 @@
 # Avance del SGO (backend y frontend)
 
-> Bitácora de trabajo para retomar entre sesiones. Última actualización: 2026-09-25.
+> Bitácora de trabajo para retomar entre sesiones. Última actualización: 2026-09-26.
 > Fuente de verdad de reglas: `docs/specs/dominio.md`; tareas: `docs/specs/backend.md` §12.
 
 ## Estado por tarea
@@ -39,6 +39,10 @@
 | 1 | F-06 Inventario (+ `/items/lookup` en backend, E2E de faltantes) | ✅ | (ver `git log`) |
 | 1 | F-07 Conteo físico y consumo (móvil) | ⏳ | |
 | 1 | F-08 Traspasos directos | ⏳ | |
+
+**Siguiente paso (al retomar):** proponer el plan de **F-07** (conteo físico y consumo, diseño móvil 390 px) y esperar OK.
+Antes: `API_PORT=8090 docker compose -f deploy/docker-compose.dev.yml up -d` y `npm start` en `frontend/` (Node ≥ 24.15).
+La base de desarrollo tiene existencias de ejemplo: AJ-000006 (SUC-01 AZU-001 25 kg) y AJ-000007 (COM HAR-001 lote L-2409 100 kg).
 
 Pruebas al cierre de B-17: **460 en verde** (322 unitarias, 138 de integración, incluida la de rendimiento), sin warnings.
 Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`, `AddCatalog`, `AddInventory`,
