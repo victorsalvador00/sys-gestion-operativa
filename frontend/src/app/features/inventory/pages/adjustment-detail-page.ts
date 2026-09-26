@@ -51,10 +51,6 @@ import { AdjustmentsApi } from '../data-access/adjustments.api';
                 <dd>{{ adj.createdAt | date: 'dd/MM/yyyy HH:mm' }}</dd>
               </div>
               <div>
-                <dt>Registró</dt>
-                <dd>{{ adj.createdBy ?? '—' }}</dd>
-              </div>
-              <div>
                 <dt>Costo total</dt>
                 <dd>{{ adj.totalCost | mxn }}</dd>
               </div>

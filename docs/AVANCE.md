@@ -198,7 +198,8 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
 - **B-12:** dos usuarios que marcan al mismo tiempo proveedores preferidos distintos para el mismo artículo → uno
   falla por el índice único parcial (500; muy poco probable). Revisar si se vuelve un problema.
 - Vigilar el `COUNT(*)` del kardex si una ubicación llega a millones de movimientos (ver `docs/rendimiento.md`).
-- Kardex devuelve `userId`, no el nombre del usuario (agregar si la pantalla lo pide).
+- Kardex (`userId`) y ajustes (`createdBy`) devuelven el **id** del usuario, no su nombre: el detalle de ajuste no lo
+  muestra (el historial sí trae el nombre). Agregar el nombre en el backend cuando una pantalla lo necesite.
 - Ajustes y consumos no se cancelan (no hay endpoint en el spec); se corrige con otro ajuste.
 - `docs/specs/dominio.md` §6 ahora tiene 29 permisos (se agregó `logistics.transfers.special`).
 - **Frontend:** la fuente de Material Symbols pesa ~4 MB (se descarga una vez y queda en caché). Si pesa en celulares
