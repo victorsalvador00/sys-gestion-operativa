@@ -9,6 +9,7 @@ namespace Sgo.Application.Catalog;
 public interface IItemService
 {
     Task<PagedResult<ItemListItemDto>> ListAsync(ItemListQuery query, CancellationToken ct = default);
+    Task<IReadOnlyList<ItemLookupDto>> LookupAsync(ItemLookupQuery query, CancellationToken ct = default);
     Task<ItemDto> GetAsync(Guid id, CancellationToken ct = default);
     Task<ItemDto> CreateAsync(CreateItemRequest request, CancellationToken ct = default);
     Task<ItemDto> UpdateAsync(Guid id, UpdateItemRequest request, CancellationToken ct = default);
@@ -52,6 +53,30 @@ public sealed class ItemService(ISgoDbContext db, ILocationScope scope) : IItemS
             page.Items.Select(i => new ItemListItemDto(i.Id, i.Sku, i.Name, i.Type, i.CategoryId, categories[i.CategoryId],
                 uoms[i.BaseUomId], i.TracksLots, i.StorageCondition, i.IsActive)).ToList(),
             page.Page, page.PageSize, page.Total);
+    }
+
+    public async Task<IReadOnlyList<ItemLookupDto>> LookupAsync(ItemLookupQuery query, CancellationToken ct = default)
+    {
+        var items = db.Items.AsNoTracking();
+        if (query.Id is { } id)
+            items = items.Where(i => i.Id == id);
+        else
+            items = items.Where(i => i.IsActive);
+        if (query.Type is { } type)
+            items = items.Where(i => i.Type == type);
+        if (!string.IsNullOrWhiteSpace(query.Q))
+        {
+            var term = query.Q.Trim().ToLower();
+            items = items.Where(i => i.Sku.ToLower().Contains(term) || i.Name.ToLower().Contains(term));
+        }
+
+        var limit = Math.Clamp(query.Limit, 1, ItemLookupQuery.MaxResults);
+        return await (from i in items
+                      join u in db.UnitsOfMeasure on i.BaseUomId equals u.Id
+                      orderby i.Sku
+                      select new ItemLookupDto(i.Id, i.Sku, i.Name, i.Type, u.Code, i.TracksLots, i.ShelfLifeDays))
+            .Take(limit)
+            .ToListAsync(ct);
     }
 
     public async Task<ItemDto> GetAsync(Guid id, CancellationToken ct = default) => (await FindAsync(id, ct)).ToDto();

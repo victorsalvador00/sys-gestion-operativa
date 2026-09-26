@@ -188,6 +188,7 @@ Todos requieren autenticación excepto los de `auth`. Entre corchetes, el permis
 | GET / POST / PUT | `/item-categories` | [catalog.view] / [catalog.manage] |
 | GET / POST / PUT | `/items`, `/items/{id}` | [catalog.view] / [catalog.manage] |
 | GET / PUT | `/items/{id}/location-settings` (mín/máx por ubicación) | [catalog.view] / [catalog.manage] |
+| GET | `/items/lookup?q&type&id&limit` — búsqueda ligera de artículos activos para los selectores | cualquiera de [catalog.view], [inventory.view], [logistics.view], [production.view], [purchasing.view] |
 | POST | `/imports/items` (CSV) — valida todo y reporta errores por fila; si hay errores no importa nada | [catalog.manage] |
 
 **Inventario**
@@ -271,7 +272,7 @@ Todos requieren autenticación excepto los de `auth`. Entre corchetes, el permis
   - `ILocationScope` expone `AllowedLocationIds` y `EnsureAccess(locationId)`.
   - Todas las consultas filtran por ubicaciones permitidas.
   - Toda operación sobre un documento valida acceso a su ubicación o ubicaciones: en un traspaso, el despacho requiere el origen y la recepción requiere el destino.
-- **Rate limiting** (middleware integrado): `/auth/login` 10 req/min por IP.
+- **Rate limiting** (middleware integrado): `/auth/login` 10 req/min por IP (`RateLimiting:LoginPermitLimit`; el compose de desarrollo lo sube a 60 para las E2E).
 - **Proxy:** detrás de Caddy, con `UseForwardedHeaders` para la IP real. No se configura CORS, porque el frontend se sirve del mismo origen.
 
 ## 8. Validación, errores y logging

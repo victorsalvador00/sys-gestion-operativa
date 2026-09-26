@@ -166,6 +166,44 @@ public class CatalogTests(SgoApiFactory factory)
     }
 
     [Fact]
+    public async Task Item_lookup_is_available_to_operational_roles_without_catalog_view()
+    {
+        var admin = await AdminAsync();
+        var sku = $"LK-{Guid.NewGuid():N}"[..12].ToUpperInvariant();
+        var item = await admin.CreateItemAsync(await admin.NewItemRequestAsync(sku: sku));
+
+        var branchManager = await factory.CreateUserAsync("Encargado de sucursal", "SUC-01");
+        var client = await factory.CreateAuthenticatedClientAsync(branchManager.Email, branchManager.Password);
+
+        var found = await client.GetFromJsonAsync<List<ItemLookupDto>>($"/api/v1/items/lookup?q={sku.ToLowerInvariant()}", HttpExtensions.Json);
+        var match = Assert.Single(found!);
+        Assert.Equal(item.Id, match.Id);
+        Assert.Equal(sku, match.Sku);
+        Assert.False(string.IsNullOrEmpty(match.BaseUomCode));
+
+        var byId = await client.GetFromJsonAsync<List<ItemLookupDto>>($"/api/v1/items/lookup?id={item.Id}", HttpExtensions.Json);
+        Assert.Equal(item.Id, Assert.Single(byId!).Id);
+
+        // The full catalog still requires catalog.view.
+        Assert.Equal(HttpStatusCode.Forbidden, (await client.GetAsync($"/api/v1/items/{item.Id}")).StatusCode);
+    }
+
+    [Fact]
+    public async Task Item_lookup_caps_the_number_of_results()
+    {
+        var admin = await AdminAsync();
+        var prefix = $"CAP{Random.Shared.Next(1000, 9999)}";
+        for (var i = 0; i < 3; i++)
+            await admin.CreateItemAsync(await admin.NewItemRequestAsync(sku: $"{prefix}-{i}"));
+
+        var limited = await admin.GetFromJsonAsync<List<ItemLookupDto>>($"/api/v1/items/lookup?q={prefix}&limit=2", HttpExtensions.Json);
+        Assert.Equal(2, limited!.Count);
+
+        var tooMany = await admin.GetFromJsonAsync<List<ItemLookupDto>>($"/api/v1/items/lookup?q={prefix}&limit=500", HttpExtensions.Json);
+        Assert.Equal(3, tooMany!.Count);
+    }
+
+    [Fact]
     public async Task New_location_is_visible_right_away_to_users_with_all_locations()
     {
         var admin = await AdminAsync();

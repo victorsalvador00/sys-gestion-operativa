@@ -33,6 +33,28 @@ public sealed record ItemListQuery : CatalogListQuery
     public Guid? CategoryId { get; init; }
 }
 
+/// <summary>Búsqueda ligera de artículos activos para los selectores de todos los módulos.</summary>
+public sealed record ItemLookupQuery
+{
+    public const int MaxResults = 50;
+
+    /// <summary>SKU o nombre (contiene).</summary>
+    public string? Q { get; init; }
+    public ItemType? Type { get; init; }
+    /// <summary>Un artículo concreto (ej. para mostrar el filtro que llega por URL).</summary>
+    public Guid? Id { get; init; }
+    public int Limit { get; init; } = 20;
+}
+
+public sealed record ItemLookupDto(
+    Guid Id,
+    string Sku,
+    string Name,
+    ItemType Type,
+    string BaseUomCode,
+    bool TracksLots,
+    int? ShelfLifeDays);
+
 public sealed record ItemListItemDto(
     Guid Id,
     string Sku,

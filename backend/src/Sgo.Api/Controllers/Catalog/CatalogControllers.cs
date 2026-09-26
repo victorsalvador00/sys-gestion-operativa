@@ -95,6 +95,16 @@ public sealed class ItemsController(IItemService items) : ControllerBase
     public Task<PagedResult<ItemListItemDto>> List([FromQuery] ItemListQuery query, CancellationToken ct) =>
         items.ListAsync(query, ct);
 
+    /// <summary>
+    /// Búsqueda ligera de artículos activos (SKU o nombre) para los selectores de inventario, logística,
+    /// producción y compras. No exige catalog.view: basta ver alguno de esos módulos.
+    /// </summary>
+    [HttpGet("lookup")]
+    [RequireAnyPermission(Permissions.CatalogView, Permissions.InventoryView, Permissions.LogisticsView,
+        Permissions.ProductionView, Permissions.PurchasingView)]
+    public Task<IReadOnlyList<ItemLookupDto>> Lookup([FromQuery] ItemLookupQuery query, CancellationToken ct) =>
+        items.LookupAsync(query, ct);
+
     [HttpGet("{id:guid}")]
     [RequirePermission(Permissions.CatalogView)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]

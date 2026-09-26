@@ -59,6 +59,8 @@ services:
       SGO__Jwt__Audience: ${SGO__Jwt__Audience:-sgo}
       SGO__Seed__AdminEmail: ${SGO__Seed__AdminEmail:-}
       SGO__Seed__AdminPassword: ${SGO__Seed__AdminPassword:-}
+      # Solo desarrollo: las pruebas E2E inician sesión muchas veces por minuto (producción: 10/min por IP).
+      SGO__RateLimiting__LoginPermitLimit: ${SGO__RateLimiting__LoginPermitLimit:-60}
     ports:
       - "${API_PORT:-8080}:8080"
     volumes:
