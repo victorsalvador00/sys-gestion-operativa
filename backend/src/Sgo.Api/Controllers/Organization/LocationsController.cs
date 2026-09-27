@@ -19,6 +19,14 @@ public sealed class LocationsController(ILocationService locations) : Controller
     public Task<PagedResult<LocationDto>> List([FromQuery] LocationListQuery query, CancellationToken ct) =>
         locations.ListAsync(query, ct);
 
+    /// <summary>
+    /// Ubicaciones activas (todas, no solo las tuyas) para elegir el destino de un traspaso. No exige locations.view:
+    /// basta logistics.view.
+    /// </summary>
+    [HttpGet("lookup")]
+    [RequireAnyPermission(Permissions.LocationsView, Permissions.LogisticsView)]
+    public Task<IReadOnlyList<LocationLookupDto>> Lookup(CancellationToken ct) => locations.LookupAsync(ct);
+
     [HttpGet("{id:guid}")]
     [RequirePermission(Permissions.LocationsView)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]

@@ -38,9 +38,9 @@
 | 1 | F-05 Catálogos (+ E2E de importación con errores) | ✅ | (ver `git log`) |
 | 1 | F-06 Inventario (+ `/items/lookup` en backend, E2E de faltantes) | ✅ | (ver `git log`) |
 | 1 | F-07 Conteo físico y consumo (móvil, + E2E en 390 px) | ✅ | (ver `git log`) |
-| 1 | F-08 Traspasos directos | ⏳ | |
+| 1 | F-08 Traspasos directos (+ E2E #3 sin pedido) | ✅ | (ver `git log`) |
 
-**Siguiente paso (al retomar):** proponer el plan de **F-08** (traspasos directos: despachar y recibir, recepción móvil; E2E #3 sin pedido) y esperar OK.
+**Siguiente paso (al retomar):** Fase 1 del frontend completa. Proponer el plan de **F-09** (recetas con editor y versiones, Fase 2) y esperar OK.
 Antes: `API_PORT=8090 docker compose -f deploy/docker-compose.dev.yml up -d` y `npm start` en `frontend/` (Node ≥ 24.15).
 La base de desarrollo tiene existencias de ejemplo: AJ-000006 (SUC-01 AZU-001 25 kg) y AJ-000007 (COM HAR-001 lote L-2409 100 kg).
 
@@ -219,6 +219,26 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
 - E2E `05-count-consumption-mobile` (escritorio y 390 px, verifica que no haya scroll horizontal): crea, inicia,
   captura, agrega artículo, revisa y **cancela** el conteo; el consumo se detiene en el resumen. No mueve inventario.
   Al inicio cancela conteos en captura de SUC-02 que haya dejado una corrida fallida.
+
+**Frontend (F-08):**
+- **Backend:** `GET /locations/lookup` (todas las ubicaciones activas: id, código, nombre, tipo) con
+  `[RequireAnyPermission]` (`locations.view` o `logistics.view`): el Almacén no tiene `locations.view` y `/locations`
+  solo devuelve las ubicaciones propias, así que no podía elegir la sucursal destino. Filtro `received=true` en
+  `GET /transfers` (recibidos con y sin diferencias, pestaña "Recibidos"). Ambos con prueba de integración.
+- `features/logistics`: lista con pestañas Por despachar / En tránsito / Recibidos / Todos (según la ubicación activa;
+  quien no despacha no ve "Por despachar") y botón **Recibir** en los traspasos en tránsito hacia la ubicación activa;
+  nuevo / editar borrador (origen, destino filtrado por ruta: sin `logistics.transfers.special` solo
+  fábrica/comisariato → sucursal; líneas con lote planeado opcional); detalle (Despachar, Editar, Cancelar; datos de
+  envío, recibido/faltante por línea, pérdida en tránsito, historial); ★ recepción móvil (tarjeta por línea
+  prellenada con lo enviado, motivo y notas si llega menos, nunca más de lo enviado, barra inferior fija, confirmación).
+- Despacho: diálogo con vehículo, chofer y, por línea con lotes, "Elegir lotes" (reparto manual que debe sumar la
+  cantidad); sin reparto se usa el lote planeado o FEFO. Confirmación con resumen y diálogo de faltantes (409).
+- Compartidos: `LocationLookupService` (caché por sesión); `app-qty-input` usa `ariaLabel` explícito aunque haya
+  etiqueta visible (cada tarjeta "Recibido de HAR-001" tiene nombre accesible propio). El kardex enlaza traspasos.
+- E2E `06-transfer-dispatch-receive` (E2E #3 sin pedido; escritorio y celular): **sí mueve inventario** — registra
+  por API +5 kg de HAR-001 en COM (lote E2E-TR), traspasa 5 a SUC-01 eligiendo ese lote y recibe 4 en 390 px con
+  faltante. COM queda igual y SUC-01 gana 4 kg por corrida.
+- En la base de desarrollo quedó TR-000009 (COM → SUC-01, recibido completo) de las capturas de pantalla.
 
 ## Pendientes y notas técnicas
 

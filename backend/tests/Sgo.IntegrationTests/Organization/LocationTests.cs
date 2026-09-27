@@ -41,6 +41,24 @@ public class LocationTests(SgoApiFactory factory)
     }
 
     [Fact]
+    public async Task Lookup_lists_all_active_locations_for_transfer_destinations()
+    {
+        // Almacén de comisariato: logistics.view sin locations.view y con acceso solo a COM.
+        var warehouse = await factory.CreateUserAsync("Almacén comisariato/fábrica", "COM");
+        var client = await factory.CreateAuthenticatedClientAsync(warehouse.Email, warehouse.Password);
+
+        Assert.Equal(HttpStatusCode.Forbidden, (await client.GetAsync(Locations)).StatusCode);
+        var lookup = (await client.GetJsonAsync<List<LocationLookupDto>>($"{Locations}/lookup"))!;
+        Assert.Contains(lookup, l => l.Code == "SUC-01" && l.Type == LocationType.Branch);
+        Assert.Contains(lookup, l => l.Code == "COM");
+        Assert.Equal(lookup.OrderBy(l => l.Code, StringComparer.Ordinal).Select(l => l.Code), lookup.Select(l => l.Code));
+
+        var branchManager = await factory.CreateUserAsync("Encargado de sucursal", "SUC-01");
+        var branch = await factory.CreateAuthenticatedClientAsync(branchManager.Email, branchManager.Password);
+        Assert.Equal(HttpStatusCode.OK, (await branch.GetAsync($"{Locations}/lookup")).StatusCode);
+    }
+
+    [Fact]
     public async Task List_shows_only_locations_in_scope()
     {
         var user = await factory.CreateUserAsync("Consulta", "SUC-01", "SUC-02");

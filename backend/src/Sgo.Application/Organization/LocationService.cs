@@ -25,6 +25,9 @@ public sealed record LocationDto(
     bool CanSupplyBranches,
     uint Version);
 
+/// <summary>Active location for destination pickers (e.g. transfers): any active location, not only the user's.</summary>
+public sealed record LocationLookupDto(Guid Id, string Code, string Name, LocationType Type);
+
 public sealed record CreateLocationRequest(string Code, string Name, LocationType Type, string? Address);
 
 public sealed class CreateLocationRequestValidator : AbstractValidator<CreateLocationRequest>
@@ -61,6 +64,9 @@ public interface ILocationService
 {
     Task<PagedResult<LocationDto>> ListAsync(LocationListQuery query, CancellationToken ct = default);
     Task<LocationDto> GetAsync(Guid id, CancellationToken ct = default);
+
+    /// <summary>All active locations (not limited by scope), ordered by code.</summary>
+    Task<IReadOnlyList<LocationLookupDto>> LookupAsync(CancellationToken ct = default);
     Task<LocationDto> CreateAsync(CreateLocationRequest request, CancellationToken ct = default);
     Task<LocationDto> UpdateAsync(Guid id, UpdateLocationRequest request, CancellationToken ct = default);
 }
@@ -93,6 +99,13 @@ public sealed class LocationService(ISgoDbContext db, ILocationScope scope, IUse
 
     public async Task<LocationDto> GetAsync(Guid id, CancellationToken ct = default) =>
         (await FindAsync(id, ct)).ToDto();
+
+    public async Task<IReadOnlyList<LocationLookupDto>> LookupAsync(CancellationToken ct = default) =>
+        await db.Locations.AsNoTracking()
+            .Where(l => l.IsActive)
+            .OrderBy(l => l.Code)
+            .Select(l => new LocationLookupDto(l.Id, l.Code, l.Name, l.Type))
+            .ToListAsync(ct);
 
     public async Task<LocationDto> CreateAsync(CreateLocationRequest request, CancellationToken ct = default)
     {

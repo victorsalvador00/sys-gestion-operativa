@@ -1962,7 +1962,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Categorías de artículo. Activas por defecto; includeInactive=true para ver todas. */
+        /**
+         * Categorías de artículo. Activas por defecto; includeInactive=true para ver todas. También con inventory.view:
+         *     los conteos físicos parciales se hacen por categoría.
+         */
         get: {
             parameters: {
                 query?: {
@@ -3018,6 +3021,69 @@ export interface paths {
                 };
             };
         };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/locations/lookup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Ubicaciones activas (todas, no solo las tuyas) para elegir el destino de un traspaso. No exige locations.view:
+         *     basta logistics.view.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["LocationLookupDto"][];
+                        "text/json": components["schemas"]["LocationLookupDto"][];
+                        "text/plain": components["schemas"]["LocationLookupDto"][];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -7542,6 +7608,7 @@ export interface paths {
                     Page?: number;
                     PageSize?: number;
                     Q?: string;
+                    Received?: boolean;
                     Skip?: number;
                     Sort?: string;
                     Status?: components["schemas"]["TransferStatus"];
@@ -10170,6 +10237,13 @@ export interface components {
             type: components["schemas"]["LocationType"];
             /** Format: uint32 */
             version: number;
+        };
+        LocationLookupDto: {
+            code: string;
+            /** Format: uuid */
+            id: string;
+            name: string;
+            type: components["schemas"]["LocationType"];
         };
         /** @enum {unknown} */
         LocationType: "Branch" | "Factory" | "Commissary";

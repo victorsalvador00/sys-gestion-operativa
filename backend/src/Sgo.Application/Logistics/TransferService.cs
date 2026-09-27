@@ -30,6 +30,10 @@ public sealed record ReceiveTransferRequest(uint Version, IReadOnlyList<ReceiveL
 public sealed record TransferListQuery : PageQuery
 {
     public TransferStatus? Status { get; init; }
+
+    /// <summary>true: received with or without discrepancies (the "Recibidos" tab).</summary>
+    public bool? Received { get; init; }
+
     public Guid? FromLocationId { get; init; }
     public Guid? ToLocationId { get; init; }
 
@@ -156,6 +160,8 @@ public sealed class TransferService(
         var transfers = Visible();
         if (query.Status is { } status)
             transfers = transfers.Where(t => t.Status == status);
+        if (query.Received is true)
+            transfers = transfers.Where(t => t.Status == TransferStatus.Received || t.Status == TransferStatus.ReceivedWithDiscrepancies);
         if (query.FromLocationId is { } from)
             transfers = transfers.Where(t => t.FromLocationId == from);
         if (query.ToLocationId is { } to)

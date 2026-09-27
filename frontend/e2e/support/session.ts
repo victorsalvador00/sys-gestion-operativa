@@ -79,3 +79,15 @@ export async function adminApi(baseURL: string): Promise<APIRequestContext> {
     extraHTTPHeaders: { Authorization: `Bearer ${accessToken}` },
   });
 }
+
+/** Ni la página ni el área de contenido del shell se desplazan a lo ancho. */
+export async function expectNoHorizontalScroll(page: Page): Promise<void> {
+  const overflow = await page.evaluate(() =>
+    [document.documentElement, document.querySelector('mat-sidenav-content')]
+      .filter((el): el is Element => !!el)
+      .map((el) => el.scrollWidth - el.clientWidth),
+  );
+  for (const extra of overflow) {
+    expect(extra).toBeLessThanOrEqual(0);
+  }
+}

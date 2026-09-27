@@ -118,7 +118,7 @@ export function qtyErrorMessage(
         [value]="text()"
         [disabled]="disabled()"
         [errorStateMatcher]="errorMatcher"
-        [attr.aria-label]="label() ? null : ariaLabel()"
+        [attr.aria-label]="ariaLabel() ?? (label() ? null : 'Cantidad')"
         (input)="onInput(field.value)"
         (blur)="onBlur()"
         (keydown.enter)="focusNext($event)"
@@ -156,7 +156,8 @@ export class QtyInput implements ControlValueAccessor, OnInit {
   private readonly matInput = viewChild(MatInput);
 
   readonly label = input<string>();
-  readonly ariaLabel = input('Cantidad');
+  /** Nombre accesible; si se da, gana sobre la etiqueta visible (ej. "Recibido de HAR-001"). */
+  readonly ariaLabel = input<string>();
   readonly unit = input<string | null>();
   readonly hint = input<string>();
   readonly allowNegative = input(false);

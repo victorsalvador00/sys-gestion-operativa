@@ -1,23 +1,17 @@
 import { expect, Page, test } from '@playwright/test';
-import { adminApi, adminCredentials, chooseOptions, login } from './support/session';
+import {
+  adminApi,
+  adminCredentials,
+  chooseOptions,
+  expectNoHorizontalScroll,
+  login,
+} from './support/session';
 
 /**
  * Criterio de aceptación de F-07: conteo físico y consumo completos en 390 px sin scroll horizontal.
  * El conteo se cancela al final y el consumo se detiene en el resumen: no mueve inventario en la
  * base de desarrollo.
  */
-
-/** Ni la página ni el área de contenido del shell se desplazan a lo ancho. */
-async function expectNoHorizontalScroll(page: Page): Promise<void> {
-  const overflow = await page.evaluate(() =>
-    [document.documentElement, document.querySelector('mat-sidenav-content')]
-      .filter((el): el is Element => !!el)
-      .map((el) => el.scrollWidth - el.clientWidth),
-  );
-  for (const extra of overflow) {
-    expect(extra).toBeLessThanOrEqual(0);
-  }
-}
 
 /** Deja SUC-02 como ubicación activa (el administrador ve todas). */
 async function useSuc02(page: Page): Promise<void> {

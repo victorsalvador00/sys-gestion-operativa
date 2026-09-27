@@ -13,7 +13,7 @@ namespace Sgo.Api.Controllers.Logistics;
 [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
 public sealed class TransfersController(ITransferService transfers) : ControllerBase
 {
-    /// <summary>Traspasos cuyo origen o destino está a tu alcance. Filtros: status, fromLocationId, toLocationId, locationId, from, to, q.</summary>
+    /// <summary>Traspasos cuyo origen o destino está a tu alcance. Filtros: status, received (recibidos con o sin diferencias), fromLocationId, toLocationId, locationId, from, to, q.</summary>
     [HttpGet]
     [RequirePermission(Permissions.LogisticsView)]
     public Task<PagedResult<TransferListItemDto>> List([FromQuery] TransferListQuery query, CancellationToken ct) =>

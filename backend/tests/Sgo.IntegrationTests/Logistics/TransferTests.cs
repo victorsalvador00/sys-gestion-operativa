@@ -102,6 +102,10 @@ public class TransferTests(SgoApiFactory factory)
 
         Assert.DoesNotContain((await admin.GetJsonAsync<List<TransferListItemDto>>($"/api/v1/transfers/in-transit?locationId={branch}"))!,
             t => t.Id == draft.Id);
+        var receivedTab = (await admin.GetJsonAsync<PagedResult<TransferListItemDto>>(
+            $"/api/v1/transfers?locationId={branch}&received=true&pageSize=100"))!;
+        Assert.Contains(receivedTab.Items, t => t.Id == draft.Id);
+        Assert.All(receivedTab.Items, t => Assert.Contains(t.Status, new[] { TransferStatus.Received, TransferStatus.ReceivedWithDiscrepancies }));
         var cancelReceived = await admin.PostAsJsonAsync($"/api/v1/transfers/{draft.Id}/cancel", new VersionRequest(received.Version));
         Assert.Equal(HttpStatusCode.UnprocessableEntity, cancelReceived.StatusCode);
     }
