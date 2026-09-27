@@ -37,10 +37,10 @@
 | 1 | F-04 Administración (+ E2E #1 con Playwright) | ✅ | (ver `git log`) |
 | 1 | F-05 Catálogos (+ E2E de importación con errores) | ✅ | (ver `git log`) |
 | 1 | F-06 Inventario (+ `/items/lookup` en backend, E2E de faltantes) | ✅ | (ver `git log`) |
-| 1 | F-07 Conteo físico y consumo (móvil) | ⏳ | |
+| 1 | F-07 Conteo físico y consumo (móvil, + E2E en 390 px) | ✅ | (ver `git log`) |
 | 1 | F-08 Traspasos directos | ⏳ | |
 
-**Siguiente paso (al retomar):** proponer el plan de **F-07** (conteo físico y consumo, diseño móvil 390 px) y esperar OK.
+**Siguiente paso (al retomar):** proponer el plan de **F-08** (traspasos directos: despachar y recibir, recepción móvil; E2E #3 sin pedido) y esperar OK.
 Antes: `API_PORT=8090 docker compose -f deploy/docker-compose.dev.yml up -d` y `npm start` en `frontend/` (Node ≥ 24.15).
 La base de desarrollo tiene existencias de ejemplo: AJ-000006 (SUC-01 AZU-001 25 kg) y AJ-000007 (COM HAR-001 lote L-2409 100 kg).
 
@@ -194,6 +194,31 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
   iniciales). Selector de la barra renombrado "Ubicación activa".
 - E2E `04-adjustment-shortages` (no registra nada). La base de desarrollo no tiene existencias: los lotes, el kardex
   con datos y un ajuste registrado no se revisaron en pantalla (sí con pruebas unitarias).
+
+**Frontend (F-07):**
+- **Backend:** `GET /item-categories` ahora acepta `catalog.view` **o** `inventory.view` (conteos parciales por
+  categoría y filtro de existencias para Encargado de sucursal, que no tiene `catalog.view`). Prueba de integración.
+- Conteos (`/inventario/conteos`, `/:id`): lista con avance, "Nuevo conteo" (ubicación, categoría opcional, notas),
+  borrador → Iniciar → captura por tarjetas (buscador fijo por nombre/SKU/lote, filtros Todas/Pendientes/Contadas,
+  barra inferior fija con avance y estado del guardado) → Revisar diferencias → Cerrar (confirmación con resumen);
+  Cancelar en borrador y en captura; vista de cerrado/cancelado con líneas, ajustes registrados e historial.
+  - **Autoguardado:** 1 s después de la última tecla, al salir del campo o al ocultar la app; guardados en serie con
+    la versión que devolvió el anterior (`PendingCounts`); 409 → diálogo de recarga. Una cantidad ya guardada no se
+    puede "borrar" (el backend no lo admite): dejar vacío el campo no envía nada.
+  - **Captura a ciegas** (decisión propia, fácil de cambiar): la existencia del sistema no se muestra al capturar,
+    solo al revisar, para no influir en lo contado.
+  - "Agregar artículo" para lo que no estaba en el snapshot (con lote obligatorio si el artículo maneja lotes).
+  - Al cerrar, si faltan líneas, el botón dice "Faltan N" y filtra las pendientes (no hay "poner en 0").
+- Consumo (`/inventario/consumos/nuevo`): solo si la ubicación activa es sucursal; día (hoy, sin futuro), captura
+  rápida artículo → cantidad → Enter (el mismo artículo sin lote elegido se suma), lote opcional (FEFO), confirmación
+  con resumen, faltantes con el diálogo de ajustes. Lista y detalle de solo lectura (`/consumos`, `/consumos/:id`).
+  El kardex enlaza folios de conteos y consumos.
+- Compartidos: `app-qty-input` con `allowZero` y salida `(entered)`; `app-item-picker` limpia sugerencias al
+  reiniciarse y ya no usa `distinctUntilChanged` (repetir el mismo artículo no buscaba); **arreglo** del
+  `app-audit-panel` en celular (el texto caía en la columna del ícono y desbordaba la pantalla).
+- E2E `05-count-consumption-mobile` (escritorio y 390 px, verifica que no haya scroll horizontal): crea, inicia,
+  captura, agrega artículo, revisa y **cancela** el conteo; el consumo se detiene en el resumen. No mueve inventario.
+  Al inicio cancela conteos en captura de SUC-02 que haya dejado una corrida fallida.
 
 ## Pendientes y notas técnicas
 

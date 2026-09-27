@@ -21,7 +21,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import {
   catchError,
   debounceTime,
-  distinctUntilChanged,
   forkJoin,
   map,
   Observable,
@@ -159,7 +158,6 @@ export class ItemPicker implements ControlValueAccessor, OnInit {
       .pipe(
         map((q) => q.trim()),
         debounceTime(250),
-        distinctUntilChanged(),
         tap((q) => {
           this.lastQuery.set(q);
           this.searching.set(q.length > 0);
@@ -191,6 +189,11 @@ export class ItemPicker implements ControlValueAccessor, OnInit {
 
   writeValue(value: ItemOption | null): void {
     this.text.set(itemDisplay(value));
+    if (!value) {
+      // Formulario reiniciado: que al volver al campo no aparezcan las sugerencias anteriores.
+      this.suggestions.set([]);
+      this.noResults.set(false);
+    }
   }
 
   registerOnChange(fn: (value: ItemOption | null) => void): void {

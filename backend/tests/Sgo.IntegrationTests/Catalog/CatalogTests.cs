@@ -189,6 +189,17 @@ public class CatalogTests(SgoApiFactory factory)
     }
 
     [Fact]
+    public async Task Category_list_is_available_with_inventory_view_for_partial_counts()
+    {
+        var branchManager = await factory.CreateUserAsync("Encargado de sucursal", "SUC-01");
+        var client = await factory.CreateAuthenticatedClientAsync(branchManager.Email, branchManager.Password);
+
+        Assert.Equal(HttpStatusCode.OK, (await client.GetAsync("/api/v1/item-categories")).StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden,
+            (await client.PostAsJsonAsync("/api/v1/item-categories", new CreateItemCategoryRequest("No permitida"))).StatusCode);
+    }
+
+    [Fact]
     public async Task Item_lookup_caps_the_number_of_results()
     {
         var admin = await AdminAsync();

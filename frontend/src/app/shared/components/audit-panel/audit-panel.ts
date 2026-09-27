@@ -85,11 +85,16 @@ const PAGE_SIZE = 10;
       }
 
       @media (max-width: 767.98px) {
-        grid-template-columns: 1fr 24px;
+        grid-template-columns: minmax(0, 1fr) 24px;
+        gap: 0 var(--sgo-space-3);
 
-        .when,
-        .muted {
+        // Fecha, acción y usuario apilados; el ícono a la derecha de las tres líneas.
+        > span {
           grid-column: 1;
+        }
+        mat-icon {
+          grid-column: 2;
+          grid-row: 1 / span 3;
         }
       }
     }

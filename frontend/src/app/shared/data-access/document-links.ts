@@ -4,6 +4,8 @@
  */
 const DOCUMENT_ROUTES: Record<string, (id: string) => string> = {
   Adjustment: (id) => `/inventario/ajustes/${id}`,
+  PhysicalCount: (id) => `/inventario/conteos/${id}`,
+  Consumption: (id) => `/inventario/consumos/${id}`,
 };
 
 export const DOCUMENT_LABELS: Record<string, string> = {

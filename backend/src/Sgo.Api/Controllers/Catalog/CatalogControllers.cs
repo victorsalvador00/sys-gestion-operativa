@@ -51,9 +51,12 @@ public sealed class UnitsOfMeasureController(IUnitOfMeasureService units) : Cont
 [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
 public sealed class ItemCategoriesController(IItemCategoryService categories) : ControllerBase
 {
-    /// <summary>Categorías de artículo. Activas por defecto; includeInactive=true para ver todas.</summary>
+    /// <summary>
+    /// Categorías de artículo. Activas por defecto; includeInactive=true para ver todas. También con inventory.view:
+    /// los conteos físicos parciales se hacen por categoría.
+    /// </summary>
     [HttpGet]
-    [RequirePermission(Permissions.CatalogView)]
+    [RequireAnyPermission(Permissions.CatalogView, Permissions.InventoryView)]
     public Task<PagedResult<ItemCategoryDto>> List([FromQuery] CatalogListQuery query, CancellationToken ct) =>
         categories.ListAsync(query, ct);
 

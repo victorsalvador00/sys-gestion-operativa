@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { parseQty, QtyInput, qtyValidator } from './qty-input';
+import { parseQty, qtyErrorMessage, QtyInput, qtyValidator } from './qty-input';
 
 describe('qtyValidator y parseQty', () => {
   const check = (value: number | null, allowNegative = false) =>
@@ -23,6 +23,16 @@ describe('qtyValidator y parseQty', () => {
   it('con signo acepta negativos pero no cero', () => {
     expect(check(-2.5, true)).toBeNull();
     expect(check(0, true)).toEqual({ qtyPositive: true });
+  });
+
+  it('con allowZero (conteos) acepta cero pero no negativos', () => {
+    const zero = (value: number) => qtyValidator(false, true)(new FormControl(value));
+    expect(zero(0)).toBeNull();
+    expect(zero(3)).toBeNull();
+    expect(zero(-1)).toEqual({ qtyPositive: true });
+    expect(qtyErrorMessage({ qtyPositive: true }, false, true)).toBe(
+      'La cantidad no puede ser negativa.',
+    );
   });
 
   it('interpreta el texto capturado', () => {

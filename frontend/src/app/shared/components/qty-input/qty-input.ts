@@ -6,6 +6,7 @@ import {
   inject,
   input,
   OnInit,
+  output,
   signal,
   viewChild,
 } from '@angular/core';
@@ -32,10 +33,15 @@ export function parseQty(text: string): number | null {
 
 /**
  * Valida una cantidad: número válido, hasta 4 decimales, y > 0 (o ≠ 0 si `allowNegative`,
- * para ajustes con signo). Vacío no es error aquí: usa `Validators.required` si aplica.
+ * para ajustes con signo; o ≥ 0 si `allowZero`, para conteos). Vacío no es error aquí: usa
+ * `Validators.required` si aplica.
  */
-export function qtyValidator(allowNegative: boolean | (() => boolean) = false): ValidatorFn {
+export function qtyValidator(
+  allowNegative: boolean | (() => boolean) = false,
+  allowZero: boolean | (() => boolean) = false,
+): ValidatorFn {
   const negativeAllowed = typeof allowNegative === 'function' ? allowNegative : () => allowNegative;
+  const zeroAllowed = typeof allowZero === 'function' ? allowZero : () => allowZero;
   return (control: AbstractControl): ValidationErrors | null => {
     const value = control.value as number | null;
     if (value === null || value === undefined) {
@@ -48,6 +54,9 @@ export function qtyValidator(allowNegative: boolean | (() => boolean) = false): 
     if (decimals > QTY_MAX_DECIMALS) {
       return { qtyDecimals: true };
     }
+    if (value === 0 && zeroAllowed()) {
+      return null;
+    }
     if (negativeAllowed() ? value === 0 : value <= 0) {
       return { qtyPositive: true };
     }
@@ -56,7 +65,11 @@ export function qtyValidator(allowNegative: boolean | (() => boolean) = false): 
 }
 
 /** Mensaje en español del primer error de una cantidad. */
-export function qtyErrorMessage(errors: ValidationErrors | null, allowNegative = false): string {
+export function qtyErrorMessage(
+  errors: ValidationErrors | null,
+  allowNegative = false,
+  allowZero = false,
+): string {
   if (!errors) {
     return '';
   }
@@ -70,6 +83,9 @@ export function qtyErrorMessage(errors: ValidationErrors | null, allowNegative =
     return `Máximo ${QTY_MAX_DECIMALS} decimales.`;
   }
   if (errors['qtyPositive']) {
+    if (allowZero) {
+      return 'La cantidad no puede ser negativa.';
+    }
     return allowNegative ? 'La cantidad no puede ser cero.' : 'La cantidad debe ser mayor a cero.';
   }
   if (typeof errors['server'] === 'string') {
@@ -144,8 +160,12 @@ export class QtyInput implements ControlValueAccessor, OnInit {
   readonly unit = input<string | null>();
   readonly hint = input<string>();
   readonly allowNegative = input(false);
+  /** Acepta 0 (ej. conteo físico: no hay nada en anaquel). */
+  readonly allowZero = input(false);
   readonly appearance = input<'outline' | 'fill'>('outline');
   readonly subscriptSizing = input<'fixed' | 'dynamic'>('fixed');
+  /** Enter en el campo (después de pasar el foco a la siguiente cantidad). */
+  readonly entered = output<void>();
 
   protected readonly text = signal('');
   protected readonly disabled = signal(false);
@@ -161,6 +181,7 @@ export class QtyInput implements ControlValueAccessor, OnInit {
     }
     effect(() => {
       this.allowNegative();
+      this.allowZero();
       this.ngControl?.control?.updateValueAndValidity({ emitEvent: false });
     });
   }
@@ -169,14 +190,23 @@ export class QtyInput implements ControlValueAccessor, OnInit {
     const control = this.ngControl?.control;
     if (control) {
       // Lee `allowNegative` en cada validación: puede cambiar (ej. el motivo de un ajuste).
-      control.addValidators(qtyValidator(() => this.allowNegative()));
+      control.addValidators(
+        qtyValidator(
+          () => this.allowNegative(),
+          () => this.allowZero(),
+        ),
+      );
       control.updateValueAndValidity({ emitEvent: false });
       this.errorState.connect(() => this.matInput());
     }
   }
 
   protected errorMessage(): string {
-    return qtyErrorMessage(this.ngControl?.control?.errors ?? null, this.allowNegative());
+    return qtyErrorMessage(
+      this.ngControl?.control?.errors ?? null,
+      this.allowNegative(),
+      this.allowZero(),
+    );
   }
 
   writeValue(value: number | null): void {
@@ -220,5 +250,6 @@ export class QtyInput implements ControlValueAccessor, OnInit {
       next.focus();
       next.select();
     }
+    this.entered.emit();
   }
 }
