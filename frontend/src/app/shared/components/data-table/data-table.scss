@@ -118,6 +118,26 @@ tr.clickable {
   }
 }
 
+.select-cell {
+  width: 56px;
+  padding-inline: var(--sgo-space-1) 0 !important;
+}
+
+.card-select {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sgo-space-1);
+
+  mat-checkbox {
+    margin: -8px 0 0 -12px;
+  }
+}
+
+.card-body {
+  flex: 1;
+  min-width: 0;
+}
+
 .expand-cell {
   width: 48px;
   padding-inline: 0 !important;

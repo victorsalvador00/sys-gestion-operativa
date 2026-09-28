@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { uniqueTaxId } from './support/purchasing';
 import { adminCredentials, expectNoHorizontalScroll, login } from './support/session';
 
 /**
@@ -6,16 +7,6 @@ import { adminCredentials, expectNoHorizontalScroll, login } from './support/ses
  * celular). No mueve inventario, pero cada corrida deja un proveedor nuevo (RFC único) que queda como
  * preferido de HAR-001: sirve de dato para requisiciones y órdenes de compra (F-12, F-13).
  */
-function uniqueTaxId(): string {
-  // Persona moral: 3 letras + fecha AAMMDD válida + homoclave de 3 caracteres.
-  const now = new Date();
-  const date = [now.getFullYear() % 100, now.getMonth() + 1, now.getDate()]
-    .map((n) => String(n).padStart(2, '0'))
-    .join('');
-  const suffix = (Date.now() % 46_656).toString(36).toUpperCase().padStart(3, '0');
-  return `EDE${date}${suffix}`;
-}
-
 test('alta de proveedor con artículo preferido y cambio de precio', async ({ page }) => {
   const admin = adminCredentials();
   await login(page, admin.email, admin.password);

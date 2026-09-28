@@ -42,9 +42,10 @@
 | 2 | F-09 Recetas con editor y versiones (+ E2E de nueva versión) | ✅ | (ver `git log`) |
 | 2 | F-10 Órdenes de producción con explosión y completar (+ E2E #4) | ✅ | (ver `git log`) |
 | 3 | F-11 Proveedores y artículos de proveedor (+ E2E de alta y precio) | ✅ | (ver `git log`) |
+| 3 | F-12 Requisiciones y conversión a OC (+ `GET /items/{id}/supplier-offers`, E2E) | ✅ | (ver `git log`) |
 
-**Siguiente paso (al retomar):** F-11 terminada. Proponer el plan de **F-12** (requisiciones y conversión a OC)
-y esperar OK.
+**Siguiente paso (al retomar):** F-12 terminada. Proponer el plan de **F-13** (órdenes de compra y recepciones,
+E2E #2) y esperar OK.
 Antes: `API_PORT=8090 docker compose -f deploy/docker-compose.dev.yml up -d` y `npm start` en `frontend/` (Node ≥ 24.15).
 La base de desarrollo tiene existencias de ejemplo: AJ-000006 (SUC-01 AZU-001 25 kg) y AJ-000007 (COM HAR-001 lote L-2409 100 kg).
 
@@ -317,6 +318,32 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
 - E2E `09-suppliers` (escritorio y celular): crea un proveedor con RFC único (`EDE` + fecha + sufijo), liga
   HAR-001 como preferido a $412.50, cambia el precio a $450 y lo busca por RFC. No mueve inventario, pero **cada
   corrida deja un proveedor nuevo que queda como preferido de HAR-001** (dato para F-12/F-13).
+
+**Frontend (F-12):**
+- Backend: `GET /items/{id}/supplier-offers` (`purchasing.view`, sin migración): proveedores activos que venden el
+  artículo (preferido primero, luego por precio) con precio, clave y días de entrega, más la unidad de compra del
+  artículo. Prueba de integración en `SupplierTests`.
+- Compartido: `app-data-table` admite selección (`selectable`, `selectionLabel`, `[(selection)]`): casilla por fila
+  elegible y en la tarjeta en celular; la del encabezado elige o quita las de la página y la selección se conserva
+  al cambiar de página. `ConfirmSummary` acepta `showCancel: false` (avisos de resultado).
+- `features/purchasing`:
+  - Lista `/compras/requisiciones`: filtros por estado y ubicación (solo las de compra del usuario), búsqueda
+    por folio; con `purchasing.po.manage`, selección de las *Aprobadas* y **"Convertir a OC (n)"** (confirmación
+    con las requisiciones → OC en borrador → diálogo con folio, proveedor, entrega y total de cada OC).
+  - Nueva / editar (`purchasing.requisitions.manage`; solo borrador): ubicación = la activa si compra (si no,
+    selector de fábrica/comisariato); fecha requerida (no pasada, por omisión en 7 días) y notas; líneas con
+    artículo, cantidad en **unidad de compra**, **proveedor sugerido** (el preferido por omisión; lista con
+    precio) e importe; total estimado sin IVA. "Guardar borrador" o "Guardar y enviar" (exige proveedor en
+    todas las líneas; si el envío falla queda como borrador).
+  - Detalle: fechas de cada paso, OC generadas (folio; el enlace llega con F-13), líneas con proveedor, precio e
+    importe estimados, aviso si falta proveedor, motivo de rechazo e historial. Acciones por estado y permiso
+    (`requisitionActions`): Enviar/Editar/Cancelar (borrador), Aprobar/Rechazar con motivo (`po.approve`),
+    Convertir a OC (`po.manage`), Cancelar (enviada o aprobada).
+  - `ui/reason-dialog` (motivo obligatorio, máx. 500) para rechazar; se reutilizará en OC.
+- Rol "Compras" no tiene `purchasing.po.approve`: aprueba el Gerente de operaciones o el administrador.
+- E2E `10-requisitions` (escritorio y celular): asegura proveedor preferido de HAR-001 (`e2e/support/purchasing.ts`),
+  crea en COM una requisición de 4 cajas, la envía, la aprueba y la convierte desde la lista. **Cada corrida deja
+  una OC en borrador.**
 
 ## Pendientes y notas técnicas
 

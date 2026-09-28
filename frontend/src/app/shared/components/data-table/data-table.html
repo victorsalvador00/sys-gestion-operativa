@@ -22,10 +22,30 @@
           (click)="onRowClick(row)"
           (keydown.enter)="onRowClick(row)"
         >
-          <ng-container
-            [ngTemplateOutlet]="cardDef()!.template"
-            [ngTemplateOutletContext]="{ $implicit: row }"
-          />
+          @if (selectable()) {
+            <div class="card-select">
+              @if (canSelect(row)) {
+                <mat-checkbox
+                  [checked]="isSelected(row)"
+                  [aria-label]="selectionLabel()(row)"
+                  (click)="$event.stopPropagation()"
+                  (keydown.enter)="$event.stopPropagation()"
+                  (change)="toggleSelection(row)"
+                />
+              }
+              <div class="card-body">
+                <ng-container
+                  [ngTemplateOutlet]="cardDef()!.template"
+                  [ngTemplateOutletContext]="{ $implicit: row }"
+                />
+              </div>
+            </div>
+          } @else {
+            <ng-container
+              [ngTemplateOutlet]="cardDef()!.template"
+              [ngTemplateOutletContext]="{ $implicit: row }"
+            />
+          }
           @if (detailDef(); as detail) {
             <button
               mat-button
@@ -91,6 +111,28 @@
           </ng-container>
         }
 
+        <ng-container [matColumnDef]="selectColumn">
+          <th mat-header-cell *matHeaderCellDef class="select-cell">
+            <mat-checkbox
+              [checked]="allSelected()"
+              [indeterminate]="someSelected()"
+              [disabled]="!selectableRows().length"
+              aria-label="Seleccionar todas las de esta página"
+              (change)="toggleAll()"
+            />
+          </th>
+          <td mat-cell *matCellDef="let row" class="select-cell">
+            @if (canSelect(row)) {
+              <mat-checkbox
+                [checked]="isSelected(row)"
+                [aria-label]="selectionLabel()(row)"
+                (click)="$event.stopPropagation()"
+                (keydown.enter)="$event.stopPropagation()"
+                (change)="toggleSelection(row)"
+              />
+            }
+          </td>
+        </ng-container>
         <ng-container [matColumnDef]="expandColumn">
           <th mat-header-cell *matHeaderCellDef class="expand-cell">
             <span class="sgo-visually-hidden">Detalle</span>

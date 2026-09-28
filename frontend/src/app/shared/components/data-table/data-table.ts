@@ -10,6 +10,7 @@ import {
   Directive,
   inject,
   input,
+  model,
   output,
   signal,
   TemplateRef,
@@ -17,6 +18,7 @@ import {
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -61,10 +63,13 @@ export class CardDef {
 
 export const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
 const EXPAND_COLUMN = '__expand';
+const SELECT_COLUMN = '__select';
 
 /**
  * Tabla de listados con paginación, orden y búsqueda del lado del servidor (spec frontend §8).
  * La página guarda la `query` y hace la petición; la tabla solo emite `queryChange`.
+ * Con `selectable` agrega una casilla a las filas elegibles; `selection` (two-way) guarda las
+ * filas elegidas, aunque cambie de página.
  */
 @Component({
   selector: 'app-data-table',
@@ -78,6 +83,7 @@ const EXPAND_COLUMN = '__expand';
     MatInputModule,
     MatIconModule,
     MatButtonModule,
+    MatCheckboxModule,
   ],
   providers: [{ provide: MatPaginatorIntl, useClass: SpanishPaginatorIntl }],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -96,6 +102,11 @@ export class DataTable<T> {
   readonly emptyActionLabel = input<string>();
   readonly rowClickable = input(false);
   readonly trackBy = input<(row: T) => unknown>((row: T) => (row as { id?: unknown }).id ?? row);
+  /** Qué filas se pueden elegir; sin él no hay casillas. */
+  readonly selectable = input<((row: T) => boolean) | null>(null);
+  /** Nombre accesible de la casilla de cada fila (ej. "Seleccionar REQ-000012"). */
+  readonly selectionLabel = input<(row: T) => string>(() => 'Seleccionar fila');
+  readonly selection = model<T[]>([]);
 
   readonly queryChange = output<ListQuery>();
   readonly rowClick = output<T>();
@@ -115,10 +126,27 @@ export class DataTable<T> {
   protected readonly showCards = computed(() => this.isMobile() && !!this.cardDef());
 
   protected readonly columnKeys = computed(() => [
+    ...(this.selectable() ? [SELECT_COLUMN] : []),
     ...(this.detailDef() ? [EXPAND_COLUMN] : []),
     ...this.columns().map((c) => c.key),
   ]);
   protected readonly expandColumn = EXPAND_COLUMN;
+  protected readonly selectColumn = SELECT_COLUMN;
+  private readonly selectedKeys = computed(
+    () => new Set(this.selection().map((row) => this.trackBy()(row))),
+  );
+  protected readonly selectableRows = computed(() => {
+    const selectable = this.selectable();
+    return selectable ? this.rows().filter(selectable) : [];
+  });
+  protected readonly allSelected = computed(
+    () =>
+      this.selectableRows().length > 0 &&
+      this.selectableRows().every((row) => this.isSelected(row)),
+  );
+  protected readonly someSelected = computed(
+    () => !this.allSelected() && this.selectableRows().some((row) => this.isSelected(row)),
+  );
   protected readonly templates = computed(
     () => new Map(this.cellDefs().map((def) => [def.appCell(), def.template])),
   );
@@ -165,6 +193,28 @@ export class DataTable<T> {
     } else if (this.detailDef()) {
       this.toggle(row);
     }
+  }
+
+  protected canSelect(row: T): boolean {
+    return this.selectable()?.(row) ?? false;
+  }
+
+  protected isSelected(row: T): boolean {
+    return this.selectedKeys().has(this.trackBy()(row));
+  }
+
+  protected toggleSelection(row: T): void {
+    const key = this.trackBy()(row);
+    this.selection.update((current) =>
+      this.isSelected(row) ? current.filter((r) => this.trackBy()(r) !== key) : [...current, row],
+    );
+  }
+
+  /** Casilla del encabezado: elige o quita todas las filas elegibles de la página. */
+  protected toggleAll(): void {
+    const pageKeys = new Set(this.selectableRows().map((row) => this.trackBy()(row)));
+    const others = this.selection().filter((row) => !pageKeys.has(this.trackBy()(row)));
+    this.selection.set(this.allSelected() ? others : [...others, ...this.selectableRows()]);
   }
 
   protected isExpanded(row: T): boolean {

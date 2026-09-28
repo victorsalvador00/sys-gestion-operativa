@@ -28,6 +28,16 @@ public sealed record SupplierItemDto(
     Guid Id, Guid SupplierId, Guid ItemId, string Sku, string Name, string PurchaseUomCode, decimal PurchaseToBaseFactor,
     string BaseUomCode, string? SupplierSku, decimal Price, int LeadTimeDays, bool IsPreferred, bool IsActive, uint Version);
 
+/// <summary>An active supplier that sells the item, with its current price per purchase unit (without VAT).</summary>
+public sealed record SupplierOfferDto(
+    Guid SupplierId, string SupplierName, Guid SupplierItemId, string? SupplierSku, decimal Price, int LeadTimeDays, bool IsPreferred);
+
+/// <param name="PurchaseUomCode">Unit of requisition and PO quantities: the item's purchase unit, or its base unit.</param>
+/// <param name="Offers">Preferred supplier first, then by price.</param>
+public sealed record ItemSupplierOffersDto(
+    Guid ItemId, string Sku, string Name, string PurchaseUomCode, decimal PurchaseToBaseFactor, string BaseUomCode,
+    IReadOnlyList<SupplierOfferDto> Offers);
+
 public sealed record CreateSupplierItemRequest(Guid ItemId, string? SupplierSku, decimal Price, int LeadTimeDays, bool IsPreferred);
 
 /// <summary>Marking it preferred unmarks the item's current preferred supplier. An inactive row is never preferred.</summary>
@@ -104,6 +114,9 @@ public interface ISupplierService
     Task<SupplierItemDto> GetItemAsync(Guid supplierId, Guid supplierItemId, CancellationToken ct = default);
     Task<SupplierItemDto> AddItemAsync(Guid supplierId, CreateSupplierItemRequest request, CancellationToken ct = default);
     Task<SupplierItemDto> UpdateItemAsync(Guid supplierId, Guid supplierItemId, UpdateSupplierItemRequest request, CancellationToken ct = default);
+
+    /// <summary>Active suppliers (and active supplier items) that sell the item, for requisition lines.</summary>
+    Task<ItemSupplierOffersDto> OffersAsync(Guid itemId, CancellationToken ct = default);
 }
 
 public sealed class SupplierService(ISgoDbContext db) : ISupplierService
@@ -243,6 +256,26 @@ public sealed class SupplierService(ISgoDbContext db) : ISupplierService
         await tx.CommitAsync(ct);
 
         return await GetItemAsync(supplierId, supplierItem.Id, ct);
+    }
+
+    public async Task<ItemSupplierOffersDto> OffersAsync(Guid itemId, CancellationToken ct = default)
+    {
+        var item = await (from i in db.Items.AsNoTracking()
+                          join u in db.UnitsOfMeasure on i.PurchaseUomId ?? i.BaseUomId equals u.Id
+                          join b in db.UnitsOfMeasure on i.BaseUomId equals b.Id
+                          where i.Id == itemId
+                          select new { i.Id, i.Sku, i.Name, UomCode = u.Code, i.PurchaseToBaseFactor, BaseUomCode = b.Code })
+                   .SingleOrDefaultAsync(ct)
+                   ?? throw new NotFoundException("el artículo", itemId);
+
+        var offers = await (from si in db.SupplierItems.AsNoTracking()
+                            join s in db.Suppliers on si.SupplierId equals s.Id
+                            where si.ItemId == itemId && si.IsActive && s.IsActive
+                            orderby si.IsPreferred descending, si.Price, s.Name
+                            select new SupplierOfferDto(s.Id, s.Name, si.Id, si.SupplierSku, si.Price, si.LeadTimeDays, si.IsPreferred))
+                           .ToListAsync(ct);
+
+        return new ItemSupplierOffersDto(item.Id, item.Sku, item.Name, item.UomCode, item.PurchaseToBaseFactor, item.BaseUomCode, offers);
     }
 
     /// <summary>The partial unique index allows one preferred row per item: the old one must be saved first.</summary>

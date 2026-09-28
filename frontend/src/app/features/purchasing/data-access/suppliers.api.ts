@@ -12,6 +12,8 @@ export type SupplierItemDto = Schemas['SupplierItemDto'];
 export type SupplierItemsPage = Schemas['PagedResultOfSupplierItemDto'];
 export type CreateSupplierItemRequest = Schemas['CreateSupplierItemRequest'];
 export type UpdateSupplierItemRequest = Schemas['UpdateSupplierItemRequest'];
+export type ItemSupplierOffers = Schemas['ItemSupplierOffersDto'];
+export type SupplierOffer = Schemas['SupplierOfferDto'];
 
 export interface SupplierFilters {
   includeInactive?: boolean | null;
@@ -70,5 +72,10 @@ export class SuppliersApi {
       `/suppliers/${supplierId}/items/${supplierItemId}`,
       request,
     );
+  }
+
+  /** Proveedores activos que venden el artículo (preferido primero) y su unidad de compra. */
+  offers(itemId: string): Observable<ItemSupplierOffers> {
+    return this.http.get<ItemSupplierOffers>(`/items/${itemId}/supplier-offers`);
   }
 }

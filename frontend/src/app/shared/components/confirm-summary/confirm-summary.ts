@@ -16,6 +16,8 @@ export interface ConfirmSummaryData {
   lines?: { headers: string[]; rows: string[][]; alignEnd?: number[] };
   confirmLabel: string;
   cancelLabel?: string;
+  /** `false` para avisos que solo se aceptan (ej. el resultado de una acción). */
+  showCancel?: boolean;
   /** `warn` para acciones destructivas (cancelar, rechazar). */
   tone?: 'primary' | 'warn';
 }
@@ -68,9 +70,11 @@ export interface ConfirmSummaryData {
       }
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button mat-button type="button" [mat-dialog-close]="false">
-        {{ data.cancelLabel ?? 'Volver' }}
-      </button>
+      @if (data.showCancel !== false) {
+        <button mat-button type="button" [mat-dialog-close]="false">
+          {{ data.cancelLabel ?? 'Volver' }}
+        </button>
+      }
       <button
         mat-flat-button
         type="button"

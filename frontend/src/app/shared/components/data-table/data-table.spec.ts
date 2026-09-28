@@ -147,6 +147,60 @@ describe('app-data-table con detalle expandible', () => {
   });
 });
 
+@Component({
+  imports: [DataTable],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
+    <app-data-table
+      [columns]="columns"
+      [rows]="rows"
+      [query]="query"
+      [selectable]="approved"
+      [selectionLabel]="label"
+      [(selection)]="selection"
+    />
+  `,
+})
+class SelectHost {
+  readonly columns: TableColumn<Row>[] = [{ key: 'folio', header: 'Folio' }];
+  readonly rows: Row[] = [
+    { id: 1, folio: 'A', total: 1 },
+    { id: 2, folio: 'B', total: 0 },
+    { id: 3, folio: 'C', total: 3 },
+  ];
+  readonly query: ListQuery = { page: 1, pageSize: 25 };
+  readonly selection = signal<Row[]>([{ id: 9, folio: 'Otra página', total: 1 }]);
+  readonly approved = (row: Row) => row.total > 0;
+  readonly label = (row: Row) => `Seleccionar ${row.folio}`;
+}
+
+describe('app-data-table con selección', () => {
+  it('solo las filas elegibles tienen casilla; la del encabezado elige o quita las de la página', async () => {
+    const fixture = TestBed.createComponent(SelectHost);
+    await fixture.whenStable();
+    const el = fixture.nativeElement as HTMLElement;
+    const host = fixture.componentInstance;
+    const rowBoxes = () => el.querySelectorAll<HTMLInputElement>('td.select-cell input');
+    const header = el.querySelector<HTMLInputElement>('th.select-cell input')!;
+
+    expect(rowBoxes()).toHaveLength(2);
+    expect(rowBoxes()[0].getAttribute('aria-label')).toBe('Seleccionar A');
+
+    rowBoxes()[1].click();
+    await fixture.whenStable();
+    expect(host.selection().map((r) => r.folio)).toEqual(['Otra página', 'C']);
+    expect(header.indeterminate).toBe(true);
+
+    header.click();
+    await fixture.whenStable();
+    expect(host.selection().map((r) => r.folio)).toEqual(['Otra página', 'A', 'C']);
+
+    header.click();
+    await fixture.whenStable();
+    expect(host.selection().map((r) => r.folio)).toEqual(['Otra página']);
+  });
+});
+
 describe('toHttpParams', () => {
   it('omite vacíos y agrega filtros', () => {
     const params = toHttpParams(

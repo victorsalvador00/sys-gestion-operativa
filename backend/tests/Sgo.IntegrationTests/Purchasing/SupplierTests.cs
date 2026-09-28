@@ -210,6 +210,39 @@ public class SupplierTests(SgoApiFactory factory)
     }
 
     [Fact]
+    public async Task Item_supplier_offers_list_active_suppliers_preferred_first_then_by_price()
+    {
+        var admin = await AdminAsync();
+        var item = await admin.CreateItemAsync(await admin.NewItemRequestAsync()); // purchased by "caja" of 25 kg
+        var cheap = await admin.CreateSupplierAsync();
+        var preferred = await admin.CreateSupplierAsync();
+        var expensive = await admin.CreateSupplierAsync();
+        var inactiveRow = await admin.CreateSupplierAsync();
+        var inactiveSupplier = await admin.CreateSupplierAsync();
+        await OkAsync<SupplierItemDto>(await admin.AddSupplierItemAsync(expensive.Id, item.Id, 500m));
+        await OkAsync<SupplierItemDto>(await admin.AddSupplierItemAsync(cheap.Id, item.Id, 380m, supplierSku: "B-25"));
+        await OkAsync<SupplierItemDto>(await admin.AddSupplierItemAsync(preferred.Id, item.Id, 410m, preferred: true));
+        var row = await OkAsync<SupplierItemDto>(await admin.AddSupplierItemAsync(inactiveRow.Id, item.Id, 100m));
+        await OkAsync<SupplierItemDto>(await UpdateItemAsync(admin, row, preferred: false, active: false));
+        await OkAsync<SupplierItemDto>(await admin.AddSupplierItemAsync(inactiveSupplier.Id, item.Id, 90m));
+        await OkAsync<SupplierDto>(await admin.PutAsJsonAsync($"/api/v1/suppliers/{inactiveSupplier.Id}",
+            UpdateOf(inactiveSupplier, isActive: false)));
+
+        var offers = (await admin.GetJsonAsync<ItemSupplierOffersDto>($"/api/v1/items/{item.Id}/supplier-offers"))!;
+
+        Assert.Equal((item.Sku, "caja", 25m, "kg"), (offers.Sku, offers.PurchaseUomCode, offers.PurchaseToBaseFactor, offers.BaseUomCode));
+        Assert.Equal([preferred.Id, cheap.Id, expensive.Id], offers.Offers.Select(o => o.SupplierId));
+        Assert.True(offers.Offers[0].IsPreferred);
+        Assert.Equal((cheap.Name, "B-25", 380m, 3), (offers.Offers[1].SupplierName, offers.Offers[1].SupplierSku,
+            offers.Offers[1].Price, offers.Offers[1].LeadTimeDays));
+
+        Assert.Equal(HttpStatusCode.NotFound, (await admin.GetAsync($"/api/v1/items/{Guid.NewGuid()}/supplier-offers")).StatusCode);
+        var branch = await factory.CreateUserAsync("Encargado de sucursal", "SUC-01");
+        var branchClient = await factory.CreateAuthenticatedClientAsync(branch.Email, branch.Password);
+        Assert.Equal(HttpStatusCode.Forbidden, (await branchClient.GetAsync($"/api/v1/items/{item.Id}/supplier-offers")).StatusCode);
+    }
+
+    [Fact]
     public async Task Supplier_permissions()
     {
         var admin = await AdminAsync();
