@@ -41,9 +41,10 @@
 | 1 | F-08 Traspasos directos (+ E2E #3 sin pedido) | ✅ | (ver `git log`) |
 | 2 | F-09 Recetas con editor y versiones (+ E2E de nueva versión) | ✅ | (ver `git log`) |
 | 2 | F-10 Órdenes de producción con explosión y completar (+ E2E #4) | ✅ | (ver `git log`) |
+| 3 | F-11 Proveedores y artículos de proveedor (+ E2E de alta y precio) | ✅ | (ver `git log`) |
 
-**Siguiente paso (al retomar):** Fase 2 del frontend completa. Proponer el plan de **F-11** (proveedores y
-artículos de proveedor, Fase 3) y esperar OK.
+**Siguiente paso (al retomar):** F-11 terminada. Proponer el plan de **F-12** (requisiciones y conversión a OC)
+y esperar OK.
 Antes: `API_PORT=8090 docker compose -f deploy/docker-compose.dev.yml up -d` y `npm start` en `frontend/` (Node ≥ 24.15).
 La base de desarrollo tiene existencias de ejemplo: AJ-000006 (SUC-01 AZU-001 25 kg) y AJ-000007 (COM HAR-001 lote L-2409 100 kg).
 
@@ -298,6 +299,24 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
 - Pruebas unitarias: con relojes simulados de vitest, `whenStable` no termina (Angular agenda con timers); usar
   `vi.advanceTimersByTimeAsync` + `TestBed.tick()` (ver `production-orders.spec.ts`). `debounceTime` necesita que
   también se simule `Date` (el `vi.useFakeTimers()` por defecto lo hace).
+
+**Frontend (F-11):**
+- Backend: `SupplierItemDto` trae además `baseUomCode` (sin migración) para mostrar el precio por unidad base.
+- `features/purchasing`:
+  - Lista `/compras/proveedores` (`purchasing.view`): búsqueda por razón social o RFC, "Mostrar inactivos",
+    orden por razón social, RFC o días de crédito; tarjetas en celular.
+  - Alta `/nuevo` (`purchasing.suppliers.manage`) y detalle `/:id` (`purchasing.view`; sin `manage` se ve en
+    solo lectura). Pestaña **Datos generales**: RFC (se guarda en mayúsculas; mismo formato que `TaxIdRules`,
+    con fecha AAMMDD válida), razón social, contacto, teléfono, correo, días de crédito (0–365, 0 = contado) y
+    activo. Desactivar pide confirmación ("dejará de ser el proveedor preferido de sus artículos"). Historial.
+  - Pestaña **Artículos** (se carga al abrirla): SKU, artículo, clave del proveedor, precio sin IVA por unidad de
+    compra, **precio por unidad base** (precio ÷ factor), días de entrega, preferido y estado. Diálogo para
+    agregar (con `item-picker`) o editar; inactivo nunca es preferido. Con el proveedor inactivo no se editan
+    (lo exige el backend) y se avisa que hay que reactivarlo.
+  - Los 422 (artículo inactivo o ya ligado) llegan como aviso del interceptor; el diálogo queda abierto.
+- E2E `09-suppliers` (escritorio y celular): crea un proveedor con RFC único (`EDE` + fecha + sufijo), liga
+  HAR-001 como preferido a $412.50, cambia el precio a $450 y lo busca por RFC. No mueve inventario, pero **cada
+  corrida deja un proveedor nuevo que queda como preferido de HAR-001** (dato para F-12/F-13).
 
 ## Pendientes y notas técnicas
 

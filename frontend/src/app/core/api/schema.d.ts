@@ -7598,7 +7598,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Traspasos cuyo origen o destino está a tu alcance. Filtros: status, fromLocationId, toLocationId, locationId, from, to, q. */
+        /** Traspasos cuyo origen o destino está a tu alcance. Filtros: status, received (recibidos con o sin diferencias), fromLocationId, toLocationId, locationId, from, to, q. */
         get: {
             parameters: {
                 query?: {
@@ -11101,6 +11101,7 @@ export interface components {
             version: number;
         };
         SupplierItemDto: {
+            baseUomCode: string;
             /** Format: uuid */
             id: string;
             isActive: boolean;

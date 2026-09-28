@@ -23,9 +23,10 @@ public sealed record SupplierItemListQuery : CatalogListQuery
 }
 
 /// <param name="PurchaseUomCode">Unit the price refers to: the item's purchase unit, or its base unit when it has none.</param>
+/// <param name="BaseUomCode">Item's base unit, to show the price per base unit (Price / PurchaseToBaseFactor).</param>
 public sealed record SupplierItemDto(
     Guid Id, Guid SupplierId, Guid ItemId, string Sku, string Name, string PurchaseUomCode, decimal PurchaseToBaseFactor,
-    string? SupplierSku, decimal Price, int LeadTimeDays, bool IsPreferred, bool IsActive, uint Version);
+    string BaseUomCode, string? SupplierSku, decimal Price, int LeadTimeDays, bool IsPreferred, bool IsActive, uint Version);
 
 public sealed record CreateSupplierItemRequest(Guid ItemId, string? SupplierSku, decimal Price, int LeadTimeDays, bool IsPreferred);
 
@@ -264,6 +265,7 @@ public sealed class SupplierService(ISgoDbContext db) : ISupplierService
         public string Name { get; init; } = null!;
         public string UomCode { get; init; } = null!;
         public decimal PurchaseToBaseFactor { get; init; }
+        public string BaseUomCode { get; init; } = null!;
         public string? SupplierSku { get; init; }
         public decimal Price { get; init; }
         public int LeadTimeDays { get; init; }
@@ -271,7 +273,7 @@ public sealed class SupplierService(ISgoDbContext db) : ISupplierService
         public bool IsActive { get; init; }
         public uint Version { get; init; }
 
-        public SupplierItemDto ToDto() => new(Id, SupplierId, ItemId, Sku, Name, UomCode, PurchaseToBaseFactor, SupplierSku, Price,
+        public SupplierItemDto ToDto() => new(Id, SupplierId, ItemId, Sku, Name, UomCode, PurchaseToBaseFactor, BaseUomCode, SupplierSku, Price,
             LeadTimeDays, IsPreferred, IsActive, Version);
     }
 
@@ -279,10 +281,11 @@ public sealed class SupplierService(ISgoDbContext db) : ISupplierService
         from si in db.SupplierItems.AsNoTracking()
         join i in db.Items on si.ItemId equals i.Id
         join u in db.UnitsOfMeasure on i.PurchaseUomId ?? i.BaseUomId equals u.Id
+        join b in db.UnitsOfMeasure on i.BaseUomId equals b.Id
         select new SupplierItemRow
         {
             Id = si.Id, SupplierId = si.SupplierId, ItemId = si.ItemId, Sku = i.Sku, Name = i.Name, UomCode = u.Code,
-            PurchaseToBaseFactor = i.PurchaseToBaseFactor, SupplierSku = si.SupplierSku, Price = si.Price,
+            PurchaseToBaseFactor = i.PurchaseToBaseFactor, BaseUomCode = b.Code, SupplierSku = si.SupplierSku, Price = si.Price,
             LeadTimeDays = si.LeadTimeDays, IsPreferred = si.IsPreferred, IsActive = si.IsActive, Version = si.Version,
         };
 
