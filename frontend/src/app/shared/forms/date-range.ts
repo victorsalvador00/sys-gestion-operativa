@@ -17,3 +17,12 @@ export function toDateOnly(date: Date | null): string | null {
   const dd = String(date.getDate()).padStart(2, '0');
   return `${date.getFullYear()}-${mm}-${dd}`;
 }
+
+/** `yyyy-MM-dd` (DateOnly del backend) como fecha local a medianoche. */
+export function fromDateOnly(value: string | null | undefined): Date | null {
+  if (!value) {
+    return null;
+  }
+  const [year, month, day] = value.split('-').map(Number);
+  return new Date(year, month - 1, day);
+}

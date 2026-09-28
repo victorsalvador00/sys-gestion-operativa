@@ -40,9 +40,10 @@
 | 1 | F-07 Conteo físico y consumo (móvil, + E2E en 390 px) | ✅ | (ver `git log`) |
 | 1 | F-08 Traspasos directos (+ E2E #3 sin pedido) | ✅ | (ver `git log`) |
 | 2 | F-09 Recetas con editor y versiones (+ E2E de nueva versión) | ✅ | (ver `git log`) |
+| 2 | F-10 Órdenes de producción con explosión y completar (+ E2E #4) | ✅ | (ver `git log`) |
 
-**Siguiente paso (al retomar):** proponer el plan de **F-10** (órdenes de producción con explosión y completar,
-E2E #4) y esperar OK.
+**Siguiente paso (al retomar):** Fase 2 del frontend completa. Proponer el plan de **F-11** (proveedores y
+artículos de proveedor, Fase 3) y esperar OK.
 Antes: `API_PORT=8090 docker compose -f deploy/docker-compose.dev.yml up -d` y `npm start` en `frontend/` (Node ≥ 24.15).
 La base de desarrollo tiene existencias de ejemplo: AJ-000006 (SUC-01 AZU-001 25 kg) y AJ-000007 (COM HAR-001 lote L-2409 100 kg).
 
@@ -268,6 +269,35 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
 - Entorno: con Docker/Hyper-V encendido, Windows reserva rangos de puertos que pueden incluir el 4200
   (`netsh int ipv4 show excludedportrange protocol=tcp`). Si `npm start` falla con `EACCES`, usar otro puerto
   libre (ej. `npm start -- --port 4300`) y `SGO_E2E_BASE_URL=http://localhost:4300 npm run e2e`.
+
+**Frontend (F-10):**
+- Sin cambios de backend ni migración (B-10/B-11 ya cubrían todo).
+- `features/production`:
+  - Lista `/produccion/ordenes`: órdenes de la ubicación activa, filtros por estado y fecha programada; las más
+    recientes primero.
+  - Nueva / editar borrador (`/nueva`, `/:id/editar`, `production.orders.manage`): ubicación = la activa si es
+    fábrica o comisariato (si no, selector limitado a esos tipos, RN-14); producto (intermedio o terminado) con su
+    receta activa (o aviso y enlace para crearla); cantidad planeada, fecha programada y notas; **explosión teórica
+    con disponibilidad** (faltante en rojo, costo estimado) que se recalcula al dejar de escribir.
+  - Detalle: Liberar, Editar y Cancelar (borrador); Completar y Cancelar (liberada). Mientras está abierta muestra
+    la explosión con la disponibilidad actual; completada muestra producido, lote de salida (folio y caducidad),
+    costo total y unitario, costo de la merma y, por componente, teórico, real, merma, costo y lotes consumidos.
+  - ★ Completar (`/:id/completar`, `production.orders.complete`, página propia): cantidad producida (prellenada
+    con la planeada), consumo real por componente prellenado con el teórico **para lo producido** (RN-13, lo trae
+    `GET /recipes/{id}/explode`); al cambiar lo producido solo se recalculan las líneas que el usuario no tocó.
+    "Elegir lotes" opcional por componente (debe sumar el consumo real). Barra inferior con costo estimado, costo
+    unitario, merma y componentes sin existencia; confirmación con resumen; 409 → diálogo de faltantes.
+- `ui/explosion-list` (lista, cabe en celular). `lot-split.ts` en `inventory/ui` con `round4`, `lotsTotal`,
+  `lotsSumValidator` (ahora acepta una función) y `chosenLots`, compartido por el despacho de traspasos y producción.
+  `fromDateOnly` en `shared/forms/date-range.ts`. El kardex enlaza las órdenes de producción.
+- E2E `08-production-order` (E2E #4, escritorio y celular): asegura E2E-PT con receta activa, registra por API en
+  FAB 10 kg de HAR-001 (lote E2E-OP-2099) y 2 kg de AZU-001; en pantalla crea la OP, revisa la explosión, la libera,
+  la completa produciendo 8 (harina repartida al lote de la prueba) y verifica el lote OP-xxxx en Existencias de
+  FAB. **Sí mueve inventario:** FAB gana E2E-PT y un poco de HAR-001/AZU-001 en cada corrida. Los helpers de
+  producción de los E2E están en `e2e/support/production.ts`.
+- Pruebas unitarias: con relojes simulados de vitest, `whenStable` no termina (Angular agenda con timers); usar
+  `vi.advanceTimersByTimeAsync` + `TestBed.tick()` (ver `production-orders.spec.ts`). `debounceTime` necesita que
+  también se simule `Date` (el `vi.useFakeTimers()` por defecto lo hace).
 
 ## Pendientes y notas técnicas
 

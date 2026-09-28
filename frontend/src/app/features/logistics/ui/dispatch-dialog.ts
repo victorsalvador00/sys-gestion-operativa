@@ -22,13 +22,8 @@ import type {
   TransferDto,
   TransferLine,
 } from '../data-access/transfers.api';
-import {
-  DispatchLine,
-  DispatchLot,
-  lotsSumValidator,
-  lotsTotal,
-  toDispatchRequest,
-} from './transfer-lines';
+import { LotQty, lotsSumValidator, lotsTotal } from '../../inventory/ui/lot-split';
+import { DispatchLine, toDispatchRequest } from './transfer-lines';
 
 export interface DispatchDialogResult {
   request: DispatchTransferRequest;
@@ -235,7 +230,7 @@ export class DispatchDialog {
         new FormGroup(
           {
             manual: new FormControl(false, { nonNullable: true }),
-            lots: new FormRecord<DispatchLot>({}),
+            lots: new FormRecord<LotQty>({}),
           },
           { validators: lotsSumValidator(line.shippedQty) },
         ),

@@ -11,6 +11,8 @@ export type RecipesPage = Schemas['PagedResultOfRecipeListItemDto'];
 export type CreateRecipeRequest = Schemas['CreateRecipeRequest'];
 export type UpdateRecipeRequest = Schemas['UpdateRecipeRequest'];
 export type RecipeLineRequest = Schemas['RecipeLineRequest'];
+export type Explosion = Schemas['ExplosionDto'];
+export type ExplosionLine = Schemas['ExplosionLineDto'];
 
 export interface RecipeFilters {
   outputItemId?: string | null;
@@ -43,6 +45,16 @@ export class RecipesApi {
 
   create(request: CreateRecipeRequest): Observable<RecipeDto> {
     return this.http.post<RecipeDto>('/recipes', request);
+  }
+
+  /**
+   * Consumo teórico para producir `qty` (RN-11). Con `locationId`: disponibilidad (sin lotes
+   * vencidos), faltante y costo estimado con el costo promedio de la ubicación.
+   */
+  explode(id: string, qty: number, locationId?: string | null): Observable<Explosion> {
+    return this.http.get<Explosion>(`/recipes/${id}/explode`, {
+      params: toHttpParams({}, { qty, locationId }),
+    });
   }
 
   /** Edita la versión activa (o crea la N+1 si ya se usó), la desactiva o reactiva una anterior. */

@@ -2,12 +2,12 @@ import {
   AbstractControl,
   FormControl,
   FormGroup,
-  FormRecord,
   ValidationErrors,
   ValidatorFn,
   Validators,
 } from '@angular/forms';
 import type { ApiEnum } from '../../../core/api/api-types';
+import { chosenLots, LotSplit } from '../../inventory/ui/lot-split';
 import type { ItemOption } from '../../../shared/data-access/item-lookup.service';
 import type { LocationOption } from '../../../shared/data-access/location-lookup.service';
 import type {
@@ -100,37 +100,7 @@ export function toTransferLines(lines: PlanLineValue[]): TransferLineRequest[] {
 
 // --- Despacho ---
 
-/** Redondeo a 4 decimales, como el backend. */
-export function round4(value: number): number {
-  return Math.round(value * 10_000) / 10_000;
-}
-
-export type DispatchLot = FormGroup<{
-  lotId: FormControl<string>;
-  quantity: FormControl<number | null>;
-}>;
-
-export type DispatchLine = FormGroup<{
-  /** `false` = FEFO automático (o el lote planeado); `true` = reparto manual en `lots`. */
-  manual: FormControl<boolean>;
-  lots: FormRecord<DispatchLot>;
-}>;
-
-/** En reparto manual, lo repartido entre lotes debe sumar la cantidad de la línea. */
-export function lotsSumValidator(expected: number): ValidatorFn {
-  return (control: AbstractControl): ValidationErrors | null => {
-    const line = control as DispatchLine;
-    if (!line.controls.manual.value) {
-      return null;
-    }
-    const total = lotsTotal(Object.values(line.controls.lots.getRawValue()));
-    return total === round4(expected) ? null : { lotsSum: { expected, total } };
-  };
-}
-
-export function lotsTotal(lots: { quantity: number | null }[]): number {
-  return round4(lots.reduce((sum, lot) => sum + (lot.quantity ?? 0), 0));
-}
+export type DispatchLine = LotSplit;
 
 export function toDispatchRequest(
   version: number,
@@ -143,12 +113,7 @@ export function toDispatchRequest(
 ): DispatchTransferRequest {
   const manual = Object.entries(lines)
     .filter(([, line]) => line.manual)
-    .map(([lineId, line]) => ({
-      lineId,
-      lots: Object.values(line.lots)
-        .filter((lot) => (lot.quantity ?? 0) > 0)
-        .map((lot) => ({ lotId: lot.lotId, quantity: lot.quantity! })),
-    }));
+    .map(([lineId, line]) => ({ lineId, lots: chosenLots(line.lots) }));
   return {
     version,
     vehicleDescription: vehicleDescription.trim(),

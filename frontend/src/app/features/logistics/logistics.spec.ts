@@ -6,13 +6,12 @@ import { provideAppLocale } from '../../core/i18n/locale';
 import type { ItemOption } from '../../shared/data-access/item-lookup.service';
 import type { LocationOption } from '../../shared/data-access/location-lookup.service';
 import type { TransferDto, TransferLine } from './data-access/transfers.api';
+import { LotQty, lotsSumValidator } from '../inventory/ui/lot-split';
 import { TransferReceivePage } from './pages/transfer-receive-page';
 import {
   createReceiveLine,
   destinationOptions,
-  DispatchLot,
   isStandardRoute,
-  lotsSumValidator,
   receiveSummary,
   tabFilters,
   toDispatchRequest,
@@ -140,7 +139,7 @@ describe('traspasos: despacho', () => {
     new FormGroup(
       {
         manual: new FormControl(manual, { nonNullable: true }),
-        lots: new FormRecord<DispatchLot>(
+        lots: new FormRecord<LotQty>(
           Object.fromEntries(
             Object.entries(quantities).map(([lotId, quantity]) => [
               lotId,

@@ -1,4 +1,5 @@
 import { APIRequestContext, expect, Page, test } from '@playwright/test';
+import { ensureProduct, Named, PRODUCT } from './support/production';
 import { adminApi, adminCredentials, expectNoHorizontalScroll, login } from './support/session';
 
 /**
@@ -7,42 +8,6 @@ import { adminApi, adminCredentials, expectNoHorizontalScroll, login } from './s
  * se marca como usada creando por API una orden en borrador que luego se cancela: no mueve
  * inventario. Usa el terminado E2E-PT (se crea si no existe) con HAR-001 y AZU-001.
  */
-const PRODUCT = 'E2E-PT';
-
-interface Named {
-  id: string;
-  code?: string;
-  sku?: string;
-}
-
-async function ensureProduct(api: APIRequestContext): Promise<string> {
-  const [existing] = (await (await api.get(`/api/v1/items/lookup?q=${PRODUCT}`)).json()) as Named[];
-  if (existing) {
-    return existing.id;
-  }
-  const categories = (await (await api.get('/api/v1/item-categories')).json()) as {
-    items: Named[];
-  };
-  const units = (await (await api.get('/api/v1/units-of-measure')).json()) as { items: Named[] };
-  const response = await api.post('/api/v1/items', {
-    data: {
-      sku: PRODUCT,
-      name: 'Pan de prueba E2E',
-      type: 'FinishedGood',
-      categoryId: categories.items[0].id,
-      baseUomId: units.items.find((u) => u.code === 'kg')!.id,
-      purchaseUomId: null,
-      purchaseToBaseFactor: null,
-      tracksLots: true,
-      shelfLifeDays: 3,
-      storageCondition: 'Ambient',
-      taxRate: 0,
-    },
-  });
-  expect(response.ok()).toBe(true);
-  return ((await response.json()) as Named).id;
-}
-
 /** Deja el producto sin receta activa para que la prueba cree la suya. */
 async function deactivateRecipes(api: APIRequestContext, productId: string): Promise<void> {
   const active = (await (await api.get(`/api/v1/recipes?outputItemId=${productId}`)).json()) as {
