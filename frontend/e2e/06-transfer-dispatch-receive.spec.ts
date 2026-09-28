@@ -10,16 +10,17 @@ import {
 /**
  * E2E #3 (sin pedido, criterio de F-08): traspaso directo COM → SUC-01, despacho con lote elegido y
  * recepción en celular con faltante. Sí mueve inventario: antes registra por API una entrada de 5 kg
- * de HAR-001 en COM (lote E2E-TR), así COM queda igual y SUC-01 gana 4 kg por corrida.
+ * de HAR-001 en COM (lote E2E-TR-2099), así COM queda igual y SUC-01 gana 4 kg por corrida.
+ * La caducidad del lote es fija: un lote existente no puede registrarse con otra fecha.
  */
-const LOT = 'E2E-TR';
+const LOT = 'E2E-TR-2099';
+const EXPIRATION = '2099-12-31';
 
 test.beforeEach(async ({ baseURL }) => {
   const api = await adminApi(baseURL!);
   const locations = await (await api.get('/api/v1/locations/lookup')).json();
   const com = locations.find((l: { code: string }) => l.code === 'COM');
   const [flour] = await (await api.get('/api/v1/items/lookup?q=HAR-001')).json();
-  const expiration = new Date(Date.now() + 60 * 86_400_000).toISOString().slice(0, 10);
   const response = await api.post('/api/v1/adjustments', {
     data: {
       locationId: com.id,
@@ -30,7 +31,7 @@ test.beforeEach(async ({ baseURL }) => {
           itemId: flour.id,
           lotId: null,
           lotNumber: LOT,
-          expirationDate: expiration,
+          expirationDate: EXPIRATION,
           quantity: 5,
           unitCost: 10,
           notes: null,

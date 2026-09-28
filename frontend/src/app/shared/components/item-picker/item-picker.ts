@@ -128,6 +128,8 @@ export class ItemPicker implements ControlValueAccessor, OnInit {
 
   readonly label = input('Artículo');
   readonly type = input<ItemType>();
+  /** Filtro adicional sobre los resultados (ej. excluir materia prima). */
+  readonly filter = input<((item: ItemOption) => boolean) | null>(null);
   readonly showStock = input(false);
   /** Ubicación de la existencia mostrada; por defecto la activa. */
   readonly stockLocationId = input<string | null>();
@@ -230,8 +232,14 @@ export class ItemPicker implements ControlValueAccessor, OnInit {
       this.showStock() && locationId
         ? this.lookup.stock(locationId, q).pipe(catchError(() => of(new Map<string, number>())))
         : of(new Map<string, number>());
+    const filter = this.filter();
     return forkJoin([items$, stock$]).pipe(
-      map(([items, stock]) => items.map((item) => ({ item, onHand: stock.get(item.id) }))),
+      map(([items, stock]) =>
+        (filter ? items.filter(filter) : items).map((item) => ({
+          item,
+          onHand: stock.get(item.id),
+        })),
+      ),
       catchError(() => of([])),
     );
   }

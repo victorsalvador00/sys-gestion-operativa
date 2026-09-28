@@ -13,6 +13,11 @@
   color: var(--sgo-status-blue-fg);
 }
 
+.notice-warn {
+  background: var(--sgo-status-yellow-bg);
+  color: var(--sgo-status-yellow-fg);
+}
+
 .notice-error {
   background: var(--sgo-status-red-bg);
   color: var(--sgo-status-red-fg);

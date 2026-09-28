@@ -39,8 +39,10 @@
 | 1 | F-06 Inventario (+ `/items/lookup` en backend, E2E de faltantes) | ✅ | (ver `git log`) |
 | 1 | F-07 Conteo físico y consumo (móvil, + E2E en 390 px) | ✅ | (ver `git log`) |
 | 1 | F-08 Traspasos directos (+ E2E #3 sin pedido) | ✅ | (ver `git log`) |
+| 2 | F-09 Recetas con editor y versiones (+ E2E de nueva versión) | ✅ | (ver `git log`) |
 
-**Siguiente paso (al retomar):** Fase 1 del frontend completa. Proponer el plan de **F-09** (recetas con editor y versiones, Fase 2) y esperar OK.
+**Siguiente paso (al retomar):** proponer el plan de **F-10** (órdenes de producción con explosión y completar,
+E2E #4) y esperar OK.
 Antes: `API_PORT=8090 docker compose -f deploy/docker-compose.dev.yml up -d` y `npm start` en `frontend/` (Node ≥ 24.15).
 La base de desarrollo tiene existencias de ejemplo: AJ-000006 (SUC-01 AZU-001 25 kg) y AJ-000007 (COM HAR-001 lote L-2409 100 kg).
 
@@ -236,9 +238,36 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
 - Compartidos: `LocationLookupService` (caché por sesión); `app-qty-input` usa `ariaLabel` explícito aunque haya
   etiqueta visible (cada tarjeta "Recibido de HAR-001" tiene nombre accesible propio). El kardex enlaza traspasos.
 - E2E `06-transfer-dispatch-receive` (E2E #3 sin pedido; escritorio y celular): **sí mueve inventario** — registra
-  por API +5 kg de HAR-001 en COM (lote E2E-TR), traspasa 5 a SUC-01 eligiendo ese lote y recibe 4 en 390 px con
+  por API +5 kg de HAR-001 en COM (lote E2E-TR-2099, caducidad fija 31/12/2099), traspasa 5 a SUC-01 eligiendo ese lote y recibe 4 en 390 px con
   faltante. COM queda igual y SUC-01 gana 4 kg por corrida.
 - En la base de desarrollo quedó TR-000009 (COM → SUC-01, recibido completo) de las capturas de pantalla.
+
+**Frontend (F-09):**
+- Sin cambios de backend ni migración (los endpoints de B-10 ya cubrían todo).
+- `features/production`: lista `/produccion/recetas` (activas; interruptor "Incluir versiones anteriores") y
+  `/produccion/recetas/nueva` y `/:id` en una sola página:
+  - Nueva (`production.recipes.manage`): producto (solo intermedios y terminados; avisa si ya tiene receta activa
+    con enlace), rendimiento en la unidad base del producto, notas, componentes (cantidad por rendimiento y % merma
+    0–100 con 2 decimales). Valida repetidos y que el producto no sea su propio componente.
+  - Versión activa con permiso: editor. **Si ya se usó en una OP** muestra "Guardar creará la versión N+1; las
+    órdenes existentes conservan la versión N", el botón dice "Guardar como versión N+1" y pide confirmación; al
+    guardar navega a la nueva versión. Sin cambios no envía nada. Botón **Desactivar receta**.
+  - Versión anterior (inactiva) o sin `production.recipes.manage` (decisión: solo lectura con `production.view`):
+    vista de solo lectura; en la inactiva, **Activar esta versión** (el backend exige desactivar antes la activa).
+  - Historial de versiones con enlace a cada una y bitácora.
+- Compartidos: `app-item-picker` con entrada `filter`; `app-qty-input` con `max` y `decimals` (y
+  `qtyLimitsValidator`); clase global `.notice-warn`; **arreglo** en `app-lines-editor` para celular: los campos de
+  cada tarjeta se enciman (etiqueta sobre el borde del anterior); ahora llevan separación. Afectaba también
+  traspasos, ajustes y consumos en 390 px.
+- E2E `07-recipe-versions` (escritorio y celular): crea el terminado E2E-PT si no existe, desactiva sus recetas,
+  crea la receta en pantalla, la marca como usada con una OP en borrador por API que cancela enseguida (no mueve
+  inventario), verifica el aviso y la confirmación, y que la versión anterior quede inactiva y de solo lectura.
+  Cada corrida deja una versión más de la receta de E2E-PT y una OP cancelada.
+- **Arreglo del E2E 06:** registraba el lote con caducidad "hoy + 60 días" y fallaba desde el segundo día (un lote
+  existente no admite otra caducidad). Ahora usa lote y caducidad fijos.
+- Entorno: con Docker/Hyper-V encendido, Windows reserva rangos de puertos que pueden incluir el 4200
+  (`netsh int ipv4 show excludedportrange protocol=tcp`). Si `npm start` falla con `EACCES`, usar otro puerto
+  libre (ej. `npm start -- --port 4300`) y `SGO_E2E_BASE_URL=http://localhost:4300 npm run e2e`.
 
 ## Pendientes y notas técnicas
 

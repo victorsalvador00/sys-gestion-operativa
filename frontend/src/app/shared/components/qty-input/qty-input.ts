@@ -64,6 +64,25 @@ export function qtyValidator(
   };
 }
 
+/** Tope opcional y menos decimales que el estándar (ej. % de merma: 0 a 100 con 2 decimales). */
+export function qtyLimitsValidator(max: () => number | null, decimals: () => number): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const value = control.value as number | null;
+    if (typeof value !== 'number' || Number.isNaN(value)) {
+      return null;
+    }
+    const limit = max();
+    if (limit !== null && value > limit) {
+      return { qtyMax: { max: limit } };
+    }
+    const places = decimals();
+    if (places < QTY_MAX_DECIMALS && (String(value).split('.')[1] ?? '').length > places) {
+      return { qtyDecimals: { max: places } };
+    }
+    return null;
+  };
+}
+
 /** Mensaje en español del primer error de una cantidad. */
 export function qtyErrorMessage(
   errors: ValidationErrors | null,
@@ -80,7 +99,11 @@ export function qtyErrorMessage(
     return 'Escribe un número válido.';
   }
   if (errors['qtyDecimals']) {
-    return `Máximo ${QTY_MAX_DECIMALS} decimales.`;
+    const limits = errors['qtyDecimals'] as { max?: number } | true;
+    return `Máximo ${(limits !== true && limits.max) || QTY_MAX_DECIMALS} decimales.`;
+  }
+  if (errors['qtyMax']) {
+    return `El máximo es ${(errors['qtyMax'] as { max: number }).max}.`;
   }
   if (errors['qtyPositive']) {
     if (allowZero) {
@@ -163,6 +186,10 @@ export class QtyInput implements ControlValueAccessor, OnInit {
   readonly allowNegative = input(false);
   /** Acepta 0 (ej. conteo físico: no hay nada en anaquel). */
   readonly allowZero = input(false);
+  /** Valor máximo permitido (ej. 100 para porcentajes). */
+  readonly max = input<number | null>(null);
+  /** Decimales permitidos; por defecto los de cantidades (4). */
+  readonly decimals = input(QTY_MAX_DECIMALS);
   readonly appearance = input<'outline' | 'fill'>('outline');
   readonly subscriptSizing = input<'fixed' | 'dynamic'>('fixed');
   /** Enter en el campo (después de pasar el foco a la siguiente cantidad). */
@@ -183,6 +210,8 @@ export class QtyInput implements ControlValueAccessor, OnInit {
     effect(() => {
       this.allowNegative();
       this.allowZero();
+      this.max();
+      this.decimals();
       this.ngControl?.control?.updateValueAndValidity({ emitEvent: false });
     });
   }
@@ -191,12 +220,16 @@ export class QtyInput implements ControlValueAccessor, OnInit {
     const control = this.ngControl?.control;
     if (control) {
       // Lee `allowNegative` en cada validación: puede cambiar (ej. el motivo de un ajuste).
-      control.addValidators(
+      control.addValidators([
         qtyValidator(
           () => this.allowNegative(),
           () => this.allowZero(),
         ),
-      );
+        qtyLimitsValidator(
+          () => this.max(),
+          () => this.decimals(),
+        ),
+      ]);
       control.updateValueAndValidity({ emitEvent: false });
       this.errorState.connect(() => this.matInput());
     }

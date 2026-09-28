@@ -79,6 +79,16 @@ tr.invalid .num,
   }
 }
 
+.card-field + .card-field {
+  // Los campos con `subscriptSizing="dynamic"` no reservan espacio abajo: sin esto, la etiqueta
+  // flotante del siguiente campo se encima en el borde del anterior.
+  margin-top: var(--sgo-space-3);
+}
+
+.card-field:last-child {
+  padding-bottom: var(--sgo-space-3);
+}
+
 .line-number {
   font: var(--mat-sys-title-small);
 }
