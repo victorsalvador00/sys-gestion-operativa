@@ -4537,6 +4537,7 @@ export interface paths {
                     LocationId?: string;
                     Page?: number;
                     PageSize?: number;
+                    PendingReceipt?: boolean;
                     Q?: string;
                     Skip?: number;
                     Sort?: string;
@@ -11207,6 +11208,9 @@ export interface components {
             /** Format: uuid */
             supplierId: string;
             supplierSku: null | string;
+            /** Format: double */
+            taxRate: number;
+            tracksLots: boolean;
             /** Format: uint32 */
             version: number;
         };

@@ -83,3 +83,13 @@ dd {
 .notice {
   margin: 0 0 var(--sgo-space-3);
 }
+
+.total.sub {
+  padding-top: var(--sgo-space-1);
+  font-weight: 400;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+dd app-status-tag {
+  margin-inline-start: var(--sgo-space-2);
+}

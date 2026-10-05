@@ -1,18 +1,21 @@
 import { Routes } from '@angular/router';
 import { permissionGuard } from '../../core/auth/auth.guards';
-import { placeholderRoute } from '../../core/layout/placeholder-routes';
 
 const view = { canActivate: [permissionGuard], data: { permission: 'purchasing.view' } };
 const manageRequisitions = {
   canActivate: [permissionGuard],
   data: { permission: 'purchasing.requisitions.manage' },
 };
+const managePurchaseOrders = {
+  canActivate: [permissionGuard],
+  data: { permission: 'purchasing.po.manage' },
+};
+const receive = { canActivate: [permissionGuard], data: { permission: 'purchasing.receive' } };
 const manageSuppliers = {
   canActivate: [permissionGuard],
   data: { permission: 'purchasing.suppliers.manage' },
 };
 
-// Órdenes de compra y recepciones en F-13.
 export const PURCHASING_ROUTES: Routes = [
   {
     path: 'proveedores',
@@ -59,6 +62,54 @@ export const PURCHASING_ROUTES: Routes = [
     ...manageRequisitions,
     loadComponent: () => import('./pages/requisition-form-page').then((m) => m.RequisitionFormPage),
   },
-  placeholderRoute('ordenes', 'Órdenes de compra', 'purchasing.view'),
-  placeholderRoute('recepciones', 'Recepciones', 'purchasing.view'),
+  {
+    path: 'ordenes',
+    title: 'Órdenes de compra',
+    ...view,
+    loadComponent: () =>
+      import('./pages/purchase-orders-list-page').then((m) => m.PurchaseOrdersListPage),
+  },
+  {
+    path: 'ordenes/nueva',
+    title: 'Nueva orden de compra',
+    ...managePurchaseOrders,
+    loadComponent: () =>
+      import('./pages/purchase-order-form-page').then((m) => m.PurchaseOrderFormPage),
+  },
+  {
+    // Quien solo tiene purchasing.view (ej. almacén, que recibe) la ve en solo lectura.
+    path: 'ordenes/:id',
+    title: 'Orden de compra',
+    ...view,
+    loadComponent: () =>
+      import('./pages/purchase-order-detail-page').then((m) => m.PurchaseOrderDetailPage),
+  },
+  {
+    path: 'ordenes/:id/editar',
+    title: 'Editar orden de compra',
+    ...managePurchaseOrders,
+    loadComponent: () =>
+      import('./pages/purchase-order-form-page').then((m) => m.PurchaseOrderFormPage),
+  },
+  {
+    path: 'recepciones',
+    title: 'Recepciones',
+    ...view,
+    loadComponent: () =>
+      import('./pages/goods-receipts-list-page').then((m) => m.GoodsReceiptsListPage),
+  },
+  {
+    path: 'recepciones/nueva',
+    title: 'Recibir orden de compra',
+    ...receive,
+    loadComponent: () =>
+      import('./pages/goods-receipt-form-page').then((m) => m.GoodsReceiptFormPage),
+  },
+  {
+    path: 'recepciones/:id',
+    title: 'Recepción',
+    ...view,
+    loadComponent: () =>
+      import('./pages/goods-receipt-detail-page').then((m) => m.GoodsReceiptDetailPage),
+  },
 ];

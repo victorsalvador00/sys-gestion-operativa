@@ -13,7 +13,10 @@ namespace Sgo.Api.Controllers.Purchasing;
 [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
 public sealed class PurchaseOrdersController(IPurchaseOrderService orders) : ControllerBase
 {
-    /// <summary>OC con entrega en ubicaciones a tu alcance. Filtros: status, supplierId, locationId, q (folio o proveedor).</summary>
+    /// <summary>
+    /// OC con entrega en ubicaciones a tu alcance. Filtros: status, supplierId, locationId, q (folio o proveedor) y
+    /// pendingReceipt=true (aprobadas o parcialmente recibidas: las que se pueden recibir).
+    /// </summary>
     [HttpGet]
     [RequirePermission(Permissions.PurchasingView)]
     public Task<PagedResult<PurchaseOrderListItemDto>> List([FromQuery] PurchaseOrderListQuery query, CancellationToken ct) =>

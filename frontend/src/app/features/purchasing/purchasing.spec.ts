@@ -42,6 +42,8 @@ function buildSupplierItem(overrides: Partial<SupplierItemDto> = {}): SupplierIt
     purchaseUomCode: 'caja',
     purchaseToBaseFactor: 25,
     baseUomCode: 'kg',
+    taxRate: 0,
+    tracksLots: true,
     supplierSku: 'HP-25',
     price: 412.5,
     leadTimeDays: 3,

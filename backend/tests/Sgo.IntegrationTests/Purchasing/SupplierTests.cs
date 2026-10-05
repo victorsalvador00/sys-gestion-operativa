@@ -114,8 +114,8 @@ public class SupplierTests(SgoApiFactory factory)
         var flour = await admin.CreateItemAsync(await admin.NewItemRequestAsync()); // purchased by "caja" of 25 kg
 
         var row = await OkAsync<SupplierItemDto>(await admin.AddSupplierItemAsync(supplier.Id, flour.Id, 412.5m, supplierSku: "HP-TRIGO-25"));
-        Assert.Equal((flour.Sku, "caja", 25m, "kg", 412.5m, "HP-TRIGO-25", true, false),
-            (row.Sku, row.PurchaseUomCode, row.PurchaseToBaseFactor, row.BaseUomCode, row.Price, row.SupplierSku, row.IsActive, row.IsPreferred));
+        Assert.Equal((flour.Sku, "caja", 25m, "kg", flour.TaxRate, flour.TracksLots, 412.5m, "HP-TRIGO-25", true, false),
+            (row.Sku, row.PurchaseUomCode, row.PurchaseToBaseFactor, row.BaseUomCode, row.TaxRate, row.TracksLots, row.Price, row.SupplierSku, row.IsActive, row.IsPreferred));
 
         var duplicate = await admin.AddSupplierItemAsync(supplier.Id, flour.Id);
         Assert.Equal("supplier_item_duplicate", await duplicate.ProblemCodeAsync());

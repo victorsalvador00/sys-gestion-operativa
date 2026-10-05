@@ -96,7 +96,8 @@
               <dt>Órdenes de compra</dt>
               <dd>
                 @for (po of r.purchaseOrders; track po.id; let last = $last) {
-                  {{ po.folio }}{{ last ? '' : ', ' }}
+                  <a [routerLink]="['/compras/ordenes', po.id]">{{ po.folio }}</a
+                  >{{ last ? '' : ', ' }}
                 }
               </dd>
             </div>

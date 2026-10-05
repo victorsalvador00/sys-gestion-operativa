@@ -14,6 +14,9 @@ public sealed record PurchaseOrderListQuery : PageQuery
     public PurchaseOrderStatus? Status { get; init; }
     public Guid? SupplierId { get; init; }
     public Guid? LocationId { get; init; }
+
+    /// <summary>Only orders that can still be received: Approved or PartiallyReceived.</summary>
+    public bool PendingReceipt { get; init; }
 }
 
 /// <param name="Quantity">In the item's purchase unit.</param>
@@ -128,6 +131,8 @@ public sealed class PurchaseOrderService(
         var orders = db.PurchaseOrders.AsNoTracking().Where(o => allowed.Contains(o.DeliveryLocationId));
         if (query.Status is { } status)
             orders = orders.Where(o => o.Status == status);
+        if (query.PendingReceipt)
+            orders = orders.Where(o => o.Status == PurchaseOrderStatus.Approved || o.Status == PurchaseOrderStatus.PartiallyReceived);
         if (query.SupplierId is { } supplierId)
             orders = orders.Where(o => o.SupplierId == supplierId);
         if (query.LocationId is { } locationId)

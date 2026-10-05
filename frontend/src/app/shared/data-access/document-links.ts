@@ -8,6 +8,7 @@ const DOCUMENT_ROUTES: Record<string, (id: string) => string> = {
   Consumption: (id) => `/inventario/consumos/${id}`,
   Transfer: (id) => `/logistica/traspasos/${id}`,
   ProductionOrder: (id) => `/produccion/ordenes/${id}`,
+  GoodsReceipt: (id) => `/compras/recepciones/${id}`,
 };
 
 export const DOCUMENT_LABELS: Record<string, string> = {

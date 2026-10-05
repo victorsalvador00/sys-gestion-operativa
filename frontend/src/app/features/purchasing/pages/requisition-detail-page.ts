@@ -49,7 +49,7 @@ import { requisitionActions } from '../ui/requisition-lines';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './requisition-detail-page.html',
-  styleUrl: './requisition-detail-page.scss',
+  styleUrl: './purchasing-detail.scss',
 })
 export class RequisitionDetailPage {
   private readonly api = inject(RequisitionsApi);

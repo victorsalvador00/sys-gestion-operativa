@@ -81,6 +81,10 @@ public class PurchaseOrderTests(SgoApiFactory factory)
         finally { await SetAsync(original); }
     }
 
+    private static async Task<List<Guid>> PendingReceiptIdsAsync(HttpClient client, Guid supplierId) =>
+        (await client.GetJsonAsync<PagedResult<PurchaseOrderListItemDto>>(
+            $"/api/v1/purchase-orders?supplierId={supplierId}&pendingReceipt=true"))!.Items.Select(o => o.Id).ToList();
+
     private async Task<StockLevelDto> StockAsync(HttpClient client, Guid locationId, Guid itemId) =>
         (await client.GetJsonAsync<PagedResult<StockLevelDto>>($"/api/v1/stock?locationId={locationId}&itemId={itemId}"))!.Items.Single();
 
@@ -101,9 +105,11 @@ public class PurchaseOrderTests(SgoApiFactory factory)
 
         order = await OkAsync<PurchaseOrderDto>(await ActAsync(admin, order, "submit"));
         Assert.Equal((PurchaseOrderStatus.PendingApproval, true), (order.Status, order.ApprovalRequired)); // threshold 0
+        Assert.DoesNotContain(await PendingReceiptIdsAsync(admin, supplier.Id), id => id == order.Id);
         Assert.Equal("purchase_order_invalid_status", await (await ReceiveAsync(admin, order, R(order, sugar.Id, 1))).ProblemCodeAsync());
         order = await OkAsync<PurchaseOrderDto>(await ActAsync(admin, order, "approve"));
         Assert.Equal(PurchaseOrderStatus.Approved, order.Status);
+        Assert.Contains(order.Id, await PendingReceiptIdsAsync(admin, supplier.Id));
 
         // Partial receipt: flour in two lots (one without date → today + shelf life), all the sugar.
         var first = await OkAsync<GoodsReceiptDto>(await ReceiveAsync(admin, order,
@@ -114,6 +120,7 @@ public class PurchaseOrderTests(SgoApiFactory factory)
         Assert.Equal((50m, "kg", 16.5m, Today.AddDays(180)), (lotB.BaseQuantity, lotB.BaseUomCode, lotB.UnitCostBase, lotB.ExpirationDate));
 
         order = await GetAsync(admin, order.Id);
+        Assert.Contains(order.Id, await PendingReceiptIdsAsync(admin, supplier.Id)); // PartiallyReceived
         Assert.Equal((6m, 4m), (order.Lines.Single(l => l.ItemId == flour.Id).ReceivedQty, order.Lines.Single(l => l.ItemId == flour.Id).PendingQty));
         var flourStock = await StockAsync(admin, fab, flour.Id);
         Assert.Equal((150m, 16.5m), (flourStock.OnHand, flourStock.AverageCost)); // 6 cajas × 25 kg at 412.5 / 25
@@ -140,6 +147,7 @@ public class PurchaseOrderTests(SgoApiFactory factory)
 
         // A received order takes nothing more and cannot be cancelled or closed.
         order = await GetAsync(admin, order.Id);
+        Assert.DoesNotContain(order.Id, await PendingReceiptIdsAsync(admin, supplier.Id));
         Assert.Equal("purchase_order_invalid_status", await (await ReceiveAsync(admin, order, R(order, sugar.Id, 1))).ProblemCodeAsync());
         Assert.Equal("purchase_order_not_cancellable", await (await ActAsync(admin, order, "cancel")).ProblemCodeAsync());
         Assert.Equal("purchase_order_invalid_status", await (await ActAsync(admin, order, "close")).ProblemCodeAsync());

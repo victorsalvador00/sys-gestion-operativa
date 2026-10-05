@@ -43,9 +43,10 @@
 | 2 | F-10 Órdenes de producción con explosión y completar (+ E2E #4) | ✅ | (ver `git log`) |
 | 3 | F-11 Proveedores y artículos de proveedor (+ E2E de alta y precio) | ✅ | (ver `git log`) |
 | 3 | F-12 Requisiciones y conversión a OC (+ `GET /items/{id}/supplier-offers`, E2E) | ✅ | (ver `git log`) |
+| 3 | F-13 Órdenes de compra y recepciones (+ E2E #2) | ✅ | (ver `git log`) |
 
-**Siguiente paso (al retomar):** F-12 terminada. Proponer el plan de **F-13** (órdenes de compra y recepciones,
-E2E #2) y esperar OK.
+**Siguiente paso (al retomar):** F-13 terminada (Fase 3 completa). Proponer el plan de **F-14** (pedidos de
+sucursal con sugerido y aprobación, E2E #3 completo) y esperar OK.
 Antes: `API_PORT=8090 docker compose -f deploy/docker-compose.dev.yml up -d` y `npm start` en `frontend/` (Node ≥ 24.15).
 La base de desarrollo tiene existencias de ejemplo: AJ-000006 (SUC-01 AZU-001 25 kg) y AJ-000007 (COM HAR-001 lote L-2409 100 kg).
 
@@ -344,6 +345,35 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
 - E2E `10-requisitions` (escritorio y celular): asegura proveedor preferido de HAR-001 (`e2e/support/purchasing.ts`),
   crea en COM una requisición de 4 cajas, la envía, la aprueba y la convierte desde la lista. **Cada corrida deja
   una OC en borrador.**
+
+**Frontend (F-13):**
+- Backend (sin migración): `SupplierItemDto` trae `taxRate` y `tracksLots` (IVA en vivo en el editor de OC) y
+  `GET /purchase-orders?pendingReceipt=true` (aprobadas o parcialmente recibidas). Pruebas en `SupplierTests` y
+  `PurchaseOrderTests`.
+- `features/purchasing`:
+  - Lista `/compras/ordenes` con pestañas Todas (filtro de estado), **Por aprobar** (solo con
+    `purchasing.po.approve`) y Por recibir; filtro de ubicación de entrega y búsqueda por folio o proveedor.
+  - Nueva / editar (`purchasing.po.manage`, solo borrador): proveedor con autocompletado (queda fijo al guardar;
+    cambiarlo antes limpia las líneas), entrega = la activa si compra, fecha esperada opcional y notas. Líneas
+    solo del catálogo activo del proveedor (RN-30) con precio sugerido editable (muestra el de catálogo si se
+    cambia), IVA por línea e importe; subtotal, IVA y total en vivo con el mismo redondeo que el backend.
+    "Guardar borrador" o "Guardar y enviar" (RN-31: por aprobar o aprobada según el umbral).
+  - Detalle (`purchasing.view`; almacén lo ve en solo lectura y con **Recibir**): líneas con pedido, precio, IVA,
+    recibido/pendiente y la requisición de origen (enlace); totales; recepciones de la OC (enlaces); acciones
+    por estado (`purchaseOrderActions`): Enviar, Editar, Aprobar, Rechazar con motivo (final), Cancelar, Cerrar
+    con saldo (confirma con lo pendiente) y Recibir.
+  - ★ Recepción `/compras/recepciones/nueva?oc=` (`purchasing.receive`): tarjeta por línea con saldo (prellenada
+    con lo pendiente), lote y caducidad opcional si maneja lotes, **"Otro lote"** para repartir, factura del
+    proveedor; aviso (no bloqueo) si se recibe más de lo pendiente (el backend aplica la tolerancia); barra
+    inferior con el costo; confirmación con resumen.
+  - Recepciones: lista (fechas, ubicación, búsqueda por folio o factura) y detalle (cantidad en unidad de compra
+    y base, lote, costo unitario base, importe, estado de la OC).
+  - `ui/lookup-picker`: autocompletado genérico con búsqueda en el servidor (proveedor y catálogo del proveedor).
+  - Enlaces: OC en el detalle de la requisición; "Recepción de compra" en el kardex. El diálogo de "Convertir a
+    OC" muestra los folios sin enlace (texto de `ConfirmSummary`).
+- E2E `11-purchase-order` (**E2E #2**, escritorio y celular): OC en COM con HAR-001 → enviar → aprobar → recibir
+  con lote → la existencia de HAR-001 en COM aumenta (API) y el lote aparece en Existencias. **Mueve
+  inventario:** cada corrida suma 2 cajas de HAR-001 a COM.
 
 ## Pendientes y notas técnicas
 
