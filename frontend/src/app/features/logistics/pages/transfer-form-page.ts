@@ -79,6 +79,13 @@ import {
       @if (id() && !transfer()) {
         <p class="muted">Cargando…</p>
       } @else {
+        @if (transfer()?.branchOrderFolio; as orderFolio) {
+          <p class="notice notice-info" role="status">
+            Este traspaso surte el pedido {{ orderFolio }}: el destino no cambia y solo puedes
+            reducir cantidades, quitar artículos o elegir lotes. No se puede pasar de lo aprobado ni
+            agregar artículos que no estén en el pedido.
+          </p>
+        }
         <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="sgo-stack">
           <mat-card appearance="outlined">
             <mat-card-content class="header">
@@ -282,6 +289,10 @@ export class TransferFormPage {
             toLocationId: transfer.to.id,
             notes: transfer.notes ?? '',
           });
+          // RN-20: el traspaso de un pedido conserva su destino.
+          if (transfer.branchOrderId) {
+            this.form.controls.toLocationId.disable();
+          }
           this.form.controls.lines.clear();
           transfer.lines.forEach((line) =>
             this.form.controls.lines.push(

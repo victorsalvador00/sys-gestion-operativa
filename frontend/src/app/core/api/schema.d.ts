@@ -4530,7 +4530,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** OC con entrega en ubicaciones a tu alcance. Filtros: status, supplierId, locationId, q (folio o proveedor). */
+        /**
+         * OC con entrega en ubicaciones a tu alcance. Filtros: status, supplierId, locationId, q (folio o proveedor) y
+         *     pendingReceipt=true (aprobadas o parcialmente recibidas: las que se pueden recibir).
+         */
         get: {
             parameters: {
                 query?: {
@@ -11233,6 +11236,7 @@ export interface components {
             expiresIn: number;
         };
         TransferDto: {
+            branchOrderFolio: null | string;
             /** Format: uuid */
             branchOrderId: null | string;
             /** Format: date-time */
@@ -11299,6 +11303,7 @@ export interface components {
             quantity: number;
         };
         TransferListItemDto: {
+            branchOrderFolio: null | string;
             /** Format: uuid */
             branchOrderId: null | string;
             /** Format: date-time */

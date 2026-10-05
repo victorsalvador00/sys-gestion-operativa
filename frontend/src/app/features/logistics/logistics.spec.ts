@@ -65,6 +65,7 @@ const buildTransfer = (overrides: Partial<TransferDto> = {}): TransferDto => ({
   from: { id: 'com', code: 'COM', name: 'Comisariato' },
   to: { id: 'suc-01', code: 'SUC-01', name: 'Sucursal 01' },
   branchOrderId: null,
+  branchOrderFolio: null,
   status: 'Dispatched',
   notes: null,
   vehicleDescription: 'NP300',

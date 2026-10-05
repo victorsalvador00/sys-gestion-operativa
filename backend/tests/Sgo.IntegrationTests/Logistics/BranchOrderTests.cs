@@ -94,6 +94,9 @@ public class BranchOrderTests(SgoApiFactory factory)
         Assert.Equal((TransferStatus.Draft, order.Id, com, branch), (transfer.Status, transfer.BranchOrderId, transfer.From.Id, transfer.To.Id));
         Assert.Equal(new Dictionary<Guid, decimal> { [bread.Id] = 20m, [milk.Id] = 10m }, transfer.Lines.ToDictionary(l => l.ItemId, l => l.ShippedQty));
         Assert.Contains(order.Folio, transfer.Notes);
+        Assert.Equal(order.Folio, transfer.BranchOrderFolio);
+        Assert.Equal(order.Folio, (await warehouse.GetJsonAsync<PagedResult<TransferListItemDto>>("/api/v1/transfers?pageSize=100"))!
+            .Items.Single(t => t.Id == transfer.Id).BranchOrderFolio);
 
         // Dispatch and receive with a loss in transit: the order counts what was dispatched (RN-24).
         transfer = await OkAsync<TransferDto>(await DispatchAsync(warehouse, transfer));

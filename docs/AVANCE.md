@@ -44,9 +44,10 @@
 | 3 | F-11 Proveedores y artículos de proveedor (+ E2E de alta y precio) | ✅ | (ver `git log`) |
 | 3 | F-12 Requisiciones y conversión a OC (+ `GET /items/{id}/supplier-offers`, E2E) | ✅ | (ver `git log`) |
 | 3 | F-13 Órdenes de compra y recepciones (+ E2E #2) | ✅ | (ver `git log`) |
+| 4 | F-14 Pedidos de sucursal con sugerido y aprobación (+ E2E #3 completo) | ✅ | (ver `git log`) |
 
-**Siguiente paso (al retomar):** F-13 terminada (Fase 3 completa). Proponer el plan de **F-14** (pedidos de
-sucursal con sugerido y aprobación, E2E #3 completo) y esperar OK.
+**Siguiente paso (al retomar):** F-14 terminada. Proponer el plan de **F-15** (tablero: tarjetas según rol y
+ubicación activa) y esperar OK.
 Antes: `API_PORT=8090 docker compose -f deploy/docker-compose.dev.yml up -d` y `npm start` en `frontend/` (Node ≥ 24.15).
 La base de desarrollo tiene existencias de ejemplo: AJ-000006 (SUC-01 AZU-001 25 kg) y AJ-000007 (COM HAR-001 lote L-2409 100 kg).
 
@@ -374,6 +375,31 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
 - E2E `11-purchase-order` (**E2E #2**, escritorio y celular): OC en COM con HAR-001 → enviar → aprobar → recibir
   con lote → la existencia de HAR-001 en COM aumenta (API) y el lote aparece en Existencias. **Mueve
   inventario:** cada corrida suma 2 cajas de HAR-001 a COM.
+
+**Frontend (F-14):**
+- Backend (sin migración): `TransferDto` y `TransferListItemDto` traen `branchOrderFolio` (enlace al pedido desde el
+  traspaso). Prueba en `BranchOrderTests`.
+- `features/logistics`:
+  - ★ Lista `/logistica/pedidos`: sin `logistics.orders.approve` muestra los de la ubicación activa (sin pestañas);
+    con él, todos los que están a su alcance, filtro de ubicación y pestaña **Por aprobar** (enviados, filtrados
+    por origen). Filtro de estado y búsqueda por folio.
+  - ★ Nuevo / editar (`logistics.orders.create`, solo borrador): sucursal = la activa si es sucursal (si no, se
+    elige), "Pedir a" fábrica o comisariato (se elige solo si hay uno), fecha requerida (mañana por omisión),
+    notas y artículos en unidad base con la existencia de la sucursal. **"Sugerir por mín/máx"** agrega solo los
+    artículos que faltan (ocupa primero las líneas vacías) y muestra bajo la cantidad mín, máx, existencia, en
+    camino y pedido. "Guardar borrador" o "Guardar y enviar".
+  - Detalle: solicitado / aprobado / despachado por artículo, traspasos ligados (enlace y **"Ir a despachar"** si
+    está en borrador y se puede despachar), motivo de rechazo, aviso de surtido parcial, historial. Acciones
+    (`branchOrderActions`): la sucursal edita/envía (borrador) y cancela (borrador o enviado); el origen aprueba o
+    rechaza (enviado). **Aprobar** abre la captura en la misma pantalla: existencia en origen, cantidad aprobada
+    prellenada con lo solicitado (0 a lo solicitado), aviso en rojo si pasa de la existencia (no bloquea), no
+    permite aprobar todo en 0 y confirma con la tabla solicitado/aprobado. Rechazar reutiliza `ReasonDialog`.
+  - Traspasos: el detalle enlaza el pedido; cancelar un borrador de pedido advierte que **también cancela el
+    pedido**; al editarlo el destino queda bloqueado y un aviso explica las restricciones de RN-20.
+- E2E `12-branch-order` (**E2E #3 completo**, escritorio y celular; captura y recepción en 390 px): por API, entrada
+  de 3 kg de HAR-001 en COM (lote E2E-PED-2099) y mín/máx de HAR-001 en SUC-01 ajustado para que el sugerido sea
+  3 kg; SUC-01 pide con el sugerido → COM aprueba 2 kg → despacha (FEFO) → SUC-01 recibe con 1 kg de faltante →
+  el pedido queda "Surtido". **Mueve inventario** y **cambia el mín/máx de HAR-001 en SUC-01** en cada corrida.
 
 ## Pendientes y notas técnicas
 

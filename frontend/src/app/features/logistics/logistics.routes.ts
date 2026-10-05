@@ -1,8 +1,11 @@
 import { Routes } from '@angular/router';
 import { permissionGuard } from '../../core/auth/auth.guards';
-import { placeholderRoute } from '../../core/layout/placeholder-routes';
 
 const view = { canActivate: [permissionGuard], data: { permission: 'logistics.view' } };
+const createOrder = {
+  canActivate: [permissionGuard],
+  data: { permission: 'logistics.orders.create' },
+};
 const dispatch = {
   canActivate: [permissionGuard],
   data: { permission: 'logistics.transfers.dispatch' },
@@ -12,9 +15,35 @@ const receive = {
   data: { permission: 'logistics.transfers.receive' },
 };
 
-// Pedidos llegan en F-14.
 export const LOGISTICS_ROUTES: Routes = [
-  placeholderRoute('pedidos', 'Pedidos', 'logistics.view'),
+  {
+    path: 'pedidos',
+    title: 'Pedidos',
+    ...view,
+    loadComponent: () =>
+      import('./pages/branch-orders-list-page').then((m) => m.BranchOrdersListPage),
+  },
+  {
+    path: 'pedidos/nuevo',
+    title: 'Nuevo pedido',
+    ...createOrder,
+    loadComponent: () =>
+      import('./pages/branch-order-form-page').then((m) => m.BranchOrderFormPage),
+  },
+  {
+    path: 'pedidos/:id',
+    title: 'Pedido',
+    ...view,
+    loadComponent: () =>
+      import('./pages/branch-order-detail-page').then((m) => m.BranchOrderDetailPage),
+  },
+  {
+    path: 'pedidos/:id/editar',
+    title: 'Editar pedido',
+    ...createOrder,
+    loadComponent: () =>
+      import('./pages/branch-order-form-page').then((m) => m.BranchOrderFormPage),
+  },
   {
     path: 'traspasos',
     title: 'Traspasos',

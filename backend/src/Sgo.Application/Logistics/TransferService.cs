@@ -48,7 +48,7 @@ public sealed record TransferLocationDto(Guid Id, string Code, string Name);
 
 public sealed record TransferListItemDto(
     Guid Id, string Folio, TransferLocationDto From, TransferLocationDto To, TransferStatus Status, Guid? BranchOrderId,
-    int LineCount, DateTimeOffset CreatedAt, DateTimeOffset? DispatchedAt, DateTimeOffset? ReceivedAt);
+    string? BranchOrderFolio, int LineCount, DateTimeOffset CreatedAt, DateTimeOffset? DispatchedAt, DateTimeOffset? ReceivedAt);
 
 /// <param name="ShortQty">Loss in transit (RN-22).</param>
 public sealed record TransferLineDto(
@@ -57,7 +57,8 @@ public sealed record TransferLineDto(
     DiscrepancyReason? DiscrepancyReason, string? DiscrepancyNotes);
 
 public sealed record TransferDto(
-    Guid Id, string Folio, TransferLocationDto From, TransferLocationDto To, Guid? BranchOrderId, TransferStatus Status, string? Notes,
+    Guid Id, string Folio, TransferLocationDto From, TransferLocationDto To, Guid? BranchOrderId, string? BranchOrderFolio,
+    TransferStatus Status, string? Notes,
     string? VehicleDescription, string? DriverName, DateTimeOffset? DispatchedAt, Guid? DispatchedBy,
     DateTimeOffset? ReceivedAt, Guid? ReceivedBy, IReadOnlyList<TransferLineDto> Lines,
     decimal ShippedValue, decimal TransitLossValue, DateTimeOffset CreatedAt, Guid? CreatedBy, uint Version);
@@ -355,14 +356,23 @@ public sealed class TransferService(
             .ToDictionaryAsync(l => l.Id, l => new TransferLocationDto(l.Id, l.Code, l.Name), ct);
     }
 
+    private async Task<Dictionary<Guid, string>> BranchOrderFoliosAsync(IEnumerable<Guid?> ids, CancellationToken ct)
+    {
+        var list = ids.OfType<Guid>().Distinct().ToList();
+        if (list.Count == 0)
+            return [];
+        return await db.BranchOrders.AsNoTracking().Where(o => list.Contains(o.Id)).ToDictionaryAsync(o => o.Id, o => o.Folio, ct);
+    }
+
     private async Task<List<TransferListItemDto>> ToListItemsAsync(IReadOnlyList<Transfer> transfers, CancellationToken ct)
     {
         var ids = transfers.Select(t => t.Id).ToList();
         var lineCounts = await db.Transfers.Where(t => ids.Contains(t.Id)).Select(t => new { t.Id, Count = t.Lines.Count })
             .ToDictionaryAsync(x => x.Id, x => x.Count, ct);
         var locations = await LocationsAsync(transfers.SelectMany(t => new[] { t.FromLocationId, t.ToLocationId }), ct);
+        var orderFolios = await BranchOrderFoliosAsync(transfers.Select(t => t.BranchOrderId), ct);
         return transfers.Select(t => new TransferListItemDto(t.Id, t.Folio, locations[t.FromLocationId], locations[t.ToLocationId],
-            t.Status, t.BranchOrderId, lineCounts[t.Id], t.CreatedAt, t.DispatchedAt, t.ReceivedAt)).ToList();
+            t.Status, t.BranchOrderId, t.BranchOrderId is { } o ? orderFolios[o] : null, lineCounts[t.Id], t.CreatedAt, t.DispatchedAt, t.ReceivedAt)).ToList();
     }
 
     private async Task<TransferDto> ToDtoAsync(Transfer t, CancellationToken ct)
@@ -382,7 +392,9 @@ public sealed class TransferService(
                 l.DiscrepancyReason, l.DiscrepancyNotes))
             .OrderBy(l => l.Sku).ThenBy(l => l.ExpirationDate).ToList();
 
-        return new TransferDto(t.Id, t.Folio, locations[t.FromLocationId], locations[t.ToLocationId], t.BranchOrderId, t.Status, t.Notes,
+        var orderFolios = await BranchOrderFoliosAsync([t.BranchOrderId], ct);
+        return new TransferDto(t.Id, t.Folio, locations[t.FromLocationId], locations[t.ToLocationId], t.BranchOrderId,
+            t.BranchOrderId is { } o ? orderFolios[o] : null, t.Status, t.Notes,
             t.VehicleDescription, t.DriverName, t.DispatchedAt, t.DispatchedBy, t.ReceivedAt, t.ReceivedBy, lines,
             lines.Sum(l => InventoryMath.Round(l.ShippedQty * (l.UnitCost ?? 0))), lines.Sum(l => l.ShortValue ?? 0),
             t.CreatedAt, t.CreatedBy, t.Version);

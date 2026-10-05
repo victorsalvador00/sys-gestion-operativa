@@ -42,6 +42,16 @@
             <dt>Destino</dt>
             <dd>{{ t.to.code }} · {{ t.to.name }}</dd>
           </div>
+          @if (t.branchOrderId) {
+            <div>
+              <dt>Pedido</dt>
+              <dd>
+                <a [routerLink]="['/logistica/pedidos', t.branchOrderId]">{{
+                  t.branchOrderFolio
+                }}</a>
+              </dd>
+            </div>
+          }
           <div>
             <dt>Creado</dt>
             <dd>{{ t.createdAt | date: 'dd/MM/yyyy HH:mm' }}</dd>

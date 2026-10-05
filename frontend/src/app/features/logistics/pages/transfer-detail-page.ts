@@ -174,7 +174,9 @@ export class TransferDetailPage {
     this.confirmService
       .confirm({
         title: `¿Cancelar el traspaso ${transfer.folio}?`,
-        message: 'El borrador ya no se podrá despachar. No se mueve inventario.',
+        message: transfer.branchOrderId
+          ? `También se cancelará el pedido ${transfer.branchOrderFolio}. El borrador ya no se podrá despachar. No se mueve inventario.`
+          : 'El borrador ya no se podrá despachar. No se mueve inventario.',
         confirmLabel: 'Cancelar traspaso',
         cancelLabel: 'Volver',
         tone: 'warn',
