@@ -1,6 +1,17 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { DatePipe } from '@angular/common';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  signal,
+  untracked,
+} from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
@@ -31,12 +42,17 @@ export function minMaxText(level: StockLevel): string {
     : `${level.minQty} / ${level.maxQty} ${level.baseUomCode}`;
 }
 
-/** Existencias de la ubicación activa (spec frontend §7.3). */
+/**
+ * Existencias de la ubicación activa (spec frontend §7.3). Desde el tablero: `?bajoMinimo=1` activa el
+ * filtro y `?porCaducar=1` muestra los lotes por caducar.
+ */
 @Component({
   selector: 'app-stock-page',
   imports: [
     RouterLink,
+    DatePipe,
     MatButtonModule,
+    MatCardModule,
     MatIconModule,
     MatFormFieldModule,
     MatSelectModule,
@@ -56,7 +72,48 @@ export function minMaxText(level: StockLevel): string {
   templateUrl: './stock-page.html',
   styles: `
     .filters {
+      flex-wrap: wrap;
       margin-bottom: var(--sgo-space-4);
+    }
+    .expiring {
+      margin-bottom: var(--sgo-space-4);
+    }
+    .expiring h2 {
+      margin: 0 0 var(--sgo-space-2);
+      font: var(--mat-sys-title-medium);
+    }
+    .expiring ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .expiring li {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: var(--sgo-space-3);
+      padding: var(--sgo-space-2) 0;
+      border-bottom: 1px solid var(--mat-sys-outline-variant);
+    }
+    .info {
+      display: grid;
+      min-width: 0;
+    }
+    .name {
+      font-weight: 500;
+      overflow-wrap: anywhere;
+    }
+    .meta {
+      margin: 0;
+      font: var(--mat-sys-body-small);
+      color: var(--mat-sys-on-surface-variant);
+    }
+    .meta.out {
+      color: var(--sgo-status-red-fg);
+    }
+    .qty {
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
     }
     .filters mat-form-field {
       width: 220px;
@@ -79,6 +136,12 @@ export class StockPage {
   private readonly api = inject(StockApi);
   private readonly categoriesApi = inject(CategoriesApi);
   protected readonly location = inject(LocationContextService).activeLocation;
+
+  /** `1` = solo bajo mínimo (desde la URL). */
+  readonly bajoMinimo = input<string>();
+  /** `1` = muestra los lotes por caducar (desde la URL). */
+  readonly porCaducar = input<string>();
+  protected readonly showExpiring = signal(false);
 
   protected readonly columns: TableColumn<StockLevel>[] = [
     { key: 'sku', header: 'SKU', sortable: true },
@@ -113,6 +176,20 @@ export class StockPage {
     () => new Set((this.alerts.value()?.expiringLots ?? []).map((lot) => lot.lotId)),
   );
   protected readonly alertDays = computed(() => this.alerts.value()?.expirationAlertDays ?? null);
+  protected readonly expiringLots = computed(() => this.alerts.value()?.expiringLots ?? []);
+
+  constructor() {
+    effect(() => {
+      const belowMin = this.bajoMinimo() === '1';
+      const expiring = this.porCaducar() === '1';
+      untracked(() => {
+        if (belowMin) {
+          this.setFilter('belowMin', true);
+        }
+        this.showExpiring.set(expiring);
+      });
+    });
+  }
 
   protected readonly categories = rxResource({
     stream: () =>

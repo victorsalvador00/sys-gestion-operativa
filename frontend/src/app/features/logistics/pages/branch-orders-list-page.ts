@@ -1,5 +1,14 @@
 import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  signal,
+  untracked,
+} from '@angular/core';
 import { rxResource, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -32,7 +41,8 @@ type OrderTab = 'all' | 'toApprove';
 
 /**
  * Pedidos de sucursal (`/logistica/pedidos`, `logistics.view`). Sin permiso de aprobar se ven los de
- * la ubicación activa; con él, todos los que están a tu alcance y la pestaña Por aprobar.
+ * la ubicación activa; con él, todos los que están a tu alcance y la pestaña Por aprobar
+ * (`?pestana=por-aprobar`).
  */
 @Component({
   selector: 'app-branch-orders-list-page',
@@ -162,6 +172,9 @@ export class BranchOrdersListPage {
   private readonly auth = inject(AuthService);
   private readonly locationContext = inject(LocationContextService);
 
+  /** Pestaña inicial desde la URL (ej. el tablero). */
+  readonly pestana = input<string>();
+
   protected readonly canCreate = this.auth.can('logistics.orders.create');
   protected readonly canApprove = this.auth.can('logistics.orders.approve');
   protected readonly statuses = BRANCH_ORDER_STATUSES;
@@ -211,6 +224,10 @@ export class BranchOrdersListPage {
     this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => {
       this.filters.set(this.form.getRawValue());
       this.query.update((query) => ({ ...query, page: 1 }));
+    });
+    effect(() => {
+      const toApprove = this.pestana() === 'por-aprobar' && this.canApprove;
+      untracked(() => toApprove && this.selectTab('toApprove'));
     });
   }
 

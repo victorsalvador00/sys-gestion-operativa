@@ -1,5 +1,13 @@
 import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  inject,
+  input,
+  signal,
+  untracked,
+} from '@angular/core';
 import { rxResource, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -32,7 +40,10 @@ import {
 } from '../data-access/production-orders.api';
 import { ORDER_STATUSES } from '../ui/production-order-lines';
 
-/** Órdenes de producción de la ubicación activa, por estado y fecha programada (spec §7.4). */
+/**
+ * Órdenes de producción de la ubicación activa, por estado y fecha programada (spec §7.4).
+ * Filtros iniciales desde la URL: `?estado=Released&fecha=hoy`.
+ */
 @Component({
   selector: 'app-production-orders-list-page',
   imports: [
@@ -157,6 +168,11 @@ export class ProductionOrdersListPage {
   protected readonly canManage = inject(AuthService).can('production.orders.manage');
   protected readonly statuses = ORDER_STATUSES;
 
+  /** Estado inicial desde la URL (ej. el tablero). */
+  readonly estado = input<string>();
+  /** `hoy` = programadas para hoy. */
+  readonly fecha = input<string>();
+
   protected readonly columns: TableColumn<ProductionOrderListItem>[] = [
     { key: 'folio', header: 'Folio', sortable: true },
     { key: 'scheduledDate', header: 'Programada', sortable: true },
@@ -195,6 +211,19 @@ export class ProductionOrdersListPage {
       });
       this.query.update((query) => ({ ...query, page: 1 }));
     });
+    effect(() => {
+      const status = ORDER_STATUSES.find((s) => s === this.estado()) ?? null;
+      const today = this.fecha() === 'hoy' ? startOfToday() : null;
+      untracked(() => {
+        if (status || today) {
+          this.form.patchValue({
+            status: status ?? this.form.controls.status.value,
+            from: today ?? this.form.controls.from.value,
+            to: today ?? this.form.controls.to.value,
+          });
+        }
+      });
+    });
   }
 
   protected statusLabel(status: ProductionOrderStatus): string {
@@ -204,4 +233,9 @@ export class ProductionOrdersListPage {
   protected open(order: ProductionOrderListItem): void {
     void this.router.navigate(['/produccion/ordenes', order.id]);
   }
+}
+
+function startOfToday(): Date {
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate());
 }

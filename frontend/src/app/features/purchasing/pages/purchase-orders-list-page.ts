@@ -1,5 +1,14 @@
 import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  signal,
+  untracked,
+} from '@angular/core';
 import { rxResource, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -35,6 +44,7 @@ type OrderTab = 'all' | 'toApprove' | 'toReceive';
 /**
  * Órdenes de compra (`/compras/ordenes`, `purchasing.view`). Pestañas: Todas (con filtro de estado),
  * Por aprobar (con `purchasing.po.approve`) y Por recibir (aprobadas o parcialmente recibidas).
+ * `?pestana=por-aprobar` o `por-recibir` abre esa pestaña.
  */
 @Component({
   selector: 'app-purchase-orders-list-page',
@@ -171,6 +181,9 @@ export class PurchaseOrdersListPage {
   private readonly auth = inject(AuthService);
   private readonly locationContext = inject(LocationContextService);
 
+  /** Pestaña inicial desde la URL (ej. el tablero). */
+  readonly pestana = input<string>();
+
   protected readonly canManage = this.auth.can('purchasing.po.manage');
   private readonly canApprove = this.auth.can('purchasing.po.approve');
   protected readonly statuses = PURCHASE_ORDER_STATUSES;
@@ -224,6 +237,16 @@ export class PurchaseOrdersListPage {
     this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => {
       this.filters.set(this.form.getRawValue());
       this.query.update((query) => ({ ...query, page: 1 }));
+    });
+    effect(() => {
+      const slug = this.pestana();
+      const tab =
+        slug === 'por-aprobar' ? 'toApprove' : slug === 'por-recibir' ? 'toReceive' : null;
+      untracked(() => {
+        if (tab && this.tabs.some((t) => t.id === tab)) {
+          this.selectTab(tab);
+        }
+      });
     });
   }
 

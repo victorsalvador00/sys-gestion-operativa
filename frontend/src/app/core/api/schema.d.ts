@@ -10020,6 +10020,7 @@ export interface components {
             version: number;
         };
         ExpiringLotAlertDto: {
+            baseUomCode: string;
             /** Format: int32 */
             daysToExpire: number;
             /** Format: date */

@@ -42,8 +42,8 @@ public sealed record LowStockAlertDto(
     decimal OnHand, decimal MinQty, decimal MaxQty);
 
 public sealed record ExpiringLotAlertDto(
-    Guid LocationId, string LocationCode, Guid ItemId, string Sku, string ItemName, Guid LotId, string LotNumber,
-    DateOnly ExpirationDate, decimal Quantity, int DaysToExpire, bool IsExpired);
+    Guid LocationId, string LocationCode, Guid ItemId, string Sku, string ItemName, string BaseUomCode, Guid LotId,
+    string LotNumber, DateOnly ExpirationDate, decimal Quantity, int DaysToExpire, bool IsExpired);
 
 public sealed record AlertsDto(int ExpirationAlertDays, IReadOnlyList<LowStockAlertDto> LowStock, IReadOnlyList<ExpiringLotAlertDto> ExpiringLots);
 

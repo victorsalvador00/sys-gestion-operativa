@@ -26,7 +26,44 @@
       >
         Solo bajo mínimo
       </mat-slide-toggle>
+      <mat-slide-toggle [checked]="showExpiring()" (change)="showExpiring.set($event.checked)">
+        Ver lotes por caducar
+      </mat-slide-toggle>
     </div>
+
+    @if (showExpiring()) {
+      <mat-card appearance="outlined" class="expiring">
+        <mat-card-content>
+          <h2>Lotes por caducar</h2>
+          @if (expiringLots().length) {
+            <ul>
+              @for (lot of expiringLots(); track lot.lotId) {
+                <li>
+                  <div class="info">
+                    <span class="name">{{ lot.sku }} · {{ lot.itemName }}</span>
+                    <span class="meta" [class.out]="lot.isExpired">
+                      Lote {{ lot.lotNumber }} · cad.
+                      {{ lot.expirationDate | date: 'dd/MM/yyyy' }} ·
+                      @if (lot.isExpired) {
+                        caducado
+                      } @else if (lot.daysToExpire === 0) {
+                        vence hoy
+                      } @else {
+                        vence en {{ lot.daysToExpire }}
+                        {{ lot.daysToExpire === 1 ? 'día' : 'días' }}
+                      }
+                    </span>
+                  </div>
+                  <span class="qty">{{ lot.quantity | qty: lot.baseUomCode }}</span>
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="meta">No hay lotes por caducar en los próximos {{ alertDays() }} días.</p>
+          }
+        </mat-card-content>
+      </mat-card>
+    }
     @if (alertDays() !== null) {
       <p class="summary">
         Toca una fila para ver sus lotes. "Por caducar" = vence en {{ alertDays() }} días o menos.

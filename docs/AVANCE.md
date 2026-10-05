@@ -45,9 +45,11 @@
 | 3 | F-12 Requisiciones y conversión a OC (+ `GET /items/{id}/supplier-offers`, E2E) | ✅ | (ver `git log`) |
 | 3 | F-13 Órdenes de compra y recepciones (+ E2E #2) | ✅ | (ver `git log`) |
 | 4 | F-14 Pedidos de sucursal con sugerido y aprobación (+ E2E #3 completo) | ✅ | (ver `git log`) |
+| 4 | F-15 Tablero (+ Chart.js, filtros por URL en listas, E2E) | ✅ | (ver `git log`) |
 
-**Siguiente paso (al retomar):** F-14 terminada. Proponer el plan de **F-15** (tablero: tarjetas según rol y
-ubicación activa) y esperar OK.
+**Siguiente paso (al retomar):** F-15 terminada. Proponer el plan de **F-16** (pulido: revisión móvil de las
+pantallas ★, accesibilidad, estados vacíos, build de producción; Lighthouse de accesibilidad ≥ 90 en login,
+tablero y recepción) y esperar OK.
 Antes: `API_PORT=8090 docker compose -f deploy/docker-compose.dev.yml up -d` y `npm start` en `frontend/` (Node ≥ 24.15).
 La base de desarrollo tiene existencias de ejemplo: AJ-000006 (SUC-01 AZU-001 25 kg) y AJ-000007 (COM HAR-001 lote L-2409 100 kg).
 
@@ -400,6 +402,29 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
   de 3 kg de HAR-001 en COM (lote E2E-PED-2099) y mín/máx de HAR-001 en SUC-01 ajustado para que el sugerido sea
   3 kg; SUC-01 pide con el sugerido → COM aprueba 2 kg → despacha (FEFO) → SUC-01 recibe con 1 kg de faltante →
   el pedido queda "Surtido". **Mueve inventario** y **cambia el mín/máx de HAR-001 en SUC-01** en cada corrida.
+
+**Frontend (F-15):**
+- Paquete nuevo: **chart.js 4.5.1 (MIT)**, con su dependencia @kurkle/color 0.3.4 (MIT). Se carga con `import()`
+  solo cuando aparece la gráfica (chunk diferido de ~61 kB gzip; el bundle inicial no cambia).
+- Backend (sin migración): `ExpiringLotAlertDto` trae `baseUomCode` (cantidad con unidad en la lista de lotes por
+  caducar). Prueba en `InventoryApiTests`.
+- `features/dashboard`: tablero `/` con `GET /dashboard?locationId=` de la ubicación activa (se vuelve a consultar
+  al cambiarla). Tarjetas según los bloques que llegan (permisos) y el tipo de ubicación (`dashboardCards`):
+  bajo mínimo y lotes por caducar (inventario); traspasos **por recibir** (sucursal) o **por despachar** (fábrica o
+  comisariato); pedidos en curso (sucursal); pedidos por aprobar, OC por aprobar y OP liberadas para hoy (fábrica o
+  comisariato). Las alertas con conteo > 0 se resaltan en naranja. Skeleton de carga, error con "Reintentar" y
+  estado vacío. Con `locations.all`: gráfica de barras horizontales de artículos bajo mínimo por ubicación (un solo
+  tono validado, sin leyenda, tooltip, tabla oculta para lector de pantalla); tocar una barra cambia a esa
+  ubicación y abre Existencias con "Bajo mínimo". Si ninguna ubicación está bajo mínimo, lo dice en lugar de la
+  gráfica.
+- Filtros iniciales por URL (los usan las tarjetas): Existencias `?bajoMinimo=1` y `?porCaducar=1` (nueva sección
+  "Lotes por caducar" con lote, caducidad, días y cantidad; también con un interruptor), Traspasos
+  `?pestana=por-despachar|en-transito|recibidos|todos`, Pedidos `?pestana=por-aprobar`, OC
+  `?pestana=por-aprobar|por-recibir`, OP `?estado=Released&fecha=hoy`.
+- E2E `13-dashboard` (escritorio y celular): el administrador ve "Por despachar" en COM y "Por recibir" en SUC-01,
+  más la gráfica; la tarjeta abre Existencias filtrada; un encargado de sucursal (creado por API y desactivado al
+  final) no ve OC ni pedidos por aprobar ni la gráfica. No mueve inventario; **deja un usuario desactivado** por
+  corrida.
 
 ## Pendientes y notas técnicas
 

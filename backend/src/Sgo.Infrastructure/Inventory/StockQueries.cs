@@ -211,14 +211,15 @@ public sealed class StockQueries(SgoDbContext db, ILocationScope scope, IClock c
                               join lot in db.Lots on b.LotId equals lot.Id
                               where lot.ExpirationDate != null && lot.ExpirationDate <= limit
                               join i in db.Items on b.ItemId equals i.Id
+                              join u in db.UnitsOfMeasure on i.BaseUomId equals u.Id
                               join l in db.Locations on b.LocationId equals l.Id
                               where l.IsActive
                               orderby lot.ExpirationDate, l.Code, i.Sku
-                              select new { l.Id, l.Code, ItemId = i.Id, i.Sku, i.Name, LotId = lot.Id, lot.LotNumber, Expiration = lot.ExpirationDate!.Value, b.Quantity })
+                              select new { l.Id, l.Code, ItemId = i.Id, i.Sku, i.Name, Uom = u.Code, LotId = lot.Id, lot.LotNumber, Expiration = lot.ExpirationDate!.Value, b.Quantity })
             .ToListAsync(ct);
 
         return new AlertsDto(days, lowStock, expiring.Select(e => new ExpiringLotAlertDto(e.Id, e.Code, e.ItemId, e.Sku, e.Name,
-            e.LotId, e.LotNumber, e.Expiration, e.Quantity, e.Expiration.DayNumber - today.DayNumber, e.Expiration < today)).ToList());
+            e.Uom, e.LotId, e.LotNumber, e.Expiration, e.Quantity, e.Expiration.DayNumber - today.DayNumber, e.Expiration < today)).ToList());
     }
 
     private async Task<int> ExpirationAlertDaysAsync(CancellationToken ct)

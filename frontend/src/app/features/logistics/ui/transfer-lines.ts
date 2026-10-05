@@ -46,11 +46,11 @@ export function destinationOptions(
 
 export type TransferTab = 'toDispatch' | 'inTransit' | 'received' | 'all';
 
-export const TRANSFER_TABS: { id: TransferTab; label: string }[] = [
-  { id: 'toDispatch', label: 'Por despachar' },
-  { id: 'inTransit', label: 'En tránsito' },
-  { id: 'received', label: 'Recibidos' },
-  { id: 'all', label: 'Todos' },
+export const TRANSFER_TABS: { id: TransferTab; label: string; slug: string }[] = [
+  { id: 'toDispatch', label: 'Por despachar', slug: 'por-despachar' },
+  { id: 'inTransit', label: 'En tránsito', slug: 'en-transito' },
+  { id: 'received', label: 'Recibidos', slug: 'recibidos' },
+  { id: 'all', label: 'Todos', slug: 'todos' },
 ];
 
 /** Filtros de cada pestaña para la ubicación activa. */

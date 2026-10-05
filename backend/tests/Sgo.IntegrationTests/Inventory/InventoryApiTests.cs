@@ -144,6 +144,7 @@ public class InventoryApiTests(SgoApiFactory factory)
         Assert.Contains(alerts.LowStock, a => a.ItemId == neverReceived.Id);
         var expiring = alerts.ExpiringLots.Where(e => e.ItemId == perishable.Id).ToList();
         Assert.Equal([("EXP-1", true, -1), ("EXP-2", false, 2)], expiring.Select(e => (e.LotNumber, e.IsExpired, e.DaysToExpire)));
+        Assert.All(expiring, e => Assert.False(string.IsNullOrWhiteSpace(e.BaseUomCode)));
     }
 
     [Fact]

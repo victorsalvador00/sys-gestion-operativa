@@ -1,5 +1,14 @@
 import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  signal,
+  untracked,
+} from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -19,7 +28,7 @@ import { StatusTag } from '../../../shared/components/status-tag/status-tag';
 import { TransferListItem, TransfersApi } from '../data-access/transfers.api';
 import { TRANSFER_TABS, tabFilters, TransferTab } from '../ui/transfer-lines';
 
-/** Traspasos de la ubicación activa por pestaña (spec frontend §7.4). */
+/** Traspasos de la ubicación activa por pestaña (spec frontend §7.4). `?pestana=en-transito` abre esa pestaña. */
 @Component({
   selector: 'app-transfers-list-page',
   imports: [
@@ -135,6 +144,9 @@ export class TransfersListPage {
   private readonly router = inject(Router);
   private readonly auth = inject(AuthService);
 
+  /** Pestaña inicial desde la URL (ej. el tablero): `por-despachar`, `en-transito`, `recibidos`, `todos`. */
+  readonly pestana = input<string>();
+
   protected readonly location = inject(LocationContextService).activeLocation;
   protected readonly canDispatch = this.auth.can('logistics.transfers.dispatch');
   private readonly canReceive = this.auth.can('logistics.transfers.receive');
@@ -177,6 +189,13 @@ export class TransfersListPage {
         return 'No hay traspasos.';
     }
   });
+
+  constructor() {
+    effect(() => {
+      const tab = this.tabs.find((t) => t.slug === this.pestana());
+      untracked(() => tab && this.selectTab(tab.id));
+    });
+  }
 
   protected selectTab(tab: TransferTab): false {
     this.tab.set(tab);
