@@ -7,6 +7,7 @@ import {
   expectNoHorizontalScroll,
   login,
 } from './support/session';
+import { expectNoA11yViolations } from './support/a11y';
 
 /**
  * E2E #3 completo (F-14): SUC-01 pide HAR-001 a COM con el sugerido por mín/máx → COM aprueba menos
@@ -102,6 +103,7 @@ test('pedido de sucursal → aprobar → despachar → recibir con faltante (cel
   await expect(page.getByLabel('Cantidad', { exact: true }).nth(flourIndex)).toHaveValue('3');
   await expect(page.getByText(/Mín .* · máx .* · hay/).first()).toBeVisible();
   await expectNoHorizontalScroll(page);
+  await expectNoA11yViolations(page);
   await page.getByRole('button', { name: 'Guardar y enviar' }).click();
 
   const heading = page.getByRole('heading', { name: /^Pedido PED-\d+$/ });
@@ -127,6 +129,7 @@ test('pedido de sucursal → aprobar → despachar → recibir con faltante (cel
   }
   await page.getByLabel(`Aprobado de ${flourName}`, { exact: true }).fill('2');
   await expectNoHorizontalScroll(page);
+  await expectNoA11yViolations(page);
   await page.getByRole('button', { name: 'Confirmar aprobación' }).click();
   const confirm = page.getByRole('dialog');
   await expect(confirm.getByText(`¿Aprobar el pedido ${folio}?`)).toBeVisible();

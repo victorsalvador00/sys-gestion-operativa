@@ -95,6 +95,8 @@ import { UserStatusTag } from '../ui/user-status-tag';
         [searchable]="true"
         searchPlaceholder="Buscar por nombre o correo"
         emptyMessage="No hay usuarios con esos filtros."
+        [emptyActionLabel]="'Nuevo usuario'"
+        (emptyAction)="goToNew()"
         [rowClickable]="true"
         (rowClick)="open($event)"
         (queryChange)="query.set($event)"
@@ -136,6 +138,10 @@ export class UsersListPage {
   private readonly router = inject(Router);
 
   protected readonly canListRoles = inject(AuthService).can('security.roles.manage');
+
+  protected goToNew(): void {
+    void this.router.navigateByUrl('/admin/usuarios/nuevo');
+  }
   protected readonly locations = inject(LocationContextService).locations;
 
   protected readonly columns: TableColumn<UserListItem>[] = [

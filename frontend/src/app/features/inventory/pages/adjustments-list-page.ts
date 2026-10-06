@@ -103,6 +103,8 @@ import {
         [searchable]="true"
         searchPlaceholder="Buscar por folio"
         emptyMessage="No hay ajustes con esos filtros."
+        [emptyActionLabel]="canAdjust ? 'Nuevo ajuste' : undefined"
+        (emptyAction)="goToNew()"
         [rowClickable]="true"
         (rowClick)="open($event)"
         (queryChange)="query.set($event)"
@@ -149,6 +151,10 @@ export class AdjustmentsListPage {
   private readonly router = inject(Router);
 
   protected readonly canAdjust = inject(AuthService).can('inventory.adjust');
+
+  protected goToNew(): void {
+    void this.router.navigateByUrl('/inventario/ajustes/nuevo');
+  }
   protected readonly reasons = Object.keys(ENUM_LABELS.AdjustmentReason) as AdjustmentReason[];
   protected readonly reasonLabels = ENUM_LABELS.AdjustmentReason;
 

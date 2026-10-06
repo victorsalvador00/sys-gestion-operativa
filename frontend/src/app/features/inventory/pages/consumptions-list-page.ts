@@ -86,6 +86,8 @@ import {
         [searchable]="true"
         searchPlaceholder="Buscar por folio"
         emptyMessage="No hay consumos con esos filtros."
+        [emptyActionLabel]="canRegister ? 'Registrar consumo' : undefined"
+        (emptyAction)="goToNew()"
         [rowClickable]="true"
         (rowClick)="open($event)"
         (queryChange)="query.set($event)"
@@ -131,6 +133,10 @@ export class ConsumptionsListPage {
   private readonly router = inject(Router);
 
   protected readonly canRegister = inject(AuthService).can('inventory.consumption');
+
+  protected goToNew(): void {
+    void this.router.navigateByUrl('/inventario/consumos/nuevo');
+  }
 
   protected readonly columns: TableColumn<ConsumptionListItem>[] = [
     { key: 'folio', header: 'Folio', sortable: true },

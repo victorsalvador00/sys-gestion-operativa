@@ -58,6 +58,8 @@ import { UnitDialog } from '../ui/unit-dialog';
         [searchable]="true"
         searchPlaceholder="Buscar por código o nombre"
         emptyMessage="No hay unidades."
+        [emptyActionLabel]="canManage ? 'Nueva unidad' : undefined"
+        (emptyAction)="edit(null)"
         [rowClickable]="canManage"
         (rowClick)="edit($event)"
         (queryChange)="query.set($event)"

@@ -89,6 +89,8 @@ import { NewCountDialog } from '../ui/new-count-dialog';
         [searchable]="true"
         searchPlaceholder="Buscar por folio"
         emptyMessage="No hay conteos con esos filtros."
+        [emptyActionLabel]="canCount ? 'Nuevo conteo' : undefined"
+        (emptyAction)="create()"
         [rowClickable]="true"
         (rowClick)="open($event)"
         (queryChange)="query.set($event)"

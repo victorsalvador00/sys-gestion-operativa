@@ -108,6 +108,8 @@ import { ORDER_STATUSES } from '../ui/production-order-lines';
         [searchable]="true"
         searchPlaceholder="Buscar por folio"
         emptyMessage="No hay órdenes de producción con esos filtros."
+        [emptyActionLabel]="canManage ? 'Nueva orden de producción' : undefined"
+        (emptyAction)="goToNew()"
         [rowClickable]="true"
         (rowClick)="open($event)"
         (queryChange)="query.set($event)"
@@ -166,6 +168,10 @@ export class ProductionOrdersListPage {
 
   protected readonly location = inject(LocationContextService).activeLocation;
   protected readonly canManage = inject(AuthService).can('production.orders.manage');
+
+  protected goToNew(): void {
+    void this.router.navigateByUrl('/produccion/ordenes/nueva');
+  }
   protected readonly statuses = ORDER_STATUSES;
 
   /** Estado inicial desde la URL (ej. el tablero). */

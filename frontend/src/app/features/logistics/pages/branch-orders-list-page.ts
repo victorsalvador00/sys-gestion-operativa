@@ -119,6 +119,8 @@ type OrderTab = 'all' | 'toApprove';
           [searchable]="true"
           searchPlaceholder="Buscar por folio"
           [emptyMessage]="emptyMessage()"
+          [emptyActionLabel]="canCreate && tab() !== 'toApprove' ? 'Nuevo pedido' : undefined"
+          (emptyAction)="goToNew()"
           [rowClickable]="true"
           (rowClick)="open($event)"
           (queryChange)="query.set($event)"
@@ -176,6 +178,10 @@ export class BranchOrdersListPage {
   readonly pestana = input<string>();
 
   protected readonly canCreate = this.auth.can('logistics.orders.create');
+
+  protected goToNew(): void {
+    void this.router.navigateByUrl('/logistica/pedidos/nuevo');
+  }
   protected readonly canApprove = this.auth.can('logistics.orders.approve');
   protected readonly statuses = BRANCH_ORDER_STATUSES;
   protected readonly tabs: { id: OrderTab; label: string }[] = [

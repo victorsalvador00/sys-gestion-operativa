@@ -6,6 +6,7 @@ import {
   expectNoHorizontalScroll,
   login,
 } from './support/session';
+import { expectNoA11yViolations } from './support/a11y';
 
 /**
  * E2E #3 (sin pedido, criterio de F-08): traspaso directo COM → SUC-01, despacho con lote elegido y
@@ -100,12 +101,14 @@ test('traspaso directo: despachar con lote elegido y recibir con faltante en cel
   await chooseOptions(page, 'Motivo del faltante', ['Faltante']);
   await page.getByLabel('Notas').fill('Llegó una bolsa menos');
   await expectNoHorizontalScroll(page);
+  await expectNoA11yViolations(page);
   await page.getByRole('button', { name: 'Recibir', exact: true }).click();
 
   const summary = page.getByRole('dialog');
   await expect(summary.getByText(`¿Recibir ${folio}?`)).toBeVisible();
   await expect(summary.getByRole('cell', { name: 'Faltante' })).toBeVisible();
   await expectNoHorizontalScroll(page);
+  await expectNoA11yViolations(page);
   await summary.getByRole('button', { name: 'Recibir' }).click();
 
   await expect(page.getByText('Recibido con diferencias', { exact: true })).toBeVisible();

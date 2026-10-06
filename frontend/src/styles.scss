@@ -2,8 +2,9 @@
 @use '@angular/material' as mat;
 @use 'styles/theme' as theme;
 
-// Las fuentes (Roboto y Material Symbols) se empaquetan localmente desde angular.json.
+// Roboto se empaqueta desde angular.json; Material Symbols es un subconjunto propio (styles/_material-symbols.scss).
 
+@use 'styles/material-symbols';
 @use 'styles/tokens';
 @use 'styles/layout';
 @use 'styles/feedback';

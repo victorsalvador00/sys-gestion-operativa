@@ -6,6 +6,7 @@ import {
   expectNoHorizontalScroll,
   login,
 } from './support/session';
+import { expectNoA11yViolations } from './support/a11y';
 
 /**
  * Criterio de aceptación de F-07: conteo físico y consumo completos en 390 px sin scroll horizontal.
@@ -77,11 +78,13 @@ test('conteo físico: crear, iniciar, capturar, revisar y cancelar', async ({ pa
   await expect(page.locator('input[aria-label^="Contado de AZU-001"]')).toHaveValue('3');
   await expect(page.getByText('Guardado', { exact: true })).toBeVisible();
   await expectNoHorizontalScroll(page);
+  await expectNoA11yViolations(page);
 
   await page.getByRole('button', { name: 'Revisar y cerrar' }).click();
   await expect(page.getByRole('heading', { name: 'Revisar diferencias' })).toBeVisible();
   await expect(page.getByText(/Sistema .* · Contado 3 kg/)).toBeVisible();
   await expectNoHorizontalScroll(page);
+  await expectNoA11yViolations(page);
 
   await page.getByRole('button', { name: 'Volver a capturar' }).click();
   await page.getByRole('button', { name: 'Cancelar conteo' }).click();
@@ -110,12 +113,14 @@ test('consumo del día: captura rápida y resumen', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Consumo (1)' })).toBeVisible();
   await expect(page.locator('input[aria-label="Cantidad de AZU-001"]')).toHaveValue('3.5');
   await expectNoHorizontalScroll(page);
+  await expectNoA11yViolations(page);
 
   await page.getByRole('button', { name: 'Registrar consumo' }).click();
   const confirm = page.getByRole('dialog');
   await expect(confirm.getByText('¿Registrar consumo?')).toBeVisible();
   await expect(confirm.getByRole('cell', { name: /3\.5 kg/ })).toBeVisible();
   await expectNoHorizontalScroll(page);
+  await expectNoA11yViolations(page);
   await confirm.getByRole('button', { name: 'Volver' }).click();
   await expect(page).toHaveURL(/\/inventario\/consumos\/nuevo$/);
 });

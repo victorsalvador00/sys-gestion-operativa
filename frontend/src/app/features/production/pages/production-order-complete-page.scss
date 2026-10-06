@@ -94,22 +94,6 @@
   color: var(--sgo-status-red-fg);
 }
 
-// Resumen y acción principal siempre a la mano con el pulgar.
-.bottom-bar {
-  position: sticky;
-  bottom: 0;
-  z-index: 2;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--sgo-space-2) var(--sgo-space-3);
-  padding: var(--sgo-space-3);
-  border: 1px solid var(--mat-sys-outline-variant);
-  border-radius: 8px;
-  background: var(--mat-sys-surface-container);
-}
-
 .status {
   display: grid;
   font: var(--mat-sys-body-medium);

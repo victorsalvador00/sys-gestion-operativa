@@ -125,6 +125,8 @@ type OrderTab = 'all' | 'toApprove' | 'toReceive';
           [searchable]="true"
           searchPlaceholder="Buscar por folio o proveedor"
           [emptyMessage]="emptyMessage()"
+          [emptyActionLabel]="canManage && tab() === 'all' ? 'Nueva orden de compra' : undefined"
+          (emptyAction)="goToNew()"
           [rowClickable]="true"
           (rowClick)="open($event)"
           (queryChange)="query.set($event)"
@@ -185,6 +187,10 @@ export class PurchaseOrdersListPage {
   readonly pestana = input<string>();
 
   protected readonly canManage = this.auth.can('purchasing.po.manage');
+
+  protected goToNew(): void {
+    void this.router.navigateByUrl('/compras/ordenes/nueva');
+  }
   private readonly canApprove = this.auth.can('purchasing.po.approve');
   protected readonly statuses = PURCHASE_ORDER_STATUSES;
   protected readonly tabs: { id: OrderTab; label: string }[] = [

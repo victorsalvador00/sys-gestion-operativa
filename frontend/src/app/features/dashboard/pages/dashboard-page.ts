@@ -51,7 +51,6 @@ import { LowStockChart } from '../ui/low-stock-chart';
                   [class.attention]="card.alert && card.count > 0"
                   [routerLink]="card.link"
                   [queryParams]="card.queryParams"
-                  [attr.aria-label]="card.label + ': ' + card.count"
                 >
                   <mat-icon aria-hidden="true">{{ card.icon }}</mat-icon>
                   <span class="count">{{ card.count }}</span>

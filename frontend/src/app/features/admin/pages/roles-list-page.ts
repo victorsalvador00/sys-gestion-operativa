@@ -48,6 +48,8 @@ import { RoleListItem, RolesApi } from '../data-access/roles.api';
         [searchable]="true"
         searchPlaceholder="Buscar rol"
         emptyMessage="No hay roles con ese nombre."
+        [emptyActionLabel]="'Nuevo rol'"
+        (emptyAction)="goToNew()"
         [rowClickable]="true"
         (rowClick)="open($event)"
         (queryChange)="query.set($event)"
@@ -78,6 +80,10 @@ import { RoleListItem, RolesApi } from '../data-access/roles.api';
 export class RolesListPage {
   private readonly api = inject(RolesApi);
   private readonly router = inject(Router);
+
+  protected goToNew(): void {
+    void this.router.navigateByUrl('/admin/roles/nuevo');
+  }
 
   protected readonly columns: TableColumn<RoleListItem>[] = [
     { key: 'name', header: 'Rol', sortable: true },

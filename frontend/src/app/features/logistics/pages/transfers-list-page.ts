@@ -75,6 +75,12 @@ import { TRANSFER_TABS, tabFilters, TransferTab } from '../ui/transfer-lines';
           [searchable]="true"
           searchPlaceholder="Buscar por folio"
           [emptyMessage]="emptyMessage()"
+          [emptyActionLabel]="
+            canDispatch && (tab() === 'toDispatch' || tab() === 'all')
+              ? 'Nuevo traspaso'
+              : undefined
+          "
+          (emptyAction)="goToNew()"
           [rowClickable]="true"
           (rowClick)="open($event)"
           (queryChange)="query.set($event)"
@@ -150,6 +156,10 @@ export class TransfersListPage {
   protected readonly location = inject(LocationContextService).activeLocation;
   protected readonly canDispatch = this.auth.can('logistics.transfers.dispatch');
   private readonly canReceive = this.auth.can('logistics.transfers.receive');
+
+  protected goToNew(): void {
+    void this.router.navigateByUrl('/logistica/traspasos/nuevo');
+  }
   /** Quien no despacha (sucursal) no tiene nada "por despachar". */
   protected readonly tabs = this.canDispatch
     ? TRANSFER_TABS

@@ -93,6 +93,12 @@ describe('DashboardPage', () => {
     return { fixture, el: fixture.nativeElement as HTMLElement };
   }
 
+  /** Tarjeta del tablero por su etiqueta visible (su nombre accesible es el texto que se ve). */
+  const cardByLabel = (el: HTMLElement, label: string) =>
+    Array.from(el.querySelectorAll<HTMLAnchorElement>('a.card')).find(
+      (card) => card.querySelector('.label')?.textContent?.trim() === label,
+    )!;
+
   const expectDashboard = (locationId: string) =>
     http.expectOne(
       (req) => req.url === '/api/v1/dashboard' && req.params.get('locationId') === locationId,
@@ -112,9 +118,8 @@ describe('DashboardPage', () => {
     const labels = () =>
       Array.from(el.querySelectorAll('.card .label')).map((l) => l.textContent?.trim());
     expect(labels()).toContain('Traspasos por despachar');
-    const lowStock = el.querySelector<HTMLAnchorElement>(
-      'a[aria-label="Artículos bajo mínimo: 3"]',
-    )!;
+    const lowStock = cardByLabel(el, 'Artículos bajo mínimo');
+    expect(lowStock.querySelector('.count')?.textContent?.trim()).toBe('3');
     expect(lowStock.getAttribute('href')).toBe('/inventario/existencias?bajoMinimo=1');
     expect(lowStock.classList).toContain('attention');
 
@@ -133,9 +138,7 @@ describe('DashboardPage', () => {
     await fixture.whenStable();
     expect(labels()).toContain('Traspasos por recibir');
     expect(labels()).not.toContain('Traspasos por despachar');
-    expect(el.querySelector('a[aria-label="Traspasos por recibir: 0"]')!.classList).not.toContain(
-      'attention',
-    );
+    expect(cardByLabel(el, 'Traspasos por recibir').classList).not.toContain('attention');
   });
 
   it('la gráfica por ubicación solo llega con locations.all (y tiene tabla accesible)', async () => {

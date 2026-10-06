@@ -38,6 +38,8 @@ npm test
 npm run lint
 npm run e2e
 npm run api:types  # regenerar tipos desde el OpenAPI del backend en ejecución
+npm run lighthouse # accesibilidad (≥ 90) de login, tablero y recepción; requiere API y frontend en marcha
+npm run icons      # regenerar el subconjunto de Material Symbols tras usar un ícono nuevo (pip install fonttools brotli)
 ```
 
 ## Convenciones

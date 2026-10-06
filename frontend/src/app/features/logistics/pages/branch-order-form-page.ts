@@ -202,12 +202,16 @@ function daysFromToday(days: number): Date {
             </mat-card-content>
           </mat-card>
 
-          <div class="sgo-row actions">
-            <button mat-flat-button type="button" [disabled]="saving()" (click)="save(true)">
-              Guardar y enviar
-            </button>
-            <button mat-stroked-button type="submit" [disabled]="saving()">Guardar borrador</button>
-            <a mat-button [routerLink]="backLink()">Cancelar</a>
+          <div class="sgo-action-bar">
+            <div class="sgo-row">
+              <button mat-flat-button type="button" [disabled]="saving()" (click)="save(true)">
+                Guardar y enviar
+              </button>
+              <button mat-stroked-button type="submit" [disabled]="saving()">
+                Guardar borrador
+              </button>
+              <a mat-button [routerLink]="backLink()">Cancelar</a>
+            </div>
           </div>
         </form>
       }
@@ -248,9 +252,6 @@ function daysFromToday(days: number): Date {
     }
     mat-form-field {
       width: 100%;
-    }
-    .actions {
-      flex-wrap: wrap;
     }
   `,
 })

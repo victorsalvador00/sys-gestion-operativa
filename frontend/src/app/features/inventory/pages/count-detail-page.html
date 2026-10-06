@@ -110,7 +110,7 @@
               }
             </mat-card-content>
           </mat-card>
-          <div class="bottom-bar">
+          <div class="sgo-action-bar">
             <button mat-button type="button" [disabled]="busy()" (click)="backToCapture()">
               <mat-icon>arrow_back</mat-icon>
               Volver a capturar
@@ -196,7 +196,7 @@
             }
           </ul>
 
-          <div class="bottom-bar">
+          <div class="sgo-action-bar">
             <div class="status">
               <strong>{{ progress().counted }} de {{ progress().total }} contadas</strong>
               <span class="save" [class.error]="saveState() === 'error'" aria-live="polite">

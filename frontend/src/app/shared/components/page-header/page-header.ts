@@ -60,6 +60,9 @@ import { BreadcrumbsService, Crumb } from '../../../core/layout/breadcrumbs';
       align-items: center;
     }
     .crumbs a {
+      // Área táctil de al menos 24 px de alto (WCAG 2.5.8) sin cambiar el tamaño del texto.
+      display: inline-block;
+      padding-block: 4px;
       color: var(--mat-sys-primary);
     }
     .crumbs mat-icon {

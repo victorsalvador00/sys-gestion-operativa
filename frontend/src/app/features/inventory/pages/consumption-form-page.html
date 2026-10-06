@@ -109,11 +109,13 @@
         </mat-card-content>
       </mat-card>
 
-      <div class="sgo-row">
-        <button mat-flat-button type="button" [disabled]="saving()" (click)="submit()">
-          Registrar consumo
-        </button>
-        <a mat-button routerLink="/inventario/consumos">Cancelar</a>
+      <div class="sgo-action-bar">
+        <div class="sgo-row">
+          <button mat-flat-button type="button" [disabled]="saving()" (click)="submit()">
+            Registrar consumo
+          </button>
+          <a mat-button routerLink="/inventario/consumos">Cancelar</a>
+        </div>
       </div>
     </div>
   }

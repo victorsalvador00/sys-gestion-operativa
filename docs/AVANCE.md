@@ -1,6 +1,6 @@
 # Avance del SGO (backend y frontend)
 
-> Bitácora de trabajo para retomar entre sesiones. Última actualización: 2026-09-26.
+> Bitácora de trabajo para retomar entre sesiones. Última actualización: 2026-10-06.
 > Fuente de verdad de reglas: `docs/specs/dominio.md`; tareas: `docs/specs/backend.md` §12.
 
 ## Estado por tarea
@@ -46,28 +46,13 @@
 | 3 | F-13 Órdenes de compra y recepciones (+ E2E #2) | ✅ | (ver `git log`) |
 | 4 | F-14 Pedidos de sucursal con sugerido y aprobación (+ E2E #3 completo) | ✅ | (ver `git log`) |
 | 4 | F-15 Tablero (+ Chart.js, filtros por URL en listas, E2E) | ✅ | (ver `git log`) |
+| 4 | F-16 Pulido: móvil, accesibilidad (axe + Lighthouse), estados vacíos, build de producción, subconjunto de íconos | ✅ | (ver `git log`) |
 
-**Siguiente paso (al retomar, 2026-10-06):** F-15 terminada y subida (`2672626`). El plan de **F-16** ya se
-presentó (abajo); **falta que el usuario decida** los dos puntos marcados antes de implementar.
+**Frontend completo (F-01..F-16).**
 
-**Plan F-16 (pulido final; criterio: Lighthouse de accesibilidad ≥ 90 en login, tablero y recepción):**
-1. Revisión móvil (360 y 390 px, con capturas) de las pantallas ★ (conteos, consumo nuevo, pedidos lista/nuevo,
-   recepción de traspaso) más login y tablero. Barra de acción fija abajo donde falte (spec §4: "Nuevo pedido",
-   "Consumo"); objetivos táctiles ≥ 48 px; sin desbordes.
-2. Accesibilidad: escaneo axe en E2E (falla con violaciones serious/critical) en login, tablero, recepción y
-   pantallas ★; revisar labels, foco, contraste, `aria-live`, orden de tabulación. Script `npm run lighthouse`
-   para las tres pantallas con sesión (cookie de refresh del admin por API); resultado en este archivo.
-3. Estados vacíos con acción sugerida en todas las listas (botón en el estado vacío de `app-data-table` si hace
-   falta) y verificar que todo botón que guarda se deshabilite durante la petición.
-4. Build de producción: `ng build` sin avisos; construir la imagen `frontend/Dockerfile` y probarla con Caddy
-   (rutas profundas con F5, proxy `/api`, compresión, caché).
-5. Subconjunto de Material Symbols (~4 MB → ~50 kB) con script manual de `fonttools` (Python, MIT; no instalado
-   aún: `pip install fonttools brotli`), woff2 versionado y prueba unitaria que falla si se usa un ícono fuera
-   del subconjunto.
-
-**Decisiones pendientes del usuario para F-16 (recomendación: sí a ambas):**
-- ¿Agregar como devDependencies **@axe-core/playwright 4.13.0 (MPL-2.0)** y **lighthouse 13.5.0 (Apache-2.0)**?
-- ¿Hacer el subconjunto de íconos (punto 5) o dejar la fuente completa?
+**Siguiente paso (al retomar):** backend (B-01..B-17) y frontend (F-01..F-16) terminados. No hay más tareas en
+`docs/specs/backend.md` §12 ni en `docs/specs/frontend.md` §11. Pendiente decidir con el cliente: piloto en una sucursal,
+contratación del hosting (DigitalOcean, ver `deploy/README.md`) y los puntos de "Pendientes y notas técnicas".
 Antes: `API_PORT=8090 docker compose -f deploy/docker-compose.dev.yml up -d` y `npm start` en `frontend/` (Node ≥ 24.15).
 La base de desarrollo tiene existencias de ejemplo: AJ-000006 (SUC-01 AZU-001 25 kg) y AJ-000007 (COM HAR-001 lote L-2409 100 kg).
 
@@ -444,6 +429,39 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
   final) no ve OC ni pedidos por aprobar ni la gráfica. No mueve inventario; **deja un usuario desactivado** por
   corrida.
 
+**Frontend (F-16):**
+- Paquetes nuevos (devDependencies): **@axe-core/playwright 4.13.0 (MPL-2.0)**, que trae axe-core 4.13.0 (MPL-2.0), y
+  **lighthouse 13.5.0 (Apache-2.0)**. `material-symbols` 0.47.5 (Apache-2.0) pasa a devDependency: solo es la fuente
+  de origen del subconjunto. Herramienta local, no npm: **fonttools + brotli (MIT)**, `pip install fonttools brotli`.
+- **Íconos:** subconjunto de Material Symbols Outlined (ejes fijos FILL 0, wght 400, opsz 24) con los 55 íconos usados:
+  **~4 MB → 7.6 kB**. `src/styles/fonts/material-symbols-outlined.subset.woff2` + `material-symbols.icons.json`
+  versionados; `styles/_material-symbols.scss` reemplaza al CSS del paquete. `npm run icons` regenera (script Node que
+  busca los íconos en `<mat-icon>` y en propiedades `icon:` + `scripts/subset-material-symbols.py`, que poda las
+  ligaduras por texto, porque el nombre del glifo no siempre es el del ícono). `npm run lint` corre `icons:check`, que
+  falla si se usa un ícono fuera del subconjunto.
+- **Móvil:** barra de acción fija abajo (`.sgo-action-bar` global, antes `.bottom-bar` duplicada en 4 pantallas) también
+  en consumo nuevo y pedido nuevo/editar. Barra superior < 600 px: se oculta el texto "SGO" (queda el ícono con
+  `aria-label`) y el selector de ubicación usa el espacio libre ("Ubicación activa" ya no se corta en 360 px); el
+  enlace de la marca mide 48 px. Migas de pan con área táctil de 24 px (WCAG 2.5.8). Revisión a 360 y 390 px de todas
+  las pantallas: sin scroll horizontal.
+- **Accesibilidad:** axe (WCAG 2.1 A/AA, falla con serious/critical) en el E2E nuevo `14-accessibility` (login con y
+  sin error, tablero y 10 listas, escritorio y celular) y dentro de los flujos de captura: conteo y consumo (E2E 05),
+  recepción de traspaso (06) y pedido y aprobación (12). Helper `e2e/support/a11y.ts` (espera a que terminen las
+  animaciones finitas). Las tarjetas del tablero ya no tienen `aria-label`: su nombre es el texto visible (WCAG 2.5.3).
+- **Lighthouse** (`npm run lighthouse`, accesibilidad con emulación de celular, falla < 90): **login 100, tablero 100,
+  recepción 100**, tanto en el servidor de desarrollo como en el build de producción servido por Caddy. Usa un
+  traspaso en tránsito y, si no hay, crea uno por API (1 kg de HAR-001, lote LH-2099, COM → SUC-01): esa corrida
+  **mueve inventario**. Reportes en `frontend/lighthouse-report/` (no se versiona).
+- **Estados vacíos:** acción sugerida en 11 listas más (consumos, conteos, ajustes, traspasos, pedidos, OC, OP,
+  usuarios, roles, ubicaciones, unidades), según el permiso y la pestaña (por ejemplo, "Nuevo traspaso" no aparece en
+  "En tránsito"). Todos los botones que guardan ya se deshabilitaban durante la petición; los diálogos solo devuelven
+  datos.
+- **Build de producción:** `ng build` sin avisos (inicial 377 kB, 103 kB transferidos). Imagen `frontend/Dockerfile`
+  construida y servida con `deploy/Caddyfile` en HTTP local, conectada a la API de desarrollo: rutas profundas con F5
+  → `index.html`; `/api` y `/health` pasan a la API; zstd/gzip; assets con hash `immutable` y HTML `no-cache`; E2E 01 y
+  14 en verde contra esa imagen. `.dockerignore` excluye los reportes.
+- Pruebas: 212 unitarias, lint y **32 E2E** en verde.
+
 ## Pendientes y notas técnicas
 
 - Dos recepciones simultáneas de **OC distintas** que crean el mismo lote nuevo del mismo artículo → una falla por el
@@ -455,8 +473,8 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
   muestra (el historial sí trae el nombre). Agregar el nombre en el backend cuando una pantalla lo necesite.
 - Ajustes y consumos no se cancelan (no hay endpoint en el spec); se corrige con otro ajuste.
 - `docs/specs/dominio.md` §6 ahora tiene 29 permisos (se agregó `logistics.transfers.special`).
-- **Frontend:** la fuente de Material Symbols pesa ~4 MB (se descarga una vez y queda en caché). Si pesa en celulares
-  de sucursal, en F-16 generar un subconjunto con solo los íconos usados.
+- ✅ **Resuelto (F-16): fuente de Material Symbols de ~4 MB.** Ahora es un subconjunto de 7.6 kB; un ícono nuevo
+  requiere `npm run icons` (Python con fonttools), y `npm run lint` avisa si falta.
 - ✅ **Resuelto (2026-09-25): sesión cerrada por "reuse detected".** Dos `/auth/refresh` casi simultáneos con la misma
   cookie (dos pestañas, doble F5) revocaban la sesión. Ahora: ventana de gracia de 30 s en el backend
   (`AuthService.ReuseGracePeriod`, también cubre la carrera `DbUpdateConcurrencyException`) y el frontend serializa el
@@ -487,6 +505,9 @@ cd ../frontend       # requiere Node >= 24.15
 npm ci
 npm start            # http://localhost:4200, proxy a la API en :8090
 npm test && npm run lint
+npm run e2e          # con la API y el frontend en marcha
+npm run lighthouse   # accesibilidad >= 90 en login, tablero y recepción
+npm run icons        # tras usar un ícono nuevo (Python con fonttools y brotli)
 ```
 
 - Credenciales locales (admin, JWT, Postgres) en `deploy/.env` (no se versiona; copia de `deploy/.env.example`).

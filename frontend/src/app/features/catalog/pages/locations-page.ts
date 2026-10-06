@@ -61,6 +61,8 @@ import { LocationDialog } from '../ui/location-dialog';
         [searchable]="true"
         searchPlaceholder="Buscar por código o nombre"
         emptyMessage="No hay ubicaciones con ese criterio."
+        [emptyActionLabel]="canManage ? 'Nueva ubicación' : undefined"
+        (emptyAction)="edit(null)"
         [rowClickable]="canManage"
         (rowClick)="edit($event)"
         (queryChange)="query.set($event)"
