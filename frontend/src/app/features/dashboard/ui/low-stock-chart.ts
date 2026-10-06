@@ -10,6 +10,7 @@ import {
   viewChild,
 } from '@angular/core';
 import type { Chart } from 'chart.js';
+import { ThemeService } from '../../../core/theme/theme.service';
 import type { LocationCount } from '../data-access/dashboard.api';
 
 const BAR_HEIGHT = 28;
@@ -62,6 +63,7 @@ export class LowStockChart {
   readonly selected = output<LocationCount>();
 
   private readonly canvas = viewChild.required<ElementRef<HTMLCanvasElement>>('canvas');
+  private readonly theme = inject(ThemeService);
   private chart: Chart<'bar'> | null = null;
 
   protected readonly height = () => this.data().length * BAR_HEIGHT + 40;
@@ -74,6 +76,8 @@ export class LowStockChart {
 
   constructor() {
     afterRenderEffect(() => {
+      // Se vuelve a dibujar al cambiar de tema: los colores del canvas no siguen al CSS.
+      this.theme.dark();
       void this.draw(this.data());
     });
     inject(DestroyRef).onDestroy(() => this.chart?.destroy());
@@ -89,12 +93,17 @@ export class LowStockChart {
       await import('chart.js');
     Chart.register(BarController, BarElement, CategoryScale, LinearScale, Tooltip);
 
-    const style = getComputedStyle(canvas);
-    const token = (name: string, fallback: string) =>
-      style.getPropertyValue(name).trim() || fallback;
+    // Los tokens de Material son light-dark(…): el navegador los resuelve en `color` de un elemento de prueba.
+    const probe = document.createElement('span');
+    canvas.parentElement!.append(probe);
+    const token = (name: string, fallback: string) => {
+      probe.style.color = `var(${name}, ${fallback})`;
+      return getComputedStyle(probe).color || fallback;
+    };
     const bar = token('--mat-sys-primary', '#005cbb');
     const ink = token('--mat-sys-on-surface-variant', '#44474e');
     const grid = token('--mat-sys-outline-variant', '#c4c6d0');
+    probe.remove();
 
     this.chart?.destroy();
     this.chart = new Chart(canvas, {

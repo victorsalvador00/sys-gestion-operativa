@@ -1,4 +1,33 @@
 <main class="login">
+  <button
+    mat-icon-button
+    type="button"
+    class="theme-toggle"
+    aria-label="Cambiar tema"
+    [matMenuTriggerFor]="themeMenu"
+  >
+    <mat-icon>{{ theme.dark() ? 'dark_mode' : 'light_mode' }}</mat-icon>
+  </button>
+  <mat-menu #themeMenu="matMenu" xPosition="before">
+    @for (option of themeOptions; track option.mode) {
+      <button
+        mat-menu-item
+        type="button"
+        role="menuitemradio"
+        [attr.aria-checked]="theme.mode() === option.mode"
+        (click)="theme.set(option.mode)"
+      >
+        <mat-icon>{{ option.icon }}</mat-icon>
+        <!-- Dentro del texto: Material pone todo <mat-icon> hijo directo como ícono inicial. -->
+        <span class="option">
+          <span>{{ option.label }}</span>
+          @if (theme.mode() === option.mode) {
+            <mat-icon class="checked" aria-hidden="true">check</mat-icon>
+          }
+        </span>
+      </button>
+    }
+  </mat-menu>
   <section class="card" aria-labelledby="login-title">
     <header class="brand">
       <mat-icon aria-hidden="true">storefront</mat-icon>

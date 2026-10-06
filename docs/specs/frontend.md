@@ -76,7 +76,7 @@ frontend/
   - Sidebar colapsable con el menú por módulo, **filtrado por permisos**.
   - Topbar con el selector de ubicación activa, el nombre del usuario y el menú (cambiar contraseña, salir).
   - En móvil, el sidebar se vuelve un drawer.
-- **Tema:** Material 3 (`mat.theme`) con la paleta primaria configurable en `styles/_theme.scss`; tokens propios en `styles/_tokens.scss`. Neutro y sobrio; soporta modo claro. El modo oscuro es opcional.
+- **Tema:** Material 3 (`mat.theme`) con la paleta primaria configurable en `styles/_theme.scss`; tokens propios en `styles/_tokens.scss`. Neutro y sobrio; modo claro, oscuro o según el sistema (elegido por dispositivo, ver `ThemeService`).
 - **Formatos (locale `es-MX`):**
   - Moneda: `$1,234.56`.
   - Cantidades: hasta 4 decimales sin ceros sobrantes, con la unidad al lado (`12.5 kg`).

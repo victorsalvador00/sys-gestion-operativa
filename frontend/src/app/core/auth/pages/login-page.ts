@@ -4,9 +4,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Router } from '@angular/router';
 import { toProblem } from '../../http/problem-details';
+import { THEME_OPTIONS, ThemeService } from '../../theme/theme.service';
 import { AuthService } from '../auth.service';
 
 /** Solo rutas internas: evita redirigir a otro sitio con `?returnUrl=//evil.com`. */
@@ -25,6 +27,7 @@ export function safeReturnUrl(url: string | null | undefined): string {
     MatInputModule,
     MatButtonModule,
     MatIconModule,
+    MatMenuModule,
     MatProgressSpinnerModule,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -34,6 +37,8 @@ export function safeReturnUrl(url: string | null | undefined): string {
 export class LoginPage {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  protected readonly theme = inject(ThemeService);
+  protected readonly themeOptions = THEME_OPTIONS;
 
   /** Query params (withComponentInputBinding). */
   readonly returnUrl = input<string>();

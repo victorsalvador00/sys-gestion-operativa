@@ -1,4 +1,5 @@
 .login {
+  position: relative;
   display: grid;
   place-items: center;
   min-height: 100%;
@@ -53,4 +54,24 @@ form {
   mat-spinner {
     margin-inline: auto;
   }
+}
+
+.theme-toggle {
+  position: absolute;
+  top: var(--sgo-space-2);
+  right: var(--sgo-space-2);
+}
+
+// Opción de tema: la marca de la elegida va al final del renglón.
+.option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sgo-space-4);
+  min-width: 10rem;
+}
+
+.checked {
+  margin: 0;
+  color: var(--mat-sys-primary);
 }

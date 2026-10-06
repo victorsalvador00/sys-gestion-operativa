@@ -16,6 +16,7 @@ import { map } from 'rxjs';
 import { AuthService } from '../../auth/auth.service';
 import { LocationContextService } from '../../context/location-context.service';
 import { provideAppDates } from '../../i18n/date-adapter';
+import { THEME_OPTIONS, ThemeService } from '../../theme/theme.service';
 import { filterMenu, MENU } from '../menu';
 
 /** Estructura base: barra superior, menú lateral filtrado por permisos y contenido. */
@@ -45,6 +46,8 @@ import { filterMenu, MENU } from '../menu';
 export class Shell {
   protected readonly auth = inject(AuthService);
   protected readonly locationContext = inject(LocationContextService);
+  protected readonly theme = inject(ThemeService);
+  protected readonly themeOptions = THEME_OPTIONS;
 
   protected readonly isMobile = toSignal(
     inject(BreakpointObserver)

@@ -50,6 +50,28 @@
       <span>{{ auth.user()?.email }}</span>
     </div>
     <mat-divider />
+    <div class="menu-label" aria-hidden="true">Tema</div>
+    <div role="group" aria-label="Tema">
+      @for (option of themeOptions; track option.mode) {
+        <button
+          mat-menu-item
+          type="button"
+          role="menuitemradio"
+          [attr.aria-checked]="theme.mode() === option.mode"
+          (click)="theme.set(option.mode)"
+        >
+          <mat-icon>{{ option.icon }}</mat-icon>
+          <!-- Dentro del texto: Material pone todo <mat-icon> hijo directo como ícono inicial. -->
+          <span class="option">
+            <span>{{ option.label }}</span>
+            @if (theme.mode() === option.mode) {
+              <mat-icon class="checked" aria-hidden="true">check</mat-icon>
+            }
+          </span>
+        </button>
+      }
+    </div>
+    <mat-divider />
     <a mat-menu-item routerLink="/perfil">
       <mat-icon>key</mat-icon>
       <span>Cambiar contraseña</span>

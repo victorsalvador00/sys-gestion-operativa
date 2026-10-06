@@ -462,6 +462,20 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
   14 en verde contra esa imagen. `.dockerignore` excluye los reportes.
 - Pruebas: 212 unitarias, lint y **32 E2E** en verde.
 
+**Frontend (tema claro/oscuro, 2026-10-06, después de F-16):**
+- `ThemeService` (`core/theme`): Claro, Oscuro o **Según el sistema** (default). Se guarda **en el navegador**
+  (`localStorage` `sgo.theme`, por dispositivo); "Según el sistema" borra la clave y sigue `prefers-color-scheme` en vivo.
+  Un script en `index.html` aplica el tema antes de que arranque Angular (sin destello claro).
+- Material 3 con `theme-type: color-scheme`: los tokens usan `light-dark()` y el tema lo decide `color-scheme`
+  (`html[data-theme]`). Los colores de estado y avisos (`_tokens.scss`) tienen variante oscura con `light-dark()`.
+- Selector en el menú del usuario (sección "Tema", `menuitemradio` con marca) y botón de ícono en la esquina del login.
+- La gráfica del tablero resuelve los colores con un elemento de prueba (los tokens ya no son colores literales) y se
+  vuelve a dibujar al cambiar de tema.
+- Íconos nuevos: `light_mode`, `dark_mode`, `brightness_auto`, `check` (59 en el subconjunto). `npm run icons` ahora
+  ignora los comentarios HTML (uno que mencionaba `<mat-icon>` ocultaba el ícono siguiente).
+- Pruebas: unitarias de `ThemeService` (219 en total) y E2E `15-theme` (login y app, escritorio y celular: persistencia
+  tras F5, "según el sistema" y **axe sin violaciones en modo oscuro**). 36 E2E en verde; Lighthouse 100/100/100.
+
 ## Pendientes y notas técnicas
 
 - ✅ **Resuelto (2026-10-06): lote nuevo en recepciones simultáneas y proveedor preferido simultáneo (antes 500).**

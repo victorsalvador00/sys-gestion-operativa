@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { ThemeService } from './core/theme/theme.service';
 
 @Component({
   selector: 'app-root',
@@ -7,4 +8,9 @@ import { RouterOutlet } from '@angular/router';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<router-outlet />',
 })
-export class App {}
+export class App {
+  constructor() {
+    // Desde el arranque: sigue los cambios del tema del sistema y conserva la elección del usuario.
+    inject(ThemeService);
+  }
+}

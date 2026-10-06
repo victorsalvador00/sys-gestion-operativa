@@ -74,6 +74,26 @@
   font: var(--mat-sys-body-medium);
 }
 
+.menu-label {
+  padding: var(--sgo-space-2) var(--sgo-space-4) 0;
+  font: var(--mat-sys-label-medium);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+// Opción de tema: la marca de la elegida va al final del renglón.
+.option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sgo-space-4);
+  min-width: 10rem;
+}
+
+.checked {
+  margin: 0;
+  color: var(--mat-sys-primary);
+}
+
 .user-info {
   display: flex;
   flex-direction: column;

@@ -67,7 +67,8 @@ function collectIcons() {
 
   for (const path of sourceFiles(sourceDir)) {
     const file = relative(root, path).replaceAll('\\', '/');
-    const text = readFileSync(path, 'utf8');
+    // Sin comentarios HTML: uno que mencione "<mat-icon>" haría que el regex se tragara el ícono siguiente.
+    const text = readFileSync(path, 'utf8').replace(/<!--[\s\S]*?-->/g, '');
 
     for (const [, content] of text.matchAll(/<mat-icon\b[^>]*>([\s\S]*?)<\/mat-icon>/g)) {
       const trimmed = content.trim();

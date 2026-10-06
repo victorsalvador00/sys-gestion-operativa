@@ -10,20 +10,30 @@
 @use 'styles/feedback';
 @use 'styles/material-overrides';
 
+// Claro y oscuro en una sola hoja: los tokens de Material usan light-dark(), así que el tema lo decide
+// `color-scheme`. Sin `data-theme` sigue al sistema; ThemeService lo fija a "light" o "dark".
 html {
   height: 100%;
-  color-scheme: light;
+  color-scheme: light dark;
   @include mat.theme(
     (
       color: (
         primary: theme.$primary-palette,
         tertiary: theme.$tertiary-palette,
-        theme-type: light,
+        theme-type: color-scheme,
       ),
       typography: Roboto,
       density: 0,
     )
   );
+}
+
+html[data-theme='light'] {
+  color-scheme: light;
+}
+
+html[data-theme='dark'] {
+  color-scheme: dark;
 }
 
 body {
