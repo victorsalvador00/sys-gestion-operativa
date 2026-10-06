@@ -26,7 +26,7 @@ describe('App', () => {
   it('sin sesión muestra el login', async () => {
     const el = await open('/');
     expect(TestBed.inject(Router).url).toBe('/login');
-    expect(el.querySelector('h1')?.textContent).toBe('SGO');
+    expect(el.querySelector('h1')?.textContent?.trim()).toBe('Bienvenido');
     expect(el.querySelector('button[type=submit]')?.textContent).toContain('Iniciar sesión');
   });
 

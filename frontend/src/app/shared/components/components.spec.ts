@@ -7,6 +7,7 @@ import { EsMxDateAdapter, provideAppDates } from '../../core/i18n/date-adapter';
 import { ConcurrencyDialog } from './concurrency-dialog/concurrency-dialog';
 import { ConflictHandler } from './dialogs.service';
 import { ShortagesDialog } from './shortages-dialog/shortages-dialog';
+import { Plexus } from './plexus/plexus';
 import { Stamp } from './stamp/stamp';
 import { StatusTag, statusColor } from './status-tag/status-tag';
 
@@ -123,5 +124,16 @@ describe('EsMxDateAdapter', () => {
       adapter.format(new Date(2026, 8, 5), { year: 'numeric', month: '2-digit', day: '2-digit' }),
     ).toBe('05/09/2026');
     expect(adapter.getFirstDayOfWeek()).toBe(1);
+  });
+});
+
+describe('app-plexus', () => {
+  it('es decorativo y no falla sin canvas (jsdom)', async () => {
+    const fixture = TestBed.createComponent(Plexus);
+    await fixture.whenStable();
+
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.getAttribute('aria-hidden')).toBe('true');
+    expect(el.querySelector('canvas')).not.toBeNull();
   });
 });

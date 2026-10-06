@@ -1,13 +1,12 @@
 import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Router } from '@angular/router';
 import { toProblem } from '../../http/problem-details';
+import { Plexus } from '../../../shared/components/plexus/plexus';
 import { THEME_OPTIONS, ThemeService } from '../../theme/theme.service';
 import { AuthService } from '../auth.service';
 
@@ -23,12 +22,11 @@ export function safeReturnUrl(url: string | null | undefined): string {
   selector: 'app-login-page',
   imports: [
     ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
     MatButtonModule,
     MatIconModule,
     MatMenuModule,
     MatProgressSpinnerModule,
+    Plexus,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './login-page.html',
@@ -51,6 +49,11 @@ export class LoginPage {
   protected readonly submitting = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly hidePassword = signal(true);
+
+  protected showError(control: 'email' | 'password'): boolean {
+    const { invalid, touched } = this.form.controls[control];
+    return invalid && touched;
+  }
 
   protected submit(): void {
     if (this.form.invalid || this.submitting()) {

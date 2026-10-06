@@ -1,4 +1,7 @@
 <main class="login">
+  <!-- Fondo de red de partículas (decorativo; fijo con "reducir movimiento"). -->
+  <app-plexus />
+
   <button
     mat-icon-button
     type="button"
@@ -28,14 +31,17 @@
       </button>
     }
   </mat-menu>
+
+  <header class="welcome">
+    <h1>Bienvenido</h1>
+    <p>Sistema de Gestión Operativa</p>
+  </header>
+
   <section class="card" aria-labelledby="login-title">
-    <header class="brand">
+    <h2 id="login-title" class="card-title">
       <mat-icon aria-hidden="true">storefront</mat-icon>
-      <div>
-        <h1 id="login-title">SGO</h1>
-        <p>Sistema de Gestión Operativa</p>
-      </div>
-    </header>
+      Iniciar sesión
+    </h2>
 
     @if (motivo() === 'contrasena') {
       <p class="notice notice-info" role="status">
@@ -47,40 +53,56 @@
     }
 
     <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
-      <mat-form-field appearance="outline">
-        <mat-label>Correo electrónico</mat-label>
-        <input matInput type="email" formControlName="email" autocomplete="username" required />
-        @if (form.controls.email.hasError('required')) {
-          <mat-error>Escribe tu correo.</mat-error>
-        } @else if (form.controls.email.hasError('email')) {
-          <mat-error>El correo no es válido.</mat-error>
-        }
-      </mat-form-field>
-
-      <mat-form-field appearance="outline">
-        <mat-label>Contraseña</mat-label>
+      <div class="field">
+        <label for="login-email">Correo electrónico</label>
         <input
-          matInput
-          [type]="hidePassword() ? 'password' : 'text'"
-          formControlName="password"
-          autocomplete="current-password"
+          id="login-email"
+          type="email"
+          formControlName="email"
+          autocomplete="username"
           required
+          [attr.aria-invalid]="showError('email')"
+          [attr.aria-describedby]="showError('email') ? 'login-email-error' : null"
         />
-        <button
-          mat-icon-button
-          matSuffix
-          type="button"
-          (click)="hidePassword.set(!hidePassword())"
-          [attr.aria-label]="hidePassword() ? 'Mostrar contraseña' : 'Ocultar contraseña'"
-        >
-          <mat-icon>{{ hidePassword() ? 'visibility' : 'visibility_off' }}</mat-icon>
-        </button>
-        @if (form.controls.password.hasError('required')) {
-          <mat-error>Escribe tu contraseña.</mat-error>
+        @if (showError('email')) {
+          <p class="field-error" id="login-email-error">
+            {{
+              form.controls.email.hasError('required')
+                ? 'Escribe tu correo.'
+                : 'El correo no es válido.'
+            }}
+          </p>
         }
-      </mat-form-field>
+      </div>
 
-      <button mat-flat-button type="submit" class="submit" [disabled]="submitting()">
+      <div class="field">
+        <label for="login-password">Contraseña</label>
+        <div class="password">
+          <input
+            id="login-password"
+            [type]="hidePassword() ? 'password' : 'text'"
+            formControlName="password"
+            autocomplete="current-password"
+            required
+            [attr.aria-invalid]="showError('password')"
+            [attr.aria-describedby]="showError('password') ? 'login-password-error' : null"
+          />
+          <button
+            mat-icon-button
+            type="button"
+            class="reveal"
+            (click)="hidePassword.set(!hidePassword())"
+            [attr.aria-label]="hidePassword() ? 'Mostrar contraseña' : 'Ocultar contraseña'"
+          >
+            <mat-icon>{{ hidePassword() ? 'visibility' : 'visibility_off' }}</mat-icon>
+          </button>
+        </div>
+        @if (showError('password')) {
+          <p class="field-error" id="login-password-error">Escribe tu contraseña.</p>
+        }
+      </div>
+
+      <button type="submit" class="submit" [disabled]="submitting()">
         @if (submitting()) {
           <mat-spinner diameter="20" aria-label="Iniciando sesión" />
         } @else {

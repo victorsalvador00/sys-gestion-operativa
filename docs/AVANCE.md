@@ -485,6 +485,13 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
   el ícono y tres cuadritos a la derecha en la página actual; hover y foco la iluminan (contorno de foco visible); menú
   contraído: solo el bloque. Un tono por estado (no opacidad) para mantener contraste ≥ 3:1 del ícono. Se desactivaron
   el indicador activo y las capas de estado de Material en esos items. Respeta `prefers-reduced-motion`.
+- **Login rediseñado** (referencia del cliente, sin la imagen de fondo): "Bienvenido / Sistema de Gestión Operativa" a
+  la izquierda y tarjeta translúcida a la derecha (en celular, apilados). Claro: morados de la referencia
+  (#3D12A0 → #9C218B, tarjeta #440A70, botón #9B3CC9 → #5A0A85); oscuro: azul neón (botón #19D3FF → #3D7BFF con
+  texto #001233). Campos nativos en píldora con etiqueta arriba, errores con `aria-describedby` y contorno de error;
+  sin "Recordarme", "Registrarse" ni "¿Olvidaste tu contraseña?" (sin función en el SGO). Fondo: red de partículas
+  **plexus** (`shared/components/plexus`, canvas sin librerías: nodos que flotan unidos por líneas; cantidad según el
+  tamaño, cuadro fijo con "reducir movimiento", colores por tema).
 - Pruebas: unitarias de `ThemeService` (219 en total) y E2E `15-theme` (login y app, escritorio y celular: persistencia
   tras F5, "según el sistema" y **axe sin violaciones en modo oscuro**). 36 E2E en verde; Lighthouse 100/100/100.
 
