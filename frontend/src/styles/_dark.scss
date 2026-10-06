@@ -1,0 +1,56 @@
+// Tema oscuro "neón azul": texto, líneas y controles en azul en lugar de blanco o gris (pedido del cliente,
+// referencia: líneas de circuito azul sobre fondo oscuro). Solo se sobrescriben los tokens de Material que dan
+// color al texto, a las líneas y a los controles; las superficies siguen siendo las grises oscuras de Material 3
+// y los colores de estado (rojo, verde, naranja, amarillo) conservan su significado.
+//
+// Contraste sobre las superficies oscuras (#111318 a #282a2f): texto ≥ 4.5:1, líneas ≥ 3:1 (axe en E2E 15).
+
+$text: #90befe; // centro brillante de las líneas
+$text-muted: #6f9dff;
+$line: #2a63ff; // cuerpo de las líneas
+$line-soft: #1f4fd6;
+$primary: #4f86ff;
+$glow: rgb(42 99 255 / 45%);
+
+/** Aplica `@content` con el tema oscuro, elegido a mano o por el sistema (ver ThemeService). */
+@mixin when-dark {
+  html[data-theme='dark'] {
+    @content;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    html:not([data-theme='light']) {
+      @content;
+    }
+  }
+}
+
+@include when-dark {
+  --mat-sys-on-surface: #{$text};
+  --mat-sys-on-background: #{$text};
+  --mat-sys-on-surface-variant: #{$text-muted};
+  --mat-sys-outline: #{$line};
+  --mat-sys-outline-variant: #{$line-soft};
+  --mat-sys-primary: #{$primary};
+  --mat-sys-on-primary: #000;
+  --mat-sys-secondary-container: #0b2a73;
+  --mat-sys-on-secondary-container: #{$text};
+
+  // Resplandor sutil en líneas y foco; el texto queda nítido.
+  --sgo-glow: 0 0 6px #{$glow};
+  --sgo-focus-glow: 0 0 8px 2px #{$glow};
+
+  // Tarjetas y contornos de los campos de Material.
+  .mat-mdc-card-outlined {
+    box-shadow: var(--sgo-glow);
+  }
+
+  .mdc-notched-outline {
+    filter: drop-shadow(0 0 2px #{$glow});
+  }
+
+  // Los campos de Material ya resaltan su contorno al enfocarse: el resplandor iría dentro del campo.
+  :focus-visible:not(.mat-mdc-input-element, .mat-mdc-select, .mat-mdc-autocomplete-trigger) {
+    box-shadow: var(--sgo-focus-glow);
+  }
+}

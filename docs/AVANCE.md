@@ -473,6 +473,12 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
   vuelve a dibujar al cambiar de tema.
 - Íconos nuevos: `light_mode`, `dark_mode`, `brightness_auto`, `check` (59 en el subconjunto). `npm run icons` ahora
   ignora los comentarios HTML (uno que mencionaba `<mat-icon>` ocultaba el ícono siguiente).
+- **Oscuro "neón azul"** (pedido del cliente con imagen de referencia: líneas de circuito azul): `styles/_dark.scss`
+  sobrescribe solo en oscuro los tokens de texto, líneas y controles: texto #90BEFE, secundario #6F9DFF, líneas
+  #2A63FF / #1F4FD6, primario #4F86FF con texto negro, elemento activo del menú #0B2A73. Fondo gris oscuro de Material
+  (el cliente lo prefirió al negro puro); estados y errores conservan rojo/verde/naranja/amarillo. Resplandor sutil
+  (`--sgo-glow`, `--sgo-focus-glow`) en tarjetas, contornos de campos, tabla, barra de acción y foco (no en el texto ni
+  dentro de los campos).
 - Pruebas: unitarias de `ThemeService` (219 en total) y E2E `15-theme` (login y app, escritorio y celular: persistencia
   tras F5, "según el sistema" y **axe sin violaciones en modo oscuro**). 36 E2E en verde; Lighthouse 100/100/100.
 

@@ -10,6 +10,7 @@
 .frame {
   position: relative;
   border: 1px solid var(--mat-sys-outline-variant);
+  box-shadow: var(--sgo-glow);
   border-radius: var(--sgo-radius);
   overflow: hidden;
   background: var(--mat-sys-surface);

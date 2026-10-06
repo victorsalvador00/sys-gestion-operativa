@@ -117,6 +117,7 @@ import { LowStockChart } from '../ui/low-stock-chart';
       border: 1px solid var(--mat-sys-outline-variant);
       border-radius: var(--mat-sys-corner-medium);
       background: var(--mat-sys-surface);
+      box-shadow: var(--sgo-glow);
       color: var(--mat-sys-on-surface);
       text-decoration: none;
     }

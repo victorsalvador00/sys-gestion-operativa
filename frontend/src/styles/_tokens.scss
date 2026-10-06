@@ -13,6 +13,9 @@
   --sgo-sidebar-collapsed-width: 72px;
   --sgo-content-max-width: 1440px;
   --sgo-radius: 8px;
+  // Resplandor de líneas y foco: solo en el tema oscuro (_dark.scss).
+  --sgo-glow: none;
+  --sgo-focus-glow: none;
 
   // Colores de estado (spec frontend §4), usados por app-status-tag y los avisos; claro y oscuro con light-dark().
   --sgo-status-gray-bg: light-dark(#eceff1, #2c3338);
