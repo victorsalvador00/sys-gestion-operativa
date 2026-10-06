@@ -25,7 +25,10 @@
   flex: 0 0 auto;
   gap: var(--sgo-space-2);
   height: var(--sgo-topbar-height);
-  border-bottom: 1px solid var(--mat-sys-outline-variant);
+
+  .mat-mdc-icon-button {
+    color: inherit;
+  }
 }
 
 .brand {
@@ -41,7 +44,7 @@
 
 .brand-name {
   font: var(--mat-sys-title-large);
-  color: var(--mat-sys-primary);
+  font-weight: 600;
 
   // En celular el selector de ubicación necesita el espacio; queda el ícono (el enlace tiene aria-label).
   @media (max-width: 599.98px) {
@@ -52,7 +55,7 @@
 .brand-subtitle,
 .location-label {
   font: var(--mat-sys-body-medium);
-  color: var(--mat-sys-on-surface-variant);
+  opacity: 0.85;
 }
 
 .brand-subtitle {
@@ -69,7 +72,7 @@
     width: auto;
     min-width: 0;
   }
-  // Compacto para que la etiqueta flotante quepa en la barra superior.
+  // Píldora compacta sin etiqueta flotante (el nombre va en aria-label) dentro de la barra superior.
   @include mat.form-field-density(-4);
   font: var(--mat-sys-body-medium);
 }

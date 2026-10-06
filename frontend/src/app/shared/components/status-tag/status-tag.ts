@@ -42,9 +42,11 @@ export function statusColor(status: string): StatusColor {
     :host {
       display: inline-flex;
       align-items: center;
-      padding: 2px 10px;
+      gap: 6px;
+      padding: 5px 14px;
       border-radius: 999px;
-      font: var(--mat-sys-label-medium);
+      font: var(--mat-sys-label-large);
+      font-weight: 500;
       white-space: nowrap;
     }
     :host(.tag-gray) {
@@ -62,6 +64,16 @@ export function statusColor(status: string): StatusColor {
     :host(.tag-green) {
       background: var(--sgo-status-green-bg);
       color: var(--sgo-status-green-fg);
+    }
+    /* Palomita de los estados terminados, dibujada (no es texto: no la lee el lector de pantalla). */
+    :host(.tag-green)::before {
+      content: '';
+      width: 5px;
+      height: 10px;
+      margin: -3px 2px 0 1px;
+      border: solid currentColor;
+      border-width: 0 2px 2px 0;
+      rotate: 45deg;
     }
     :host(.tag-orange) {
       background: var(--sgo-status-orange-bg);

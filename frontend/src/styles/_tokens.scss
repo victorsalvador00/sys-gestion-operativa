@@ -13,6 +13,21 @@
   --sgo-sidebar-collapsed-width: 72px;
   --sgo-content-max-width: 1440px;
   --sgo-radius: 8px;
+  // Estilo de pantallas (_ui.scss): fondo lavanda, tarjetas blancas con sombra suave, campos y botones en píldora.
+  --sgo-page-bg: light-dark(#f3f4f9, #0d0f14);
+  --sgo-card-bg: light-dark(#ffffff, #14171e);
+  --sgo-card-border: light-dark(transparent, #1f4fd6);
+  --sgo-card-radius: 14px;
+  --sgo-card-shadow: 0 2px 12px rgb(35 40 80 / 7%);
+  --sgo-row-alt: light-dark(#f8f9fc, rgb(42 99 255 / 5%));
+  --sgo-row-hover: light-dark(#eef1fa, rgb(42 99 255 / 11%));
+  --sgo-row-divider: light-dark(#eceef5, rgb(42 99 255 / 22%));
+  --sgo-pill-bg: light-dark(#ffffff, #10141d);
+  --sgo-pill-border: light-dark(#dfe3ee, #2a63ff);
+  --sgo-soft-bg: light-dark(#eceff7, rgb(42 99 255 / 14%));
+  --sgo-topbar-bg: light-dark(#005cbb, #0a1733);
+  --sgo-topbar-ink: light-dark(#ffffff, #90befe);
+
   // Resplandor de líneas y foco: solo en el tema oscuro (_dark.scss).
   --sgo-glow: none;
   --sgo-focus-glow: none;

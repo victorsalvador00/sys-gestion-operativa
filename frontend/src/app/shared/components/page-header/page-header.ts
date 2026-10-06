@@ -80,6 +80,7 @@ import { BreadcrumbsService, Crumb } from '../../../core/layout/breadcrumbs';
     h1 {
       margin: 0;
       font: var(--mat-sys-headline-small);
+      font-weight: 600;
     }
     p {
       margin: var(--sgo-space-1) 0 0;

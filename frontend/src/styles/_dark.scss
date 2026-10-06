@@ -40,10 +40,8 @@ $glow: rgb(42 99 255 / 45%);
   --sgo-glow: 0 0 6px #{$glow};
   --sgo-focus-glow: 0 0 8px 2px #{$glow};
 
-  // Tarjetas y contornos de los campos de Material.
-  .mat-mdc-card-outlined {
-    box-shadow: var(--sgo-glow);
-  }
+  // Las tarjetas (_ui.scss) brillan en lugar de proyectar sombra.
+  --sgo-card-shadow: var(--sgo-glow);
 
   .mdc-notched-outline {
     filter: drop-shadow(0 0 2px #{$glow});

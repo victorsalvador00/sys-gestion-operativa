@@ -492,6 +492,15 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
   sin "Recordarme", "Registrarse" ni "¿Olvidaste tu contraseña?" (sin función en el SGO). Fondo: red de partículas
   **plexus** (`shared/components/plexus`, canvas sin librerías: nodos que flotan unidos por líneas; cantidad según el
   tamaño, cuadro fijo con "reducir movimiento", colores por tema).
+- **Estilo de pantallas** (referencia del cliente; acento azul conservado): `styles/_ui.scss` + tokens `--sgo-page-bg`,
+  `--sgo-card-*`, `--sgo-row-*`, `--sgo-pill-*`, `--sgo-soft-bg`, `--sgo-topbar-*`. Fondo lavanda, tarjetas blancas con
+  sombra suave (en oscuro: resplandor), campos de Material en píldora rellena (radio 12 px dentro de tablas de captura
+  para no ensancharlas), botón principal con sombra, secundario en píldora suave sin contorno, botones de ícono del
+  contenido en círculo, pestañas con subrayado de 3 px. `app-data-table`: renglones de 64 px, divisores suaves,
+  alternancia y hover; en celular cada renglón es una tarjeta separada (se desplaza por dentro si su detalle es
+  ancho). Etiquetas de estado más grandes, con palomita dibujada con CSS en los estados verdes (no es texto). Barra
+  superior de color (azul en claro, azul marino en oscuro) con el selector de ubicación en píldora sin etiqueta
+  flotante (`aria-label="Ubicación activa"`). Títulos de página en negrita.
 - Pruebas: unitarias de `ThemeService` (219 en total) y E2E `15-theme` (login y app, escritorio y celular: persistencia
   tras F5, "según el sistema" y **axe sin violaciones en modo oscuro**). 36 E2E en verde; Lighthouse 100/100/100.
 

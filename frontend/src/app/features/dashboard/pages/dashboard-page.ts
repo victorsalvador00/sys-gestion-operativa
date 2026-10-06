@@ -114,15 +114,15 @@ import { LowStockChart } from '../ui/low-stock-chart';
       height: 100%;
       box-sizing: border-box;
       padding: var(--sgo-space-4);
-      border: 1px solid var(--mat-sys-outline-variant);
-      border-radius: var(--mat-sys-corner-medium);
-      background: var(--mat-sys-surface);
-      box-shadow: var(--sgo-glow);
+      border: 1px solid var(--sgo-card-border);
+      border-radius: var(--sgo-card-radius);
+      background: var(--sgo-card-bg);
+      box-shadow: var(--sgo-card-shadow);
       color: var(--mat-sys-on-surface);
       text-decoration: none;
     }
     a.card:hover {
-      background: var(--mat-sys-surface-container-low);
+      background: var(--sgo-row-hover);
     }
     a.card:focus-visible {
       outline: 2px solid var(--mat-sys-primary);

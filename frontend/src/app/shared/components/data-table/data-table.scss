@@ -1,5 +1,22 @@
+@use '@angular/material' as mat;
+
 :host {
   display: block;
+  // Renglones amplios con divisores suaves (estilo de pantallas, _ui.scss).
+  @include mat.table-overrides(
+    (
+      background-color: transparent,
+      header-container-height: 52px,
+      row-item-container-height: 64px,
+      row-item-outline-color: var(--sgo-row-divider),
+      header-headline-color: var(--mat-sys-on-surface-variant),
+    )
+  );
+  @include mat.paginator-overrides(
+    (
+      container-background-color: transparent,
+    )
+  );
 }
 
 .search {
@@ -9,11 +26,27 @@
 
 .frame {
   position: relative;
-  border: 1px solid var(--mat-sys-outline-variant);
-  box-shadow: var(--sgo-glow);
-  border-radius: var(--sgo-radius);
+  border: 1px solid var(--sgo-card-border);
+  box-shadow: var(--sgo-card-shadow);
+  border-radius: var(--sgo-card-radius);
   overflow: hidden;
-  background: var(--mat-sys-surface);
+  background: var(--sgo-card-bg);
+
+  // En celular cada renglón es su propia tarjeta.
+  &:has(.cards) {
+    border: 0;
+    box-shadow: none;
+    overflow: visible;
+    background: transparent;
+  }
+}
+
+tr.mat-mdc-row:nth-child(even of .mat-mdc-row:not(.detail-row)) {
+  background: var(--sgo-row-alt);
+}
+
+tr.mat-mdc-row:not(.detail-row):hover {
+  background: var(--sgo-row-hover);
 }
 
 .scroll {
@@ -30,25 +63,25 @@ table {
 
 tr.clickable {
   cursor: pointer;
-
-  &:hover {
-    background: var(--mat-sys-surface-container-low);
-  }
 }
 
 .cards {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: var(--sgo-space-2);
   margin: 0;
   padding: 0;
   list-style: none;
-  background: var(--mat-sys-outline-variant);
 }
 
 .card {
+  min-width: 0;
+  overflow-x: auto; // un detalle ancho (tabla de lotes) se desplaza dentro de la tarjeta, no la página
   padding: var(--sgo-space-3) var(--sgo-space-4);
-  background: var(--mat-sys-surface);
+  border: 1px solid var(--sgo-card-border);
+  border-radius: var(--sgo-card-radius);
+  background: var(--sgo-card-bg);
+  box-shadow: var(--sgo-card-shadow);
 
   &.clickable {
     cursor: pointer;
