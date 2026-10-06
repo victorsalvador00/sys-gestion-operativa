@@ -479,6 +479,12 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
   (el cliente lo prefirió al negro puro); estados y errores conservan rojo/verde/naranja/amarillo. Resplandor sutil
   (`--sgo-glow`, `--sgo-focus-glow`) en tarjetas, contornos de campos, tabla, barra de acción y foco (no en el texto ni
   dentro de los campos).
+- **Menú lateral con "etiqueta"** (pedido del cliente con imagen de referencia de pngtree: con marca de agua y licencia de
+  pago, así que **se recreó con CSS puro**, sin usar el archivo): `styles/_nav-tag.scss` + tokens `--sgo-tag-*` en
+  `_tokens.scss` (claro y oscuro con `light-dark()`). Barra inclinada tenue con resplandor radial, bloque inclinado tras
+  el ícono y tres cuadritos a la derecha en la página actual; hover y foco la iluminan (contorno de foco visible); menú
+  contraído: solo el bloque. Un tono por estado (no opacidad) para mantener contraste ≥ 3:1 del ícono. Se desactivaron
+  el indicador activo y las capas de estado de Material en esos items. Respeta `prefers-reduced-motion`.
 - Pruebas: unitarias de `ThemeService` (219 en total) y E2E `15-theme` (login y app, escritorio y celular: persistencia
   tras F5, "según el sistema" y **axe sin violaciones en modo oscuro**). 36 E2E en verde; Lighthouse 100/100/100.
 

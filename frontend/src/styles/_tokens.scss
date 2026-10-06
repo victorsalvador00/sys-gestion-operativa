@@ -30,4 +30,18 @@
   --sgo-status-orange-fg: light-dark(#a64200, #ffb870);
   --sgo-status-red-bg: light-dark(#ffebee, #3d1214);
   --sgo-status-red-fg: light-dark(#b71c1c, #f4a3a3);
+
+  // Etiqueta del menú lateral (barra inclinada con bloque tras el ícono). Un tono por estado en lugar de
+  // opacidad, para que el ícono conserve contraste ≥ 3:1 sobre el bloque en los dos temas.
+  --sgo-tag-bar: light-dark(#eef3fd, #0a1733);
+  --sgo-tag-bar-active: light-dark(#dce7fd, #071a46);
+  --sgo-tag-glow: light-dark(rgb(79 134 255 / 30%), rgb(42 99 255 / 55%));
+  --sgo-tag-block-from: light-dark(#d3e1fd, #164bb8);
+  --sgo-tag-block-to: light-dark(#b3cbfb, #0b2a73);
+  --sgo-tag-block-active-from: light-dark(#4f86ff, #19d3ff);
+  --sgo-tag-block-active-to: light-dark(#0045a8, #2a63ff);
+  --sgo-tag-icon: light-dark(#003b8e, #90befe);
+  --sgo-tag-icon-active: light-dark(#ffffff, #001233);
+  --sgo-tag-text-active: light-dark(#002a6b, #cfe2ff);
+  --sgo-tag-dots: light-dark(#0045a8, #19d3ff);
 }

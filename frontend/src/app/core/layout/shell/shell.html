@@ -91,7 +91,7 @@
     [opened]="menuOpened()"
     (closedStart)="closeMobileMenu()"
   >
-    <nav aria-label="Menú principal">
+    <nav aria-label="Menú principal" [class.sgo-nav-collapsed]="showCollapsed()">
       @for (section of menu(); track section.label) {
         @if (showCollapsed()) {
           @if (!$first) {
@@ -104,6 +104,7 @@
           @for (item of section.items; track item.route) {
             <a
               mat-list-item
+              class="sgo-nav-item"
               [routerLink]="item.route"
               routerLinkActive
               #rla="routerLinkActive"
@@ -116,9 +117,13 @@
               matTooltipPosition="right"
               (click)="closeMobileMenu()"
             >
+              <span class="sgo-nav-tag" aria-hidden="true">
+                <span class="sgo-nav-tag-block"></span>
+                <span class="sgo-nav-tag-dots"></span>
+              </span>
               <mat-icon matListItemIcon aria-hidden="true">{{ item.icon }}</mat-icon>
               @if (!showCollapsed()) {
-                <span matListItemTitle class="item-label">{{ item.label }}</span>
+                <span matListItemTitle class="item-label sgo-nav-label">{{ item.label }}</span>
               }
             </a>
           }
