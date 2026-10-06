@@ -27,6 +27,7 @@ import { RequisitionDto, RequisitionsApi } from '../data-access/requisitions.api
 import { ReasonDialog, ReasonDialogData } from '../ui/reason-dialog';
 import { RequisitionConversion } from '../ui/requisition-conversion';
 import { requisitionActions } from '../ui/requisition-lines';
+import { Stamp } from '../../../shared/components/stamp/stamp';
 
 /**
  * Detalle de una requisición: líneas con proveedor y precio estimados, fechas de cada paso y las
@@ -36,6 +37,7 @@ import { requisitionActions } from '../ui/requisition-lines';
 @Component({
   selector: 'app-requisition-detail-page',
   imports: [
+    Stamp,
     RouterLink,
     DatePipe,
     MatCardModule,

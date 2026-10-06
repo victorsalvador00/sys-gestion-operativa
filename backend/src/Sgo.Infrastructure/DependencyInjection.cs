@@ -47,6 +47,7 @@ public static class DependencyInjection
             .AddInterceptors(sp.GetRequiredService<TimestampsInterceptor>(), sp.GetRequiredService<AuditInterceptor>()));
         services.AddScoped<ISgoDbContext>(sp => sp.GetRequiredService<SgoDbContext>());
         services.AddScoped<IFolioGenerator, FolioGenerator>();
+        services.AddScoped<ITransactionLocks, PostgresTransactionLocks>();
 
         services.AddIdentityCore<AppUser>(options =>
             {
@@ -80,6 +81,7 @@ public static class DependencyInjection
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IRoleService, RoleService>();
         services.AddScoped<IAuditLogQueries, AuditLogQueries>();
+        services.AddScoped<IUserDirectory, UserDirectory>();
         services.AddScoped<ILocationService, LocationService>();
         services.AddScoped<IUnitOfMeasureService, UnitOfMeasureService>();
         services.AddScoped<IItemCategoryService, ItemCategoryService>();

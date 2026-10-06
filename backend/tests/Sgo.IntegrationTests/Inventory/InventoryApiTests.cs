@@ -88,6 +88,12 @@ public class InventoryApiTests(SgoApiFactory factory)
         // Newest first, in the exact order they were posted: +10 L-A, +6 L-B, then FEFO −6 L-B, −2 L-A.
         Assert.Equal(new decimal?[] { 8, 10, 16, 10 }, kardex.Items.Select(k => k.BalanceAfter));
         Assert.Equal(["L-A", "L-B", "L-B", "L-A"], kardex.Items.Select(k => k.LotNumber!));
+
+        var adminName = (await admin.GetJsonAsync<Sgo.Application.Security.MeDto>("/api/v1/me"))!.FullName;
+        Assert.All(kardex.Items, k => Assert.Equal(adminName, k.UserName));
+        Assert.Equal(adminName, created.CreatedByName);
+        var listed = (await admin.GetJsonAsync<PagedResult<AdjustmentListItemDto>>($"/api/v1/adjustments?locationId={location}&q={created.Folio}"))!;
+        Assert.Equal(adminName, Assert.Single(listed.Items).CreatedByName);
     }
 
     [Fact]

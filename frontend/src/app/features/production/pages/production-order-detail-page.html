@@ -55,7 +55,7 @@
           </div>
           <div>
             <dt>Creada</dt>
-            <dd>{{ o.createdAt | date: 'dd/MM/yyyy HH:mm' }}</dd>
+            <dd><app-stamp [at]="o.createdAt" [by]="o.createdByName" /></dd>
           </div>
           @if (o.releasedAt) {
             <div>
@@ -66,7 +66,7 @@
           @if (o.status === 'Completed') {
             <div>
               <dt>Completada</dt>
-              <dd>{{ o.completedAt | date: 'dd/MM/yyyy HH:mm' }}</dd>
+              <dd><app-stamp [at]="o.completedAt" [by]="o.completedByName" /></dd>
             </div>
             <div>
               <dt>Producido</dt>

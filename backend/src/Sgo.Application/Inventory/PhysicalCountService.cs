@@ -47,7 +47,7 @@ public sealed record PhysicalCountLineDto(
 
 public sealed record PhysicalCountDto(
     Guid Id, string Folio, Guid LocationId, string LocationCode, Guid? CategoryId, PhysicalCountStatus Status, string? Notes,
-    DateTimeOffset CreatedAt, DateTimeOffset? StartedAt, DateTimeOffset? ClosedAt,
+    DateTimeOffset CreatedAt, Guid? CreatedBy, string? CreatedByName, DateTimeOffset? StartedAt, DateTimeOffset? ClosedAt,
     IReadOnlyList<PhysicalCountLineDto> Lines, IReadOnlyList<PostedMovementDto> Movements, uint Version);
 
 public sealed class CreatePhysicalCountRequestValidator : AbstractValidator<CreatePhysicalCountRequest>
@@ -92,6 +92,7 @@ public sealed class PhysicalCountService(
     IClock clock,
     IInventorySnapshotReader snapshots,
     ILotRegistry lots,
+    IUserDirectory userDirectory,
     IInventoryPostingService posting) : IPhysicalCountService
 {
     private static readonly Dictionary<string, Expression<Func<PhysicalCount, object?>>> SortColumns = new()
@@ -144,6 +145,8 @@ public sealed class PhysicalCountService(
     {
         var count = await FindAsync(id, ct);
         db.EnsureVersion(count, request.Version);
+        // A counted lot that does not exist yet is created here; the lot lock needs a transaction.
+        await using var tx = await db.Database.BeginTransactionAsync(ct);
 
         if (count.Status == PhysicalCountStatus.Draft)
         {
@@ -163,6 +166,7 @@ public sealed class PhysicalCountService(
 
         db.Entry(count).State = EntityState.Modified; // line-only edits still bump the version
         await db.SaveChangesAsync(ct);
+        await tx.CommitAsync(ct);
         return await ToDtoAsync(count, ct);
     }
 
@@ -280,8 +284,10 @@ public sealed class PhysicalCountService(
                 l.SnapshotQty, l.CountedQty, l.Difference))
             .OrderBy(l => l.Sku).ThenBy(l => l.LotNumber)
             .ToList();
+        var users = await userDirectory.GetNamesAsync([c.CreatedBy], ct);
 
-        return new PhysicalCountDto(c.Id, c.Folio, c.LocationId, location, c.CategoryId, c.Status, c.Notes, c.CreatedAt, c.StartedAt,
+        return new PhysicalCountDto(c.Id, c.Folio, c.LocationId, location, c.CategoryId, c.Status, c.Notes, c.CreatedAt, c.CreatedBy,
+            users.Of(c.CreatedBy), c.StartedAt,
             c.ClosedAt, lines,
             movements.Select(m => new PostedMovementDto(m.ItemId, items[m.ItemId].Sku, m.LotId,
                 m.LotId is { } id ? lotInfo.GetValueOrDefault(id)?.LotNumber : null, m.Quantity, m.UnitCost, m.TotalCost)).ToList(),

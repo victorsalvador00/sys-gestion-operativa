@@ -105,6 +105,7 @@ describe('configuración', () => {
     version: 1,
     updatedAt: null,
     updatedBy: null,
+    updatedByName: null,
   };
 
   it('respeta mínimo, máximo y decimales del backend', () => {

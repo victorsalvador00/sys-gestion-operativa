@@ -29,6 +29,7 @@ import { GoodsReceiptsApi } from '../data-access/goods-receipts.api';
 import { PurchaseOrderDto, PurchaseOrdersApi } from '../data-access/purchase-orders.api';
 import { purchaseOrderActions, taxLabel } from '../ui/purchase-order-lines';
 import { ReasonDialog, ReasonDialogData } from '../ui/reason-dialog';
+import { Stamp } from '../../../shared/components/stamp/stamp';
 
 /**
  * Detalle de una OC: líneas con lo pedido, recibido y pendiente, totales con IVA, recepciones y las
@@ -37,6 +38,7 @@ import { ReasonDialog, ReasonDialogData } from '../ui/reason-dialog';
 @Component({
   selector: 'app-purchase-order-detail-page',
   imports: [
+    Stamp,
     RouterLink,
     DatePipe,
     MatCardModule,

@@ -65,6 +65,8 @@ const buildRecipe = (overrides: Partial<RecipeDto> = {}): RecipeDto => ({
     },
   ],
   createdAt: '2026-09-20T10:00:00Z',
+  createdBy: null,
+  createdByName: null,
   updatedAt: null,
   version: 7,
   ...overrides,
@@ -82,6 +84,8 @@ const versionRow = (recipe: RecipeDto): RecipeListItem => ({
   outputUomCode: recipe.outputUomCode,
   lineCount: recipe.lines.length,
   createdAt: recipe.createdAt,
+  createdBy: recipe.createdBy,
+  createdByName: recipe.createdByName,
   updatedAt: recipe.updatedAt,
 });
 

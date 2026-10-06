@@ -37,6 +37,7 @@ import {
   exceedsStock,
   toApproveRequest,
 } from '../ui/branch-order-lines';
+import { Stamp } from '../../../shared/components/stamp/stamp';
 
 /**
  * Detalle de un pedido de sucursal: lo solicitado, aprobado y despachado por artículo, sus traspasos
@@ -46,6 +47,7 @@ import {
 @Component({
   selector: 'app-branch-order-detail-page',
   imports: [
+    Stamp,
     RouterLink,
     DatePipe,
     ReactiveFormsModule,

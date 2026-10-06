@@ -57,6 +57,7 @@ const buildOrder = (overrides: Partial<ProductionOrderDto> = {}): ProductionOrde
   totalWasteCost: null,
   completedAt: null,
   completedBy: null,
+  completedByName: null,
   lines: [
     {
       id: 'l1',
@@ -76,6 +77,7 @@ const buildOrder = (overrides: Partial<ProductionOrderDto> = {}): ProductionOrde
   ],
   createdAt: '2026-09-28T09:00:00Z',
   createdBy: null,
+  createdByName: null,
   version: 3,
   ...overrides,
 });

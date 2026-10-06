@@ -120,7 +120,7 @@ public interface ISupplierService
     Task<ItemSupplierOffersDto> OffersAsync(Guid itemId, CancellationToken ct = default);
 }
 
-public sealed class SupplierService(ISgoDbContext db) : ISupplierService
+public sealed class SupplierService(ISgoDbContext db, ITransactionLocks locks) : ISupplierService
 {
     private static readonly Dictionary<string, Expression<Func<Supplier, object?>>> SortColumns = new()
     {
@@ -279,9 +279,14 @@ public sealed class SupplierService(ISgoDbContext db) : ISupplierService
         return new ItemSupplierOffersDto(item.Id, item.Sku, item.Name, item.UomCode, item.PurchaseToBaseFactor, item.BaseUomCode, offers);
     }
 
-    /// <summary>The partial unique index allows one preferred row per item: the old one must be saved first.</summary>
+    /// <summary>
+    /// The partial unique index allows one preferred row per item: the old one must be saved first. The lock makes
+    /// two simultaneous "preferred" changes for the same item run one after the other (the last one wins) instead of
+    /// the second breaking the index.
+    /// </summary>
     private async Task UnmarkCurrentPreferredAsync(Guid itemId, Guid? exceptId, CancellationToken ct)
     {
+        await locks.AcquireAsync(TransactionLockScopes.PreferredSupplier, itemId.ToString(), ct);
         var current = await db.SupplierItems.Where(i => i.ItemId == itemId && i.IsPreferred && i.Id != exceptId).ToListAsync(ct);
         if (current.Count == 0) return;
         foreach (var row in current)

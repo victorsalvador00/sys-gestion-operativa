@@ -59,9 +59,9 @@ public sealed record TransferLineDto(
 public sealed record TransferDto(
     Guid Id, string Folio, TransferLocationDto From, TransferLocationDto To, Guid? BranchOrderId, string? BranchOrderFolio,
     TransferStatus Status, string? Notes,
-    string? VehicleDescription, string? DriverName, DateTimeOffset? DispatchedAt, Guid? DispatchedBy,
-    DateTimeOffset? ReceivedAt, Guid? ReceivedBy, IReadOnlyList<TransferLineDto> Lines,
-    decimal ShippedValue, decimal TransitLossValue, DateTimeOffset CreatedAt, Guid? CreatedBy, uint Version);
+    string? VehicleDescription, string? DriverName, DateTimeOffset? DispatchedAt, Guid? DispatchedBy, string? DispatchedByName,
+    DateTimeOffset? ReceivedAt, Guid? ReceivedBy, string? ReceivedByName, IReadOnlyList<TransferLineDto> Lines,
+    decimal ShippedValue, decimal TransitLossValue, DateTimeOffset CreatedAt, Guid? CreatedBy, string? CreatedByName, uint Version);
 
 public sealed class TransferLineRequestValidator : AbstractValidator<TransferLineRequest>
 {
@@ -136,6 +136,7 @@ public sealed class TransferService(
     IFolioGenerator folios,
     IClock clock,
     ICurrentUser currentUser,
+    IUserDirectory userDirectory,
     IInventoryPostingService posting) : ITransferService
 {
     public const string SpecialRouteMessage =
@@ -393,10 +394,12 @@ public sealed class TransferService(
             .OrderBy(l => l.Sku).ThenBy(l => l.ExpirationDate).ToList();
 
         var orderFolios = await BranchOrderFoliosAsync([t.BranchOrderId], ct);
+        var users = await userDirectory.GetNamesAsync([t.DispatchedBy, t.ReceivedBy, t.CreatedBy], ct);
         return new TransferDto(t.Id, t.Folio, locations[t.FromLocationId], locations[t.ToLocationId], t.BranchOrderId,
             t.BranchOrderId is { } o ? orderFolios[o] : null, t.Status, t.Notes,
-            t.VehicleDescription, t.DriverName, t.DispatchedAt, t.DispatchedBy, t.ReceivedAt, t.ReceivedBy, lines,
+            t.VehicleDescription, t.DriverName, t.DispatchedAt, t.DispatchedBy, users.Of(t.DispatchedBy), t.ReceivedAt, t.ReceivedBy,
+            users.Of(t.ReceivedBy), lines,
             lines.Sum(l => InventoryMath.Round(l.ShippedQty * (l.UnitCost ?? 0))), lines.Sum(l => l.ShortValue ?? 0),
-            t.CreatedAt, t.CreatedBy, t.Version);
+            t.CreatedAt, t.CreatedBy, users.Of(t.CreatedBy), t.Version);
     }
 }

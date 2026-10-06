@@ -172,7 +172,7 @@
             </div>
             <div>
               <dt>Creada</dt>
-              <dd>{{ r.createdAt | date: 'dd/MM/yyyy HH:mm' }}</dd>
+              <dd><app-stamp [at]="r.createdAt" [by]="r.createdByName" /></dd>
             </div>
             @if (r.notes) {
               <div>
@@ -226,7 +226,9 @@
                     </a>
                   }
                   <span class="meta">
-                    Creada {{ version.createdAt | date: 'dd/MM/yyyy HH:mm' }} · rinde
+                    Creada {{ version.createdAt | date: 'dd/MM/yyyy HH:mm'
+                    }}{{ version.createdByName ? ' por ' + version.createdByName : '' }}
+                    · rinde
                     {{ version.yieldQty | qty: version.outputUomCode }} ·
                     {{ version.lineCount }} componentes ·
                     {{ version.isUsed ? 'usada en órdenes' : 'sin usar' }}

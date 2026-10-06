@@ -47,6 +47,8 @@ const buildCount = (overrides: Partial<PhysicalCountDto> = {}): PhysicalCountDto
   status: 'InProgress',
   notes: null,
   createdAt: '2026-09-26T10:00:00Z',
+  createdBy: null,
+  createdByName: null,
   startedAt: '2026-09-26T10:05:00Z',
   closedAt: null,
   lines: [

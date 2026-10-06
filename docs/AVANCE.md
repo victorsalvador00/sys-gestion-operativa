@@ -1,6 +1,6 @@
 # Avance del SGO (backend y frontend)
 
-> Bitácora de trabajo para retomar entre sesiones. Última actualización: 2026-10-06.
+> Bitácora de trabajo para retomar entre sesiones. Última actualización: 2026-10-06 (pendientes técnicos).
 > Fuente de verdad de reglas: `docs/specs/dominio.md`; tareas: `docs/specs/backend.md` §12.
 
 ## Estado por tarea
@@ -464,13 +464,20 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
 
 ## Pendientes y notas técnicas
 
-- Dos recepciones simultáneas de **OC distintas** que crean el mismo lote nuevo del mismo artículo → una falla por el
-  índice único (500; muy poco probable). Las de la misma OC ya se serializan (409).
-- **B-12:** dos usuarios que marcan al mismo tiempo proveedores preferidos distintos para el mismo artículo → uno
-  falla por el índice único parcial (500; muy poco probable). Revisar si se vuelve un problema.
+- ✅ **Resuelto (2026-10-06): lote nuevo en recepciones simultáneas y proveedor preferido simultáneo (antes 500).**
+  `ITransactionLocks` (`pg_advisory_xact_lock`, se libera al terminar la transacción): `LotRegistry` lo toma por
+  (artículo, lote) antes de buscar el lote y `SupplierService` por artículo antes de cambiar el preferido. La segunda
+  transacción espera y reutiliza el lote o gana al final. `ILotRegistry` ahora **exige transacción** (la edición de
+  conteos ya abre una). Red de seguridad: cualquier otra violación de índice único (`23505`) responde **409
+  `duplicate`** en español. Pruebas de integración con 4 recepciones y 4 "preferido" en paralelo (fallaban 3 de 3 sin
+  el candado).
 - Vigilar el `COUNT(*)` del kardex si una ubicación llega a millones de movimientos (ver `docs/rendimiento.md`).
-- Kardex (`userId`) y ajustes (`createdBy`) devuelven el **id** del usuario, no su nombre: el detalle de ajuste no lo
-  muestra (el historial sí trae el nombre). Agregar el nombre en el backend cuando una pantalla lo necesite.
+- ✅ **Resuelto (2026-10-06): nombre de usuario en los documentos.** `IUserDirectory` (una consulta por documento o
+  página) y campos `*ByName` junto a cada `*By`: ajustes y consumos (lista y detalle), conteos y recetas (`createdBy`
+  nuevo), traspasos, pedidos, OP, recepciones, OC, requisiciones, parámetros (`updatedByName`) y kardex (`userName`,
+  sin join para no cambiar el plan de B-17). Frontend: componente `app-stamp` ("fecha · nombre") en todos los
+  detalles, "por …" en rechazos, versiones de receta y parámetros, columna "Usuario" en el kardex y "Registró" en
+  ajustes y consumos.
 - Ajustes y consumos no se cancelan (no hay endpoint en el spec); se corrige con otro ajuste.
 - `docs/specs/dominio.md` §6 ahora tiene 29 permisos (se agregó `logistics.transfers.special`).
 - ✅ **Resuelto (F-16): fuente de Material Symbols de ~4 MB.** Ahora es un subconjunto de 7.6 kB; un ícono nuevo
@@ -480,11 +487,13 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
   (`AuthService.ReuseGracePeriod`, también cubre la carrera `DbUpdateConcurrencyException`) y el frontend serializa el
   refresh entre pestañas con Web Locks (`withLock`). E2E `03-session-tabs`.
 - ✅ **E2E y límite de login:** el compose de desarrollo sube el límite a 60/min.
-- **Bitácora:** `/audit-log?entityId=` compara exacto. Los cambios de roles/ubicaciones de un usuario y de permisos de
-  un rol se registran con ids compuestos (`usuario|ubicación`, `rol|permiso`) y **no aparecen en el historial** del
-  usuario o rol (sí en la bitácora general). Opción futura: que el backend incluya `entityId LIKE 'id|%'`.
-- **Backend:** los errores de *model binding* (JSON mal formado o tipo incorrecto) salen con mensajes técnicos en inglés
-  (`"The request field is required."`). Solo ocurren con peticiones mal armadas, no con el frontend; traducir si molesta.
+- ✅ **Resuelto (2026-10-06): historial de la bitácora con ids compuestos.** `/audit-log?entityId=X` trae también los
+  registros `X|…` (roles y ubicaciones de un usuario, permisos de un rol).
+- ✅ **Resuelto (2026-10-06): errores de *model binding* en español.** `ModelStateProblem`: claves en camelCase sin
+  `$.` (`lines[0].quantity`), sin la entrada sobrante del parámetro del cuerpo, mensajes de MVC en español, los de
+  System.Text.Json ocultos ("El valor no tiene el formato o el tipo esperado."), cuerpo vacío → `body`, y 415 con
+  detalle. Pruebas en `ModelBindingErrorTests`.
+- `app-data-table`: el skeleton de escritorio tenía `aria-label` sin rol (axe "serious"); ahora `role="status"`.
 
 ## Cómo retomar
 

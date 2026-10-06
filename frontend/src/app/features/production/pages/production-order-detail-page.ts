@@ -27,6 +27,7 @@ import { formatQty, QtyPipe } from '../../../shared/pipes/qty.pipe';
 import { ProductionOrderDto, ProductionOrdersApi } from '../data-access/production-orders.api';
 import { RecipesApi } from '../data-access/recipes.api';
 import { ExplosionList } from '../ui/explosion-list';
+import { Stamp } from '../../../shared/components/stamp/stamp';
 
 /**
  * Detalle de una orden de producción: editar, liberar o cancelar; completar (página propia); y, ya
@@ -35,6 +36,7 @@ import { ExplosionList } from '../ui/explosion-list';
 @Component({
   selector: 'app-production-order-detail-page',
   imports: [
+    Stamp,
     RouterLink,
     DatePipe,
     MatCardModule,

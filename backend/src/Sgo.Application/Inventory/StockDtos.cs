@@ -35,7 +35,7 @@ public sealed record KardexEntryDto(
     Guid Id, DateTimeOffset OccurredAt, DateOnly BusinessDate, Guid LocationId, string LocationCode,
     Guid ItemId, string Sku, string ItemName, Guid? LotId, string? LotNumber, MovementType Type,
     decimal Quantity, decimal UnitCost, decimal TotalCost, string SourceDocType, Guid SourceDocId, string SourceDocFolio,
-    Guid? UserId, string? Notes, decimal? BalanceAfter);
+    Guid? UserId, string? UserName, string? Notes, decimal? BalanceAfter);
 
 public sealed record LowStockAlertDto(
     Guid LocationId, string LocationCode, Guid ItemId, string Sku, string ItemName, string BaseUomCode,

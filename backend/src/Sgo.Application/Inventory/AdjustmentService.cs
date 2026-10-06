@@ -23,7 +23,7 @@ public sealed record AdjustmentListQuery : PageQuery
 
 public sealed record AdjustmentListItemDto(
     Guid Id, string Folio, Guid LocationId, string LocationCode, AdjustmentReason Reason, AdjustmentStatus Status,
-    int LineCount, decimal TotalCost, DateTimeOffset CreatedAt, Guid? CreatedBy);
+    int LineCount, decimal TotalCost, DateTimeOffset CreatedAt, Guid? CreatedBy, string? CreatedByName);
 
 public sealed record AdjustmentLineDto(Guid Id, Guid ItemId, string Sku, string ItemName, Guid? LotId, string? LotNumber, decimal Quantity, string? Notes);
 
@@ -33,7 +33,7 @@ public sealed record PostedMovementDto(Guid ItemId, string Sku, Guid? LotId, str
 public sealed record AdjustmentDto(
     Guid Id, string Folio, Guid LocationId, string LocationCode, AdjustmentReason Reason, AdjustmentStatus Status, string? Notes,
     IReadOnlyList<AdjustmentLineDto> Lines, IReadOnlyList<PostedMovementDto> Movements, decimal TotalCost,
-    DateTimeOffset CreatedAt, Guid? CreatedBy, uint Version);
+    DateTimeOffset CreatedAt, Guid? CreatedBy, string? CreatedByName, uint Version);
 
 public sealed class CreateAdjustmentRequestValidator : AbstractValidator<CreateAdjustmentRequest>
 {
@@ -74,6 +74,7 @@ public sealed class AdjustmentService(
     ILocationScope scope,
     IFolioGenerator folios,
     ILotRegistry lots,
+    IUserDirectory userDirectory,
     IInventoryPostingService posting) : IAdjustmentService
 {
     private static readonly Dictionary<string, Expression<Func<InventoryAdjustment, object?>>> SortColumns = new()
@@ -107,10 +108,11 @@ public sealed class AdjustmentService(
             .ToDictionaryAsync(x => x.Key, x => x.Total, ct);
         var lineCounts = await db.InventoryAdjustments.Where(a => ids.Contains(a.Id))
             .Select(a => new { a.Id, Count = a.Lines.Count }).ToDictionaryAsync(x => x.Id, x => x.Count, ct);
+        var users = await userDirectory.GetNamesAsync(page.Items.Select(a => a.CreatedBy), ct);
 
         return new PagedResult<AdjustmentListItemDto>(
             page.Items.Select(a => new AdjustmentListItemDto(a.Id, a.Folio, a.LocationId, codes[a.LocationId], a.Reason, a.Status,
-                lineCounts[a.Id], totals.GetValueOrDefault(a.Id), a.CreatedAt, a.CreatedBy)).ToList(),
+                lineCounts[a.Id], totals.GetValueOrDefault(a.Id), a.CreatedAt, a.CreatedBy, users.Of(a.CreatedBy))).ToList(),
             page.Page, page.PageSize, page.Total);
     }
 
@@ -182,10 +184,11 @@ public sealed class AdjustmentService(
         var lotNumbers = await db.Lots.AsNoTracking().Where(l => lotIds.Contains(l.Id)).ToDictionaryAsync(l => l.Id, l => l.LotNumber, ct);
 
         string? LotNumber(Guid? id) => id is { } lotId ? lotNumbers.GetValueOrDefault(lotId) : null;
+        var users = await userDirectory.GetNamesAsync([a.CreatedBy], ct);
 
         return new AdjustmentDto(a.Id, a.Folio, a.LocationId, location, a.Reason, a.Status, a.Notes,
             a.Lines.Select(l => new AdjustmentLineDto(l.Id, l.ItemId, items[l.ItemId].Sku, items[l.ItemId].Name, l.LotId, LotNumber(l.LotId), l.Quantity, l.Notes)).ToList(),
             movements.Select(m => new PostedMovementDto(m.ItemId, items[m.ItemId].Sku, m.LotId, LotNumber(m.LotId), m.Quantity, m.UnitCost, m.TotalCost)).ToList(),
-            movements.Sum(m => m.TotalCost), a.CreatedAt, a.CreatedBy, a.Version);
+            movements.Sum(m => m.TotalCost), a.CreatedAt, a.CreatedBy, users.Of(a.CreatedBy), a.Version);
     }
 }

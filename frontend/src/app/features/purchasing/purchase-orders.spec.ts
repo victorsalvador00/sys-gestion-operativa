@@ -78,14 +78,18 @@ function buildOrder(overrides: Partial<PurchaseOrderDto> = {}): PurchaseOrderDto
     total: 4264.2,
     submittedAt: '2026-09-28T15:00:00Z',
     submittedBy: 'u-1',
+    submittedByName: null,
     approvalRequired: true,
     approvedBy: 'u-1',
+    approvedByName: null,
     approvedAt: '2026-09-28T16:00:00Z',
     rejectedAt: null,
     rejectedBy: null,
+    rejectedByName: null,
     rejectionReason: null,
     closedAt: null,
     closedBy: null,
+    closedByName: null,
     lines: [
       poLine(),
       poLine({
@@ -106,6 +110,7 @@ function buildOrder(overrides: Partial<PurchaseOrderDto> = {}): PurchaseOrderDto
     ],
     createdAt: '2026-09-28T14:00:00Z',
     createdBy: 'u-1',
+    createdByName: null,
     version: 7,
     ...overrides,
   };

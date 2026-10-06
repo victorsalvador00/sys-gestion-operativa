@@ -55,7 +55,8 @@
 
     @if (o.status === 'Rejected') {
       <p class="notice notice-error" role="status">
-        Rechazada el {{ o.rejectedAt | date: 'dd/MM/yyyy HH:mm' }}. Motivo:
+        Rechazada el {{ o.rejectedAt | date: 'dd/MM/yyyy HH:mm'
+        }}{{ o.rejectedByName ? ' por ' + o.rejectedByName : '' }}. Motivo:
         {{ o.rejectionReason }}
       </p>
     }
@@ -73,19 +74,19 @@
           </div>
           <div>
             <dt>Creada</dt>
-            <dd>{{ o.createdAt | date: 'dd/MM/yyyy HH:mm' }}</dd>
+            <dd><app-stamp [at]="o.createdAt" [by]="o.createdByName" /></dd>
           </div>
           @if (o.submittedAt) {
             <div>
               <dt>Enviada</dt>
-              <dd>{{ o.submittedAt | date: 'dd/MM/yyyy HH:mm' }}</dd>
+              <dd><app-stamp [at]="o.submittedAt" [by]="o.submittedByName" /></dd>
             </div>
           }
           @if (o.approvedAt) {
             <div>
               <dt>Aprobada</dt>
               <dd>
-                {{ o.approvedAt | date: 'dd/MM/yyyy HH:mm' }}
+                <app-stamp [at]="o.approvedAt" [by]="o.approvedByName" />
                 @if (!o.approvalRequired) {
                   <span class="meta">(sin aprobación por monto)</span>
                 }
@@ -95,7 +96,7 @@
           @if (o.closedAt) {
             <div>
               <dt>Cerrada</dt>
-              <dd>{{ o.closedAt | date: 'dd/MM/yyyy HH:mm' }}</dd>
+              <dd><app-stamp [at]="o.closedAt" [by]="o.closedByName" /></dd>
             </div>
           }
           @if (o.notes) {

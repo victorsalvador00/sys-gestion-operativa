@@ -16,11 +16,13 @@ import { StatusTag } from '../../../shared/components/status-tag/status-tag';
 import { MxnPipe } from '../../../shared/pipes/mxn.pipe';
 import { QtyPipe } from '../../../shared/pipes/qty.pipe';
 import { GoodsReceiptDto, GoodsReceiptsApi } from '../data-access/goods-receipts.api';
+import { Stamp } from '../../../shared/components/stamp/stamp';
 
 /** Detalle de una recepción: lo recibido en unidad de compra y base, lote y costo (RN-33). */
 @Component({
   selector: 'app-goods-receipt-detail-page',
   imports: [
+    Stamp,
     RouterLink,
     DatePipe,
     MatButtonModule,
@@ -58,7 +60,7 @@ import { GoodsReceiptDto, GoodsReceiptsApi } from '../data-access/goods-receipts
               </div>
               <div>
                 <dt>Recibida</dt>
-                <dd>{{ r.receivedAt | date: 'dd/MM/yyyy HH:mm' }}</dd>
+                <dd><app-stamp [at]="r.receivedAt" [by]="r.receivedByName" /></dd>
               </div>
               <div>
                 <dt>Factura</dt>

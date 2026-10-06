@@ -7,6 +7,7 @@ import { EsMxDateAdapter, provideAppDates } from '../../core/i18n/date-adapter';
 import { ConcurrencyDialog } from './concurrency-dialog/concurrency-dialog';
 import { ConflictHandler } from './dialogs.service';
 import { ShortagesDialog } from './shortages-dialog/shortages-dialog';
+import { Stamp } from './stamp/stamp';
 import { StatusTag, statusColor } from './status-tag/status-tag';
 
 describe('app-status-tag', () => {
@@ -28,6 +29,27 @@ describe('app-status-tag', () => {
     const el = fixture.nativeElement as HTMLElement;
     expect(el.textContent).toBe('Por aprobar');
     expect(el.classList).toContain('tag-yellow');
+  });
+});
+
+describe('app-stamp', () => {
+  async function render(at: string | null, by: string | null): Promise<string> {
+    const fixture = TestBed.createComponent(Stamp);
+    fixture.componentRef.setInput('at', at);
+    fixture.componentRef.setInput('by', by);
+    await fixture.whenStable();
+    return (fixture.nativeElement as HTMLElement).textContent!.replace(/\s+/g, ' ').trim();
+  }
+
+  it('muestra la fecha y quién hizo el paso', async () => {
+    expect(await render('2026-10-06T14:30:00', 'Laura Méndez')).toMatch(
+      /^06\/10\/2026 14:30 · Laura Méndez$/,
+    );
+  });
+
+  it('sin nombre muestra solo la fecha; sin fecha, un guion', async () => {
+    expect(await render('2026-10-06T14:30:00', null)).toBe('06/10/2026 14:30');
+    expect(await render(null, null)).toBe('—');
   });
 });
 

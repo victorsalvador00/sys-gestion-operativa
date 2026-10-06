@@ -7,6 +7,7 @@ import type { ItemOption } from '../../shared/data-access/item-lookup.service';
 import type { LocationOption } from '../../shared/data-access/location-lookup.service';
 import type { TransferDto, TransferLine } from './data-access/transfers.api';
 import { LotQty, lotsSumValidator } from '../inventory/ui/lot-split';
+import { TransferDetailPage } from './pages/transfer-detail-page';
 import { TransferReceivePage } from './pages/transfer-receive-page';
 import {
   createReceiveLine,
@@ -72,8 +73,10 @@ const buildTransfer = (overrides: Partial<TransferDto> = {}): TransferDto => ({
   driverName: 'Juan',
   dispatchedAt: '2026-09-26T10:00:00Z',
   dispatchedBy: null,
+  dispatchedByName: null,
   receivedAt: null,
   receivedBy: null,
+  receivedByName: null,
   lines: [
     transferLine(),
     transferLine({
@@ -90,6 +93,7 @@ const buildTransfer = (overrides: Partial<TransferDto> = {}): TransferDto => ({
   transitLossValue: 0,
   createdAt: '2026-09-26T09:00:00Z',
   createdBy: null,
+  createdByName: null,
   version: 3,
   ...overrides,
 });
@@ -261,5 +265,40 @@ describe('TransferReceivePage', () => {
     expect(el.textContent).toContain('Elige el motivo del faltante.');
     // No se abrió la confirmación ni se envió nada.
     expect(document.querySelector('mat-dialog-container')).toBeNull();
+  });
+});
+
+describe('TransferDetailPage', () => {
+  let http: HttpTestingController;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({ providers: [...provideHttpTesting(), provideAppLocale()] });
+    http = TestBed.inject(HttpTestingController);
+    signIn({ permissions: ['logistics.view'] });
+  });
+
+  afterEach(() => http.verify());
+
+  it('muestra quién creó, despachó y recibió el traspaso', async () => {
+    const fixture = TestBed.createComponent(TransferDetailPage);
+    fixture.componentRef.setInput('id', 't1');
+    fixture.detectChanges();
+    http.expectOne('/api/v1/transfers/t1').flush(
+      buildTransfer({
+        status: 'Received',
+        createdByName: 'Ana Ruiz',
+        dispatchedByName: 'Pedro Gómez',
+        receivedAt: '2026-09-26T15:00:00Z',
+        receivedByName: 'Laura Méndez',
+      }),
+    );
+    await fixture.whenStable();
+
+    const rows = Array.from(
+      (fixture.nativeElement as HTMLElement).querySelectorAll('dl > div'),
+    ).map((row) => row.textContent!.replace(/\s+/g, ' ').trim());
+    expect(rows.find((r) => r.startsWith('Creado'))).toContain('· Ana Ruiz');
+    expect(rows.find((r) => r.startsWith('Despachado'))).toContain('· Pedro Gómez');
+    expect(rows.find((r) => r.startsWith('Recibido'))).toContain('· Laura Méndez');
   });
 });

@@ -49,8 +49,9 @@ public sealed record BranchOrderTransferDto(Guid Id, string Folio, TransferStatu
 public sealed record BranchOrderDto(
     Guid Id, string Folio, TransferLocationDto RequestingLocation, TransferLocationDto SupplyingLocation, DateOnly RequiredDate,
     BranchOrderStatus Status, string? Notes, IReadOnlyList<BranchOrderLineDto> Lines, IReadOnlyList<BranchOrderTransferDto> Transfers,
-    DateTimeOffset? SubmittedAt, Guid? SubmittedBy, DateTimeOffset? ApprovedAt, Guid? ApprovedBy, DateTimeOffset? RejectedAt,
-    Guid? RejectedBy, string? RejectionReason, DateTimeOffset? FulfilledAt, DateTimeOffset CreatedAt, Guid? CreatedBy, uint Version);
+    DateTimeOffset? SubmittedAt, Guid? SubmittedBy, string? SubmittedByName, DateTimeOffset? ApprovedAt, Guid? ApprovedBy,
+    string? ApprovedByName, DateTimeOffset? RejectedAt, Guid? RejectedBy, string? RejectedByName, string? RejectionReason,
+    DateTimeOffset? FulfilledAt, DateTimeOffset CreatedAt, Guid? CreatedBy, string? CreatedByName, uint Version);
 
 /// <param name="Pending">Submitted orders, and approved ones whose transfer has not been dispatched.</param>
 public sealed record BranchOrderSuggestionDto(
@@ -127,7 +128,8 @@ public sealed class BranchOrderService(
     ILocationScope scope,
     IFolioGenerator folios,
     IClock clock,
-    ICurrentUser currentUser) : IBranchOrderService
+    ICurrentUser currentUser,
+    IUserDirectory userDirectory) : IBranchOrderService
 {
     private static readonly Dictionary<string, Expression<Func<BranchOrder, object?>>> SortColumns = new()
     {
@@ -352,9 +354,11 @@ public sealed class BranchOrderService(
         var lines = o.Lines.Select(l => new BranchOrderLineDto(l.Id, l.ItemId, items[l.ItemId].Sku, items[l.ItemId].Name, items[l.ItemId].Uom,
                 l.RequestedQty, l.ApprovedQty, l.ShippedQty, atOrigin.GetValueOrDefault(l.ItemId)))
             .OrderBy(l => l.Sku).ToList();
+        var users = await userDirectory.GetNamesAsync([o.SubmittedBy, o.ApprovedBy, o.RejectedBy, o.CreatedBy], ct);
 
         return new BranchOrderDto(o.Id, o.Folio, locations[o.RequestingLocationId], locations[o.SupplyingLocationId], o.RequiredDate, o.Status,
-            o.Notes, lines, transfers, o.SubmittedAt, o.SubmittedBy, o.ApprovedAt, o.ApprovedBy, o.RejectedAt, o.RejectedBy,
-            o.RejectionReason, o.FulfilledAt, o.CreatedAt, o.CreatedBy, o.Version);
+            o.Notes, lines, transfers, o.SubmittedAt, o.SubmittedBy, users.Of(o.SubmittedBy), o.ApprovedAt, o.ApprovedBy,
+            users.Of(o.ApprovedBy), o.RejectedAt, o.RejectedBy, users.Of(o.RejectedBy), o.RejectionReason, o.FulfilledAt, o.CreatedAt,
+            o.CreatedBy, users.Of(o.CreatedBy), o.Version);
     }
 }

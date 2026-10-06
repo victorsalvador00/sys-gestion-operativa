@@ -12,6 +12,8 @@ public sealed class GlobalExceptionHandler(
     {
         if (exception is DomainException or DbUpdateConcurrencyException)
             logger.LogInformation("Domain error {ExceptionType}: {Message}", exception.GetType().Name, exception.Message);
+        else if (ProblemDetailsMapper.IsUniqueViolation(exception))
+            logger.LogWarning(exception, "Concurrent duplicate write");
         else
             logger.LogError(exception, "Unhandled exception");
 

@@ -250,6 +250,13 @@ public class UserManagementTests(SgoApiFactory factory)
         var roleAssignments = (await admin.GetFromJsonAsync<PagedResult<AuditLogDto>>(
             $"/api/v1/audit-log?entityType=IdentityUserRole`1&userId={adminId}&pageSize=100"))!;
         Assert.Contains(roleAssignments.Items, a => a.EntityId.StartsWith(user.Id.ToString(), StringComparison.Ordinal));
+
+        // The user's history (entityId only, as the audit panel asks) includes its role and location assignments.
+        var history = (await admin.GetFromJsonAsync<PagedResult<AuditLogDto>>($"/api/v1/audit-log?entityId={user.Id}&pageSize=100"))!;
+        Assert.Contains(history.Items, a => a.EntityType == "AppUser" && a.EntityId == user.Id.ToString());
+        Assert.Contains(history.Items, a => a.EntityType == "IdentityUserRole`1" && a.EntityId.StartsWith($"{user.Id}|", StringComparison.Ordinal));
+        Assert.Contains(history.Items, a => a.EntityType == "UserLocation" && a.EntityId.StartsWith($"{user.Id}|", StringComparison.Ordinal));
+        Assert.All(history.Items, a => Assert.True(a.EntityId == user.Id.ToString() || a.EntityId.StartsWith($"{user.Id}|", StringComparison.Ordinal)));
     }
 
     [Fact]

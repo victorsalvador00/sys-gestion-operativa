@@ -50,9 +50,10 @@ public sealed record PurchaseOrderLineDto(
 public sealed record PurchaseOrderDto(
     Guid Id, string Folio, PurchaseOrderSupplierDto Supplier, PurchasingLocationDto DeliveryLocation, DateOnly? ExpectedDate,
     PurchaseOrderStatus Status, string? Notes, decimal Subtotal, decimal TaxTotal, decimal Total,
-    DateTimeOffset? SubmittedAt, Guid? SubmittedBy, bool ApprovalRequired, Guid? ApprovedBy, DateTimeOffset? ApprovedAt,
-    DateTimeOffset? RejectedAt, Guid? RejectedBy, string? RejectionReason, DateTimeOffset? ClosedAt, Guid? ClosedBy,
-    IReadOnlyList<PurchaseOrderLineDto> Lines, DateTimeOffset CreatedAt, Guid? CreatedBy, uint Version);
+    DateTimeOffset? SubmittedAt, Guid? SubmittedBy, string? SubmittedByName, bool ApprovalRequired, Guid? ApprovedBy,
+    string? ApprovedByName, DateTimeOffset? ApprovedAt, DateTimeOffset? RejectedAt, Guid? RejectedBy, string? RejectedByName,
+    string? RejectionReason, DateTimeOffset? ClosedAt, Guid? ClosedBy, string? ClosedByName,
+    IReadOnlyList<PurchaseOrderLineDto> Lines, DateTimeOffset CreatedAt, Guid? CreatedBy, string? CreatedByName, uint Version);
 
 public sealed class PurchaseOrderLineRequestValidator : AbstractValidator<PurchaseOrderLineRequest>
 {
@@ -114,7 +115,8 @@ public sealed class PurchaseOrderService(
     ILocationScope scope,
     IFolioGenerator folios,
     IClock clock,
-    ICurrentUser currentUser) : IPurchaseOrderService
+    ICurrentUser currentUser,
+    IUserDirectory userDirectory) : IPurchaseOrderService
 {
     private static readonly Dictionary<string, Expression<Func<PurchaseOrder, object?>>> SortColumns = new()
     {
@@ -303,10 +305,12 @@ public sealed class PurchaseOrderService(
                 l.Quantity, l.UnitPrice, l.TaxRate, l.Subtotal, l.TaxAmount, l.ReceivedQty, l.PendingQty,
                 l.RequisitionLineId, requisition?.Id, requisition?.Folio);
         }).OrderBy(l => l.Sku).ToList();
+        var users = await userDirectory.GetNamesAsync([o.SubmittedBy, o.ApprovedBy, o.RejectedBy, o.ClosedBy, o.CreatedBy], ct);
 
         return new PurchaseOrderDto(o.Id, o.Folio, suppliers[o.SupplierId], locations[o.DeliveryLocationId], o.ExpectedDate, o.Status,
-            o.Notes, o.Subtotal, o.TaxTotal, o.Total, o.SubmittedAt, o.SubmittedBy, o.ApprovalRequired, o.ApprovedBy, o.ApprovedAt,
-            o.RejectedAt, o.RejectedBy, o.RejectionReason, o.ClosedAt, o.ClosedBy, lines, o.CreatedAt, o.CreatedBy, o.Version);
+            o.Notes, o.Subtotal, o.TaxTotal, o.Total, o.SubmittedAt, o.SubmittedBy, users.Of(o.SubmittedBy), o.ApprovalRequired,
+            o.ApprovedBy, users.Of(o.ApprovedBy), o.ApprovedAt, o.RejectedAt, o.RejectedBy, users.Of(o.RejectedBy), o.RejectionReason,
+            o.ClosedAt, o.ClosedBy, users.Of(o.ClosedBy), lines, o.CreatedAt, o.CreatedBy, users.Of(o.CreatedBy), o.Version);
     }
 
     internal static async Task<Dictionary<Guid, PurchaseOrderSupplierDto>> SuppliersAsync(ISgoDbContext db, IEnumerable<Guid> ids, CancellationToken ct)

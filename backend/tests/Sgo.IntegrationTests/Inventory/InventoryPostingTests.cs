@@ -38,9 +38,12 @@ public class InventoryPostingTests(SgoApiFactory factory)
     private async Task<Guid> CreateLotAsync(Guid itemId, string number, DateOnly? expiration)
     {
         await using var scope = factory.CreateScope();
+        var db = SgoApiFactory.Db(scope);
+        await using var tx = await db.Database.BeginTransactionAsync(); // as the services do: the lot lock needs one
         var lot = await scope.ServiceProvider.GetRequiredService<ILotRegistry>()
             .GetOrCreateAsync(itemId, number, expiration, "TEST", Guid.NewGuid(), default);
-        await SgoApiFactory.Db(scope).SaveChangesAsync();
+        await db.SaveChangesAsync();
+        await tx.CommitAsync();
         return lot.Id;
     }
 

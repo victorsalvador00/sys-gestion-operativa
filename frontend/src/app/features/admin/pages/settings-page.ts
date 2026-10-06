@@ -98,7 +98,8 @@ export function settingError(control: AbstractControl, setting: AppSetting): str
                 </mat-form-field>
                 @if (setting.updatedAt) {
                   <p class="meta">
-                    Última modificación: {{ setting.updatedAt | date: 'dd/MM/yyyy HH:mm' }}
+                    Última modificación: {{ setting.updatedAt | date: 'dd/MM/yyyy HH:mm'
+                    }}{{ setting.updatedByName ? ' por ' + setting.updatedByName : '' }}
                   </p>
                 }
               </mat-card-content>

@@ -19,7 +19,7 @@ public sealed class ValidationFilter(IServiceProvider services) : IAsyncActionFi
                 continue;
 
             var result = await validator.ValidateAsync(new ValidationContext<object>(argument), context.HttpContext.RequestAborted);
-            foreach (var group in result.Errors.GroupBy(e => ToCamelCase(e.PropertyName)))
+            foreach (var group in result.Errors.GroupBy(e => ValidationKeys.ToCamelCase(e.PropertyName)))
                 errors[group.Key] = group.Select(e => e.ErrorMessage).ToArray();
         }
 
@@ -37,7 +37,4 @@ public sealed class ValidationFilter(IServiceProvider services) : IAsyncActionFi
 
         await next();
     }
-
-    private static string ToCamelCase(string name) =>
-        string.Join('.', name.Split('.').Select(part => part.Length == 0 ? part : char.ToLowerInvariant(part[0]) + part[1..]));
 }

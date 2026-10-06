@@ -15,7 +15,11 @@ public sealed class AuditLogQueries(SgoDbContext db) : IAuditLogQueries
         if (!string.IsNullOrWhiteSpace(query.EntityType))
             logs = logs.Where(a => a.EntityType == query.EntityType);
         if (!string.IsNullOrWhiteSpace(query.EntityId))
-            logs = logs.Where(a => a.EntityId == query.EntityId);
+        {
+            // Rows with a composite key ("user|location", "role|permission") belong to the history of their first part.
+            var compositePrefix = query.EntityId + "|";
+            logs = logs.Where(a => a.EntityId == query.EntityId || a.EntityId.StartsWith(compositePrefix));
+        }
         if (query.UserId is { } userId)
             logs = logs.Where(a => a.UserId == userId);
         if (query.From is { } from)

@@ -28,14 +28,23 @@ public sealed class LotAllocator(SgoDbContext db, IClock clock) : ILotAllocator
     }
 }
 
-public sealed class LotRegistry(SgoDbContext db, IClock clock) : ILotRegistry
+/// <remarks>
+/// Two documents that bring the same new lot at the same time (two receipts of different POs, for example) would
+/// both miss it and the second insert would break the unique (item, lot number) index. The lock makes the second
+/// one wait for the first commit and then reuse the lot.
+/// </remarks>
+public sealed class LotRegistry(SgoDbContext db, IClock clock, ITransactionLocks locks) : ILotRegistry
 {
     public async Task<Lot> GetOrCreateAsync(Guid itemId, string lotNumber, DateOnly? expirationDate,
         string sourceDocType, Guid sourceDocId, CancellationToken ct)
     {
         var number = lotNumber.Trim();
-        var lot = db.Lots.Local.FirstOrDefault(l => l.ItemId == itemId && l.LotNumber == number)
-                  ?? await db.Lots.SingleOrDefaultAsync(l => l.ItemId == itemId && l.LotNumber == number, ct);
+        var lot = db.Lots.Local.FirstOrDefault(l => l.ItemId == itemId && l.LotNumber == number);
+        if (lot is null)
+        {
+            await locks.AcquireAsync(TransactionLockScopes.Lot, $"{itemId}:{number}", ct);
+            lot = await db.Lots.SingleOrDefaultAsync(l => l.ItemId == itemId && l.LotNumber == number, ct);
+        }
 
         if (lot is null)
         {

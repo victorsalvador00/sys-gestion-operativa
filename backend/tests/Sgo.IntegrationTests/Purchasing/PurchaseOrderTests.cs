@@ -132,6 +132,12 @@ public class PurchaseOrderTests(SgoApiFactory factory)
         Assert.Equal(PurchaseOrderStatus.Received, second.PurchaseOrderStatus);
         Assert.Equal(Today.AddDays(90), second.Lines.Single().ExpirationDate);
 
+        var adminName = (await admin.GetJsonAsync<Sgo.Application.Security.MeDto>("/api/v1/me"))!.FullName;
+        var received = await GetAsync(admin, order.Id);
+        Assert.Equal((adminName, adminName, adminName), (received.CreatedByName, received.SubmittedByName, received.ApprovedByName));
+        Assert.Null(received.RejectedByName);
+        Assert.Equal(adminName, second.ReceivedByName);
+
         Assert.Equal(250m, (await StockAsync(admin, fab, flour.Id)).OnHand);
         var lots = (await admin.GetJsonAsync<List<LotStockDto>>($"/api/v1/stock/{fab}/{flour.Id}/lots"))!;
         Assert.Equal(new[] { ("L-A", 200m), ("L-B", 50m) }, lots.OrderBy(l => l.LotNumber).Select(l => (l.LotNumber!, l.Quantity)));
@@ -281,6 +287,28 @@ public class PurchaseOrderTests(SgoApiFactory factory)
         Assert.Single(responses, r => r.StatusCode == HttpStatusCode.Conflict);
         Assert.Equal(100m, (await StockAsync(admin, fab, item.Id)).OnHand);
         Assert.Equal(4m, (await GetAsync(admin, order.Id)).Lines.Single().ReceivedQty);
+    }
+
+    [Fact]
+    public async Task Concurrent_receipts_of_different_orders_share_a_new_lot()
+    {
+        var admin = await AdminAsync();
+        var fab = await factory.LocationIdAsync("FAB");
+        var item = await ItemAsync(admin, tracksLots: true);
+        var supplier = await SupplierWithAsync(admin, (item, 10m));
+        var orders = new List<PurchaseOrderDto>();
+        for (var i = 0; i < 4; i++)
+            orders.Add(await ApprovedAsync(admin, supplier.Id, fab, L(item.Id, 1)));
+        var expiration = Today.AddDays(90);
+
+        // Before the lot lock, all of them missed the lot and every insert but one broke the unique index (500).
+        var responses = await Task.WhenAll(orders.Select(o => ReceiveAsync(admin, o, R(o, item.Id, 1, "L-CONC", expiration))));
+
+        Assert.All(responses, r => Assert.Equal(HttpStatusCode.Created, r.StatusCode));
+        await using var scope = factory.CreateScope();
+        var lot = await SgoApiFactory.Db(scope).Lots.SingleAsync(l => l.ItemId == item.Id);
+        Assert.Equal("L-CONC", lot.LotNumber);
+        Assert.Equal(100m, (await StockAsync(admin, fab, item.Id)).OnHand); // 4 cajas × 25 kg
     }
 
     [Fact]

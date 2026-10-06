@@ -93,6 +93,14 @@ public class TransferTests(SgoApiFactory factory)
         Assert.Equal((1m, DiscrepancyReason.Damaged, 12.7273m), (damaged.ShortQty, damaged.DiscrepancyReason!.Value, damaged.ShortValue!.Value));
         Assert.Equal(12.7273m, received.TransitLossValue);
 
+        // Who did each step comes with its name, not only its id.
+        var adminName = (await admin.GetJsonAsync<MeDto>("/api/v1/me"))!.FullName;
+        Assert.Equal((adminName, adminName, "Usuario de prueba"),
+            (received.CreatedByName, received.DispatchedByName, received.ReceivedByName));
+        Assert.Equal(manager.Id, received.ReceivedBy);
+        var kardex = (await admin.GetJsonAsync<PagedResult<KardexEntryDto>>($"/api/v1/movements?locationId={branch}&itemId={flour.Id}"))!;
+        Assert.Equal("Usuario de prueba", Assert.Single(kardex.Items).UserName);
+
         Assert.Equal(7m, await OnHandAsync(admin, branch, milk.Id));
         Assert.Equal(5m, await OnHandAsync(admin, branch, flour.Id));
         var branchStock = (await admin.GetJsonAsync<PagedResult<StockLevelDto>>($"/api/v1/stock?locationId={branch}&itemId={flour.Id}"))!;

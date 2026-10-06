@@ -11,7 +11,7 @@ namespace Sgo.Application.Organization;
 /// <param name="Decimals">0 for whole numbers.</param>
 public sealed record AppSettingDto(
     string Key, string Label, string Description, SettingKind Kind, decimal Value, decimal Min, decimal Max, int Decimals,
-    DateTimeOffset? UpdatedAt, Guid? UpdatedBy, uint Version);
+    DateTimeOffset? UpdatedAt, Guid? UpdatedBy, string? UpdatedByName, uint Version);
 
 public sealed record SettingValueRequest(string Key, decimal Value, uint Version);
 
@@ -42,12 +42,13 @@ public interface ISettingsService
     Task<IReadOnlyList<AppSettingDto>> UpdateAsync(UpdateSettingsRequest request, CancellationToken ct = default);
 }
 
-public sealed class SettingsService(ISgoDbContext db, IClock clock, ICurrentUser currentUser) : ISettingsService
+public sealed class SettingsService(ISgoDbContext db, IClock clock, ICurrentUser currentUser, IUserDirectory userDirectory) : ISettingsService
 {
     public async Task<IReadOnlyList<AppSettingDto>> GetAsync(CancellationToken ct = default)
     {
         var stored = await db.AppSettings.AsNoTracking().ToDictionaryAsync(s => s.Key, ct);
-        return SettingDefinitions.All.Select(d => ToDto(d, stored.GetValueOrDefault(d.Key))).ToList();
+        var users = await userDirectory.GetNamesAsync(stored.Values.Select(s => s.UpdatedBy), ct);
+        return SettingDefinitions.All.Select(d => ToDto(d, stored.GetValueOrDefault(d.Key), users)).ToList();
     }
 
     public async Task<IReadOnlyList<AppSettingDto>> UpdateAsync(UpdateSettingsRequest request, CancellationToken ct = default)
@@ -72,11 +73,12 @@ public sealed class SettingsService(ISgoDbContext db, IClock clock, ICurrentUser
     /// <summary>Invariant text without trailing zeros, e.g. 15000 or 2.5.</summary>
     private static string Format(decimal value) => value.ToString("0.##########", CultureInfo.InvariantCulture);
 
-    private static AppSettingDto ToDto(SettingDefinition d, AppSetting? s)
+    private static AppSettingDto ToDto(SettingDefinition d, AppSetting? s, UserNames users)
     {
         var raw = s?.Value ?? AppSettingKeys.Defaults.Single(x => x.Key == d.Key).Value;
         var value = decimal.Parse(raw, NumberStyles.Number, CultureInfo.InvariantCulture);
         var description = s?.Description ?? AppSettingKeys.Defaults.Single(x => x.Key == d.Key).Description;
-        return new AppSettingDto(d.Key, d.Label, description, d.Kind, value, d.Min, d.Max, d.Decimals, s?.UpdatedAt, s?.UpdatedBy, s?.Version ?? 0);
+        return new AppSettingDto(d.Key, d.Label, description, d.Kind, value, d.Min, d.Max, d.Decimals, s?.UpdatedAt, s?.UpdatedBy,
+            users.Of(s?.UpdatedBy), s?.Version ?? 0);
     }
 }

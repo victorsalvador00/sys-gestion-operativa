@@ -32,7 +32,13 @@ public interface IRoleService
 public sealed record AuditLogQuery : PageQuery
 {
     public string? EntityType { get; init; }
+
+    /// <summary>
+    /// History of one record: its own rows plus those whose composite key starts with it
+    /// (a user's roles and locations, a role's permissions).
+    /// </summary>
     public string? EntityId { get; init; }
+
     public Guid? UserId { get; init; }
     public DateTimeOffset? From { get; init; }
     public DateTimeOffset? To { get; init; }

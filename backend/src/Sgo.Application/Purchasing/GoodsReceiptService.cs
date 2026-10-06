@@ -42,7 +42,7 @@ public sealed record GoodsReceiptLineDto(
 
 public sealed record GoodsReceiptDto(
     Guid Id, string Folio, GoodsReceiptOrderDto PurchaseOrder, PurchaseOrderSupplierDto Supplier, PurchasingLocationDto Location,
-    DateTimeOffset ReceivedAt, Guid? ReceivedBy, string? SupplierInvoiceNumber, IReadOnlyList<GoodsReceiptLineDto> Lines,
+    DateTimeOffset ReceivedAt, Guid? ReceivedBy, string? ReceivedByName, string? SupplierInvoiceNumber, IReadOnlyList<GoodsReceiptLineDto> Lines,
     decimal TotalCost, PurchaseOrderStatus PurchaseOrderStatus);
 
 public sealed class CreateGoodsReceiptRequestValidator : AbstractValidator<CreateGoodsReceiptRequest>
@@ -77,6 +77,7 @@ public sealed class GoodsReceiptService(
     IClock clock,
     ICurrentUser currentUser,
     ILotRegistry lots,
+    IUserDirectory userDirectory,
     IInventoryPostingService posting) : IGoodsReceiptService
 {
     private static readonly Dictionary<string, Expression<Func<GoodsReceipt, object?>>> SortColumns = new()
@@ -222,8 +223,10 @@ public sealed class GoodsReceiptService(
                 items[l.ItemId].Name, items[l.ItemId].Purchase, l.Quantity, items[l.ItemId].Base, l.BaseQuantity, l.UnitCostBase, l.Amount,
                 l.LotId, l.LotNumber, l.ExpirationDate))
             .OrderBy(l => l.Sku).ThenBy(l => l.ExpirationDate).ToList();
+        var users = await userDirectory.GetNamesAsync([r.ReceivedBy], ct);
 
         return new GoodsReceiptDto(r.Id, r.Folio, new GoodsReceiptOrderDto(order.Id, order.Folio), suppliers[order.SupplierId],
-            locations[r.LocationId], r.ReceivedAt, r.ReceivedBy, r.SupplierInvoiceNumber, lines, r.TotalCost, order.Status);
+            locations[r.LocationId], r.ReceivedAt, r.ReceivedBy, users.Of(r.ReceivedBy), r.SupplierInvoiceNumber, lines, r.TotalCost,
+            order.Status);
     }
 }

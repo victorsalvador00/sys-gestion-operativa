@@ -27,14 +27,16 @@ public sealed record RecipeListQuery : PageQuery
 
 public sealed record RecipeListItemDto(
     Guid Id, Guid OutputItemId, string OutputSku, string OutputName, int RecipeVersion, bool IsActive, bool IsUsed,
-    decimal YieldQty, string OutputUomCode, int LineCount, DateTimeOffset CreatedAt, DateTimeOffset? UpdatedAt);
+    decimal YieldQty, string OutputUomCode, int LineCount, DateTimeOffset CreatedAt, Guid? CreatedBy, string? CreatedByName,
+    DateTimeOffset? UpdatedAt);
 
 public sealed record RecipeLineDto(
     Guid Id, Guid ComponentItemId, string Sku, string Name, ItemType Type, string BaseUomCode, decimal Quantity, decimal WastePct, bool HasRecipe);
 
 public sealed record RecipeDto(
     Guid Id, Guid OutputItemId, string OutputSku, string OutputName, string OutputUomCode, int RecipeVersion, bool IsActive, bool IsUsed,
-    decimal YieldQty, string? Notes, IReadOnlyList<RecipeLineDto> Lines, DateTimeOffset CreatedAt, DateTimeOffset? UpdatedAt, uint Version);
+    decimal YieldQty, string? Notes, IReadOnlyList<RecipeLineDto> Lines, DateTimeOffset CreatedAt, Guid? CreatedBy, string? CreatedByName,
+    DateTimeOffset? UpdatedAt, uint Version);
 
 /// <param name="Available">Usable stock at the location (expired lots excluded, RN-05); null without location.</param>
 public sealed record ExplosionLineDto(
@@ -90,7 +92,7 @@ public interface IRecipeService
     Task<ExplosionDto> ExplodeAsync(Guid id, decimal quantity, Guid? locationId, CancellationToken ct = default);
 }
 
-public sealed class RecipeService(ISgoDbContext db, ILocationScope scope, IClock clock) : IRecipeService
+public sealed class RecipeService(ISgoDbContext db, ILocationScope scope, IClock clock, IUserDirectory userDirectory) : IRecipeService
 {
     public async Task<PagedResult<RecipeListItemDto>> ListAsync(RecipeListQuery query, CancellationToken ct = default)
     {
@@ -116,9 +118,10 @@ public sealed class RecipeService(ISgoDbContext db, ILocationScope scope, IClock
         };
 
         var page = await ordered.ToPagedResultAsync(query, ct);
+        var users = await userDirectory.GetNamesAsync(page.Items.Select(x => x.Recipe.CreatedBy), ct);
         return new PagedResult<RecipeListItemDto>(page.Items.Select(x => new RecipeListItemDto(x.Recipe.Id, x.Recipe.OutputItemId,
                 x.Sku, x.Name, x.Recipe.VersionNumber, x.Recipe.IsActive, x.Recipe.IsUsed, x.Recipe.YieldQty, x.Uom, x.LineCount,
-                x.Recipe.CreatedAt, x.Recipe.UpdatedAt)).ToList(),
+                x.Recipe.CreatedAt, x.Recipe.CreatedBy, users.Of(x.Recipe.CreatedBy), x.Recipe.UpdatedAt)).ToList(),
             page.Page, page.PageSize, page.Total);
     }
 
@@ -292,8 +295,9 @@ public sealed class RecipeService(ISgoDbContext db, ILocationScope scope, IClock
             var c = components[l.ComponentItemId];
             return new RecipeLineDto(l.Id, l.ComponentItemId, c.Sku, c.Name, c.Type, c.Uom, l.Quantity, l.WastePct, c.HasRecipe);
         }).OrderBy(l => l.Sku).ToList();
+        var users = await userDirectory.GetNamesAsync([r.CreatedBy], ct);
 
         return new RecipeDto(r.Id, r.OutputItemId, output.Sku, output.Name, output.Uom, r.VersionNumber, r.IsActive, r.IsUsed,
-            r.YieldQty, r.Notes, lines, r.CreatedAt, r.UpdatedAt, r.Version);
+            r.YieldQty, r.Notes, lines, r.CreatedAt, r.CreatedBy, users.Of(r.CreatedBy), r.UpdatedAt, r.Version);
     }
 }

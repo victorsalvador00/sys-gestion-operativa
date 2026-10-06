@@ -106,6 +106,9 @@ import {
           </div>
           <div class="muted">
             {{ row.locationCode }} · {{ row.lineCount }} líneas · {{ row.totalCost | mxn }}
+            @if (row.createdByName) {
+              · {{ row.createdByName }}
+            }
           </div>
         </ng-template>
       </app-data-table>
@@ -142,6 +145,7 @@ export class ConsumptionsListPage {
     { key: 'folio', header: 'Folio', sortable: true },
     { key: 'businessDate', header: 'Día', sortable: true },
     { key: 'locationCode', header: 'Sucursal' },
+    { key: 'createdByName', header: 'Registró', value: (row) => row.createdByName ?? '—' },
     { key: 'lineCount', header: 'Líneas', align: 'end' },
     { key: 'totalCost', header: 'Costo', align: 'end' },
     { key: 'status', header: 'Estado' },

@@ -54,12 +54,12 @@
           }
           <div>
             <dt>Creado</dt>
-            <dd>{{ t.createdAt | date: 'dd/MM/yyyy HH:mm' }}</dd>
+            <dd><app-stamp [at]="t.createdAt" [by]="t.createdByName" /></dd>
           </div>
           @if (t.dispatchedAt) {
             <div>
               <dt>Despachado</dt>
-              <dd>{{ t.dispatchedAt | date: 'dd/MM/yyyy HH:mm' }}</dd>
+              <dd><app-stamp [at]="t.dispatchedAt" [by]="t.dispatchedByName" /></dd>
             </div>
             <div>
               <dt>Vehículo</dt>
@@ -77,7 +77,7 @@
           @if (t.receivedAt) {
             <div>
               <dt>Recibido</dt>
-              <dd>{{ t.receivedAt | date: 'dd/MM/yyyy HH:mm' }}</dd>
+              <dd><app-stamp [at]="t.receivedAt" [by]="t.receivedByName" /></dd>
             </div>
             <div>
               <dt>Pérdida en tránsito</dt>

@@ -103,6 +103,7 @@ export class KardexPage {
     { key: 'type', header: 'Movimiento', value: (row) => enumLabel('MovementType', row.type) },
     { key: 'item', header: 'Artículo', value: (row) => `${row.sku} · ${row.itemName}` },
     { key: 'document', header: 'Documento' },
+    { key: 'userName', header: 'Usuario', value: (row) => row.userName ?? '—' },
     { key: 'lotNumber', header: 'Lote', value: (row) => row.lotNumber ?? '—' },
     { key: 'quantity', header: 'Cantidad', align: 'end' },
     { key: 'unitCost', header: 'Costo unitario', align: 'end' },

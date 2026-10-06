@@ -9193,6 +9193,7 @@ export interface components {
             createdAt: string;
             /** Format: uuid */
             createdBy: null | string;
+            createdByName: null | string;
             folio: string;
             /** Format: uuid */
             id: string;
@@ -9242,6 +9243,7 @@ export interface components {
             createdAt: string;
             /** Format: uuid */
             createdBy: null | string;
+            createdByName: null | string;
             folio: string;
             /** Format: uuid */
             id: string;
@@ -9306,6 +9308,7 @@ export interface components {
             updatedAt: null | string;
             /** Format: uuid */
             updatedBy: null | string;
+            updatedByName: null | string;
             /** Format: double */
             value: number;
             /** Format: uint32 */
@@ -9330,10 +9333,12 @@ export interface components {
             approvedAt: null | string;
             /** Format: uuid */
             approvedBy: null | string;
+            approvedByName: null | string;
             /** Format: date-time */
             createdAt: string;
             /** Format: uuid */
             createdBy: null | string;
+            createdByName: null | string;
             folio: string;
             /** Format: date-time */
             fulfilledAt: null | string;
@@ -9345,6 +9350,7 @@ export interface components {
             rejectedAt: null | string;
             /** Format: uuid */
             rejectedBy: null | string;
+            rejectedByName: null | string;
             rejectionReason: null | string;
             requestingLocation: components["schemas"]["TransferLocationDto"];
             /** Format: date */
@@ -9354,6 +9360,7 @@ export interface components {
             submittedAt: null | string;
             /** Format: uuid */
             submittedBy: null | string;
+            submittedByName: null | string;
             supplyingLocation: components["schemas"]["TransferLocationDto"];
             transfers: components["schemas"]["BranchOrderTransferDto"][];
             /** Format: uint32 */
@@ -9483,6 +9490,7 @@ export interface components {
             createdAt: string;
             /** Format: uuid */
             createdBy: null | string;
+            createdByName: null | string;
             folio: string;
             /** Format: uuid */
             id: string;
@@ -9526,6 +9534,7 @@ export interface components {
             createdAt: string;
             /** Format: uuid */
             createdBy: null | string;
+            createdByName: null | string;
             folio: string;
             /** Format: uuid */
             id: string;
@@ -10095,6 +10104,7 @@ export interface components {
             receivedAt: string;
             /** Format: uuid */
             receivedBy: null | string;
+            receivedByName: null | string;
             supplier: components["schemas"]["PurchaseOrderSupplierDto"];
             supplierInvoiceNumber: null | string;
             /** Format: double */
@@ -10299,6 +10309,7 @@ export interface components {
             unitCost: number;
             /** Format: uuid */
             userId: null | string;
+            userName: null | string;
         };
         LineLotDto: {
             /** Format: date */
@@ -10608,6 +10619,9 @@ export interface components {
             closedAt: null | string;
             /** Format: date-time */
             createdAt: string;
+            /** Format: uuid */
+            createdBy: null | string;
+            createdByName: null | string;
             folio: string;
             /** Format: uuid */
             id: string;
@@ -10693,10 +10707,12 @@ export interface components {
             completedAt: null | string;
             /** Format: uuid */
             completedBy: null | string;
+            completedByName: null | string;
             /** Format: date-time */
             createdAt: string;
             /** Format: uuid */
             createdBy: null | string;
+            createdByName: null | string;
             folio: string;
             /** Format: uuid */
             id: string;
@@ -10793,14 +10809,17 @@ export interface components {
             approvedAt: null | string;
             /** Format: uuid */
             approvedBy: null | string;
+            approvedByName: null | string;
             /** Format: date-time */
             closedAt: null | string;
             /** Format: uuid */
             closedBy: null | string;
+            closedByName: null | string;
             /** Format: date-time */
             createdAt: string;
             /** Format: uuid */
             createdBy: null | string;
+            createdByName: null | string;
             deliveryLocation: components["schemas"]["PurchasingLocationDto"];
             /** Format: date */
             expectedDate: null | string;
@@ -10813,12 +10832,14 @@ export interface components {
             rejectedAt: null | string;
             /** Format: uuid */
             rejectedBy: null | string;
+            rejectedByName: null | string;
             rejectionReason: null | string;
             status: components["schemas"]["PurchaseOrderStatus"];
             /** Format: date-time */
             submittedAt: null | string;
             /** Format: uuid */
             submittedBy: null | string;
+            submittedByName: null | string;
             /** Format: double */
             subtotal: number;
             supplier: components["schemas"]["PurchaseOrderSupplierDto"];
@@ -10936,6 +10957,9 @@ export interface components {
             /** Format: date-time */
             createdAt: string;
             /** Format: uuid */
+            createdBy: null | string;
+            createdByName: null | string;
+            /** Format: uuid */
             id: string;
             isActive: boolean;
             isUsed: boolean;
@@ -10981,6 +11005,9 @@ export interface components {
         RecipeListItemDto: {
             /** Format: date-time */
             createdAt: string;
+            /** Format: uuid */
+            createdBy: null | string;
+            createdByName: null | string;
             /** Format: uuid */
             id: string;
             isActive: boolean;
@@ -11037,14 +11064,17 @@ export interface components {
             approvedAt: null | string;
             /** Format: uuid */
             approvedBy: null | string;
+            approvedByName: null | string;
             /** Format: date-time */
             convertedAt: null | string;
             /** Format: uuid */
             convertedBy: null | string;
+            convertedByName: null | string;
             /** Format: date-time */
             createdAt: string;
             /** Format: uuid */
             createdBy: null | string;
+            createdByName: null | string;
             folio: string;
             /** Format: uuid */
             id: string;
@@ -11058,12 +11088,14 @@ export interface components {
             rejectedAt: null | string;
             /** Format: uuid */
             rejectedBy: null | string;
+            rejectedByName: null | string;
             rejectionReason: null | string;
             status: components["schemas"]["RequisitionStatus"];
             /** Format: date-time */
             submittedAt: null | string;
             /** Format: uuid */
             submittedBy: null | string;
+            submittedByName: null | string;
             /** Format: uint32 */
             version: number;
         };
@@ -11244,10 +11276,12 @@ export interface components {
             createdAt: string;
             /** Format: uuid */
             createdBy: null | string;
+            createdByName: null | string;
             /** Format: date-time */
             dispatchedAt: null | string;
             /** Format: uuid */
             dispatchedBy: null | string;
+            dispatchedByName: null | string;
             driverName: null | string;
             folio: string;
             from: components["schemas"]["TransferLocationDto"];
@@ -11259,6 +11293,7 @@ export interface components {
             receivedAt: null | string;
             /** Format: uuid */
             receivedBy: null | string;
+            receivedByName: null | string;
             /** Format: double */
             shippedValue: number;
             status: components["schemas"]["TransferStatus"];

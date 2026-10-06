@@ -183,7 +183,7 @@
       </table>
 
       @if (loading() && !rows().length) {
-        <div class="skeleton-rows" aria-label="Cargando">
+        <div class="skeleton-rows" role="status" aria-label="Cargando">
           @for (i of skeletonRows; track i) {
             <span class="skeleton"></span>
           }

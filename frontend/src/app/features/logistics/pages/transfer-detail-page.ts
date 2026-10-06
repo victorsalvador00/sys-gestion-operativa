@@ -28,11 +28,13 @@ import { formatQty, QtyPipe } from '../../../shared/pipes/qty.pipe';
 import { StatusLabelPipe } from '../../../shared/pipes/status-label.pipe';
 import { TransferDto, TransfersApi } from '../data-access/transfers.api';
 import { DispatchDialog, DispatchDialogResult } from '../ui/dispatch-dialog';
+import { Stamp } from '../../../shared/components/stamp/stamp';
 
 /** Detalle de un traspaso: editar, despachar o cancelar el borrador; ver envío y recepción. */
 @Component({
   selector: 'app-transfer-detail-page',
   imports: [
+    Stamp,
     RouterLink,
     DatePipe,
     MatCardModule,

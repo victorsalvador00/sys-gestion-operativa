@@ -55,6 +55,29 @@ public class ProblemDetailsMapperTests
     }
 
     [Fact]
+    public void Unique_violation_maps_to_409_duplicate_without_database_details()
+    {
+        var inner = new Npgsql.PostgresException(
+            "duplicate key value violates unique constraint \"ix_lots_item_id_lot_number\"", "ERROR", "ERROR", "23505");
+
+        var problem = ProblemDetailsMapper.Map(new Microsoft.EntityFrameworkCore.DbUpdateException("save failed", inner));
+
+        Assert.Equal(409, problem.Status);
+        Assert.Equal("duplicate", problem.Extensions["code"]);
+        Assert.Equal("Otro usuario registró la misma información al mismo tiempo. Vuelve a intentarlo.", problem.Detail);
+    }
+
+    [Fact]
+    public void Other_database_errors_stay_500()
+    {
+        var inner = new Npgsql.PostgresException("violates foreign key constraint", "ERROR", "ERROR", "23503");
+
+        var problem = ProblemDetailsMapper.Map(new Microsoft.EntityFrameworkCore.DbUpdateException("save failed", inner));
+
+        Assert.Equal(500, problem.Status);
+    }
+
+    [Fact]
     public void NotFound_maps_to_404()
     {
         var problem = ProblemDetailsMapper.Map(new NotFoundException("Artículo", Guid.Empty));

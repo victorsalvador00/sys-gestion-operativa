@@ -174,6 +174,24 @@ public class SupplierTests(SgoApiFactory factory)
     }
 
     [Fact]
+    public async Task Simultaneous_preferred_suppliers_for_an_item_all_succeed_and_leave_one()
+    {
+        var admin = await AdminAsync();
+        var item = await admin.CreateItemAsync(await admin.NewItemRequestAsync());
+        var suppliers = new List<SupplierDto>();
+        for (var i = 0; i < 4; i++)
+            suppliers.Add(await admin.CreateSupplierAsync());
+
+        // Before the lock, two of these could both see "no preferred yet" and the second broke the partial index (500).
+        var responses = await Task.WhenAll(suppliers.Select(s => admin.AddSupplierItemAsync(s.Id, item.Id, 100m, preferred: true)));
+
+        Assert.All(responses, r => Assert.Equal(HttpStatusCode.Created, r.StatusCode));
+        var offers = (await admin.GetJsonAsync<ItemSupplierOffersDto>($"/api/v1/items/{item.Id}/supplier-offers"))!;
+        Assert.Equal(4, offers.Offers.Count);
+        Assert.Single(offers.Offers, o => o.IsPreferred);
+    }
+
+    [Fact]
     public async Task Deactivating_a_supplier_unmarks_its_preferred_items_and_locks_its_items()
     {
         var admin = await AdminAsync();

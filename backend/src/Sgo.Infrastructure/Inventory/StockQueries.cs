@@ -10,7 +10,7 @@ using Sgo.Infrastructure.Persistence;
 namespace Sgo.Infrastructure.Inventory;
 
 /// <summary>Read side of inventory: stock, lots, kardex and alerts, always limited to the caller's locations (RN-40).</summary>
-public sealed class StockQueries(SgoDbContext db, ILocationScope scope, IClock clock) : IStockQueries
+public sealed class StockQueries(SgoDbContext db, ILocationScope scope, IClock clock, IUserDirectory userDirectory) : IStockQueries
 {
     private sealed class StockRow
     {
@@ -151,13 +151,15 @@ public sealed class StockQueries(SgoDbContext db, ILocationScope scope, IClock c
         var balances = new Dictionary<Guid, decimal>();
         if (query.LocationId is { } locationId && query.ItemId is { } oneItem && page.Items.Count > 0)
             balances = await RunningBalancesAsync(locationId, oneItem, page.Items.Select(r => r.Movement).ToList(), ct);
+        // Looked up for the page only: a join would change the plan of the kardex query (B-17).
+        var users = await userDirectory.GetNamesAsync(page.Items.Select(r => r.Movement.UserId), ct);
 
         return new PagedResult<KardexEntryDto>(page.Items.Select(r =>
         {
             var m = r.Movement;
             return new KardexEntryDto(m.Id, m.OccurredAt, m.BusinessDate, m.LocationId, r.LocationCode, m.ItemId, r.Sku, r.ItemName,
                 m.LotId, r.LotNumber, m.Type, m.Quantity, m.UnitCost, m.TotalCost, m.SourceDocType, m.SourceDocId, m.SourceDocFolio,
-                m.UserId, m.Notes, balances.TryGetValue(m.Id, out var balance) ? balance : null);
+                m.UserId, users.Of(m.UserId), m.Notes, balances.TryGetValue(m.Id, out var balance) ? balance : null);
         }).ToList(), page.Page, page.PageSize, page.Total);
     }
 

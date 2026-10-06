@@ -51,6 +51,7 @@ import {
   PendingCounts,
   toCountInputs,
 } from '../ui/count-lines';
+import { Stamp } from '../../../shared/components/stamp/stamp';
 
 type SaveState = 'saved' | 'pending' | 'saving' | 'error';
 
@@ -65,6 +66,7 @@ export const AUTOSAVE_DELAY_MS = 1000;
 @Component({
   selector: 'app-count-detail-page',
   imports: [
+    Stamp,
     ReactiveFormsModule,
     RouterLink,
     DatePipe,

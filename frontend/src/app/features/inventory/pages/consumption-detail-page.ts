@@ -10,11 +10,13 @@ import { StatusTag } from '../../../shared/components/status-tag/status-tag';
 import { MxnPipe } from '../../../shared/pipes/mxn.pipe';
 import { QtyPipe } from '../../../shared/pipes/qty.pipe';
 import { ConsumptionsApi } from '../data-access/consumptions.api';
+import { Stamp } from '../../../shared/components/stamp/stamp';
 
 /** Detalle de un consumo registrado: salidas por lote con su costo e historial. */
 @Component({
   selector: 'app-consumption-detail-page',
   imports: [
+    Stamp,
     RouterLink,
     DatePipe,
     MatCardModule,
@@ -46,7 +48,7 @@ import { ConsumptionsApi } from '../data-access/consumptions.api';
             <dl>
               <div>
                 <dt>Registrado</dt>
-                <dd>{{ entry.createdAt | date: 'dd/MM/yyyy HH:mm' }}</dd>
+                <dd><app-stamp [at]="entry.createdAt" [by]="entry.createdByName" /></dd>
               </div>
               <div>
                 <dt>Costo total</dt>

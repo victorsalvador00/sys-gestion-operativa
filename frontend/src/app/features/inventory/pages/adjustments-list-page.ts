@@ -124,6 +124,9 @@ import {
           <div class="muted">
             {{ row.createdAt | date: 'dd/MM/yyyy HH:mm' }} · {{ row.locationCode }} ·
             {{ row.totalCost | mxn }}
+            @if (row.createdByName) {
+              · {{ row.createdByName }}
+            }
           </div>
         </ng-template>
       </app-data-table>
@@ -163,6 +166,7 @@ export class AdjustmentsListPage {
     { key: 'createdAt', header: 'Fecha', sortable: true },
     { key: 'locationCode', header: 'Ubicación' },
     { key: 'reason', header: 'Motivo', value: (row) => enumLabel('AdjustmentReason', row.reason) },
+    { key: 'createdByName', header: 'Registró', value: (row) => row.createdByName ?? '—' },
     { key: 'lineCount', header: 'Líneas', align: 'end' },
     { key: 'totalCost', header: 'Costo', align: 'end' },
     { key: 'status', header: 'Estado' },

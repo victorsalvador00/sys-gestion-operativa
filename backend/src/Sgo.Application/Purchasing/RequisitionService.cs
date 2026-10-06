@@ -41,9 +41,11 @@ public sealed record RequisitionPurchaseOrderDto(Guid Id, string Folio);
 
 public sealed record RequisitionDto(
     Guid Id, string Folio, PurchasingLocationDto Location, DateOnly NeededBy, RequisitionStatus Status, string? Notes,
-    IReadOnlyList<RequisitionLineDto> Lines, DateTimeOffset? SubmittedAt, Guid? SubmittedBy, DateTimeOffset? ApprovedAt, Guid? ApprovedBy,
-    DateTimeOffset? RejectedAt, Guid? RejectedBy, string? RejectionReason, DateTimeOffset? ConvertedAt, Guid? ConvertedBy,
-    IReadOnlyList<RequisitionPurchaseOrderDto> PurchaseOrders, DateTimeOffset CreatedAt, Guid? CreatedBy, uint Version);
+    IReadOnlyList<RequisitionLineDto> Lines, DateTimeOffset? SubmittedAt, Guid? SubmittedBy, string? SubmittedByName,
+    DateTimeOffset? ApprovedAt, Guid? ApprovedBy, string? ApprovedByName, DateTimeOffset? RejectedAt, Guid? RejectedBy,
+    string? RejectedByName, string? RejectionReason, DateTimeOffset? ConvertedAt, Guid? ConvertedBy, string? ConvertedByName,
+    IReadOnlyList<RequisitionPurchaseOrderDto> PurchaseOrders, DateTimeOffset CreatedAt, Guid? CreatedBy, string? CreatedByName,
+    uint Version);
 
 public sealed class RequisitionLineRequestValidator : AbstractValidator<RequisitionLineRequest>
 {
@@ -113,7 +115,8 @@ public sealed class RequisitionService(
     ILocationScope scope,
     IFolioGenerator folios,
     IClock clock,
-    ICurrentUser currentUser) : IRequisitionService
+    ICurrentUser currentUser,
+    IUserDirectory userDirectory) : IRequisitionService
 {
     private static readonly Dictionary<string, Expression<Func<PurchaseRequisition, object?>>> SortColumns = new()
     {
@@ -341,9 +344,11 @@ public sealed class RequisitionService(
                 l.SuggestedSupplierId is { } s ? suppliers[s] : null,
                 l.SuggestedSupplierId is { } p && prices.TryGetValue((p, l.ItemId), out var price) ? price : null))
             .OrderBy(l => l.Sku).ToList();
+        var users = await userDirectory.GetNamesAsync([r.SubmittedBy, r.ApprovedBy, r.RejectedBy, r.ConvertedBy, r.CreatedBy], ct);
 
         return new RequisitionDto(r.Id, r.Folio, locations[r.LocationId], r.NeededBy, r.Status, r.Notes, lines, r.SubmittedAt, r.SubmittedBy,
-            r.ApprovedAt, r.ApprovedBy, r.RejectedAt, r.RejectedBy, r.RejectionReason, r.ConvertedAt, r.ConvertedBy, orders,
-            r.CreatedAt, r.CreatedBy, r.Version);
+            users.Of(r.SubmittedBy), r.ApprovedAt, r.ApprovedBy, users.Of(r.ApprovedBy), r.RejectedAt, r.RejectedBy, users.Of(r.RejectedBy),
+            r.RejectionReason, r.ConvertedAt, r.ConvertedBy, users.Of(r.ConvertedBy), orders,
+            r.CreatedAt, r.CreatedBy, users.Of(r.CreatedBy), r.Version);
     }
 }

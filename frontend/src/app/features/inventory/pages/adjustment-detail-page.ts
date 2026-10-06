@@ -1,4 +1,3 @@
-import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -11,13 +10,14 @@ import { MxnPipe } from '../../../shared/pipes/mxn.pipe';
 import { QtyPipe } from '../../../shared/pipes/qty.pipe';
 import { StatusLabelPipe } from '../../../shared/pipes/status-label.pipe';
 import { AdjustmentsApi } from '../data-access/adjustments.api';
+import { Stamp } from '../../../shared/components/stamp/stamp';
 
 /** Detalle de un ajuste registrado: líneas, movimientos con su costo e historial. */
 @Component({
   selector: 'app-adjustment-detail-page',
   imports: [
+    Stamp,
     RouterLink,
-    DatePipe,
     MatCardModule,
     MatButtonModule,
     PageHeader,
@@ -48,7 +48,7 @@ import { AdjustmentsApi } from '../data-access/adjustments.api';
             <dl>
               <div>
                 <dt>Fecha</dt>
-                <dd>{{ adj.createdAt | date: 'dd/MM/yyyy HH:mm' }}</dd>
+                <dd><app-stamp [at]="adj.createdAt" [by]="adj.createdByName" /></dd>
               </div>
               <div>
                 <dt>Costo total</dt>

@@ -22,14 +22,14 @@ public sealed record ConsumptionListQuery : PageQuery
 
 public sealed record ConsumptionListItemDto(
     Guid Id, string Folio, Guid LocationId, string LocationCode, DateOnly BusinessDate, ConsumptionStatus Status,
-    int LineCount, decimal TotalCost, DateTimeOffset CreatedAt, Guid? CreatedBy);
+    int LineCount, decimal TotalCost, DateTimeOffset CreatedAt, Guid? CreatedBy, string? CreatedByName);
 
 public sealed record ConsumptionLineDto(Guid Id, Guid ItemId, string Sku, string ItemName, Guid? LotId, string? LotNumber, decimal Quantity);
 
 public sealed record ConsumptionDto(
     Guid Id, string Folio, Guid LocationId, string LocationCode, DateOnly BusinessDate, ConsumptionStatus Status, string? Notes,
     IReadOnlyList<ConsumptionLineDto> Lines, IReadOnlyList<PostedMovementDto> Movements, decimal TotalCost,
-    DateTimeOffset CreatedAt, Guid? CreatedBy, uint Version);
+    DateTimeOffset CreatedAt, Guid? CreatedBy, string? CreatedByName, uint Version);
 
 public sealed class CreateConsumptionRequestValidator : AbstractValidator<CreateConsumptionRequest>
 {
@@ -57,6 +57,7 @@ public sealed class ConsumptionService(
     ILocationScope scope,
     IFolioGenerator folios,
     IClock clock,
+    IUserDirectory userDirectory,
     IInventoryPostingService posting) : IConsumptionService
 {
     private static readonly Dictionary<string, Expression<Func<ConsumptionEntry, object?>>> SortColumns = new()
@@ -89,9 +90,10 @@ public sealed class ConsumptionService(
             .ToDictionaryAsync(x => x.Key, x => x.Total, ct);
         var locationIds = page.Items.Select(c => c.LocationId).Distinct().ToList();
         var codes = await db.Locations.Where(l => locationIds.Contains(l.Id)).ToDictionaryAsync(l => l.Id, l => l.Code, ct);
+        var users = await userDirectory.GetNamesAsync(page.Items.Select(c => c.CreatedBy), ct);
 
         return new PagedResult<ConsumptionListItemDto>(page.Items.Select(c => new ConsumptionListItemDto(c.Id, c.Folio, c.LocationId,
-                codes[c.LocationId], c.BusinessDate, c.Status, lineCounts[c.Id], totals.GetValueOrDefault(c.Id), c.CreatedAt, c.CreatedBy)).ToList(),
+                codes[c.LocationId], c.BusinessDate, c.Status, lineCounts[c.Id], totals.GetValueOrDefault(c.Id), c.CreatedAt, c.CreatedBy, users.Of(c.CreatedBy))).ToList(),
             page.Page, page.PageSize, page.Total);
     }
 
@@ -139,10 +141,11 @@ public sealed class ConsumptionService(
         var lotIds = c.Lines.Select(l => l.LotId).Concat(movements.Select(m => m.LotId)).OfType<Guid>().Distinct().ToList();
         var lotNumbers = await db.Lots.AsNoTracking().Where(l => lotIds.Contains(l.Id)).ToDictionaryAsync(l => l.Id, l => l.LotNumber, ct);
         string? LotNumber(Guid? id) => id is { } lotId ? lotNumbers.GetValueOrDefault(lotId) : null;
+        var users = await userDirectory.GetNamesAsync([c.CreatedBy], ct);
 
         return new ConsumptionDto(c.Id, c.Folio, c.LocationId, location, c.BusinessDate, c.Status, c.Notes,
             c.Lines.Select(l => new ConsumptionLineDto(l.Id, l.ItemId, items[l.ItemId].Sku, items[l.ItemId].Name, l.LotId, LotNumber(l.LotId), l.Quantity)).ToList(),
             movements.Select(m => new PostedMovementDto(m.ItemId, items[m.ItemId].Sku, m.LotId, LotNumber(m.LotId), m.Quantity, m.UnitCost, m.TotalCost)).ToList(),
-            movements.Sum(m => m.TotalCost), c.CreatedAt, c.CreatedBy, c.Version);
+            movements.Sum(m => m.TotalCost), c.CreatedAt, c.CreatedBy, users.Of(c.CreatedBy), c.Version);
     }
 }

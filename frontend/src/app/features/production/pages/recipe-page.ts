@@ -50,6 +50,7 @@ import {
   RecipeLineForm,
   toRecipeLines,
 } from '../ui/recipe-lines';
+import { Stamp } from '../../../shared/components/stamp/stamp';
 
 /**
  * Receta de un producto (spec frontend §7.4). Sin `id` crea la versión 1. Con `id`: la versión
@@ -59,6 +60,7 @@ import {
 @Component({
   selector: 'app-recipe-page',
   imports: [
+    Stamp,
     ReactiveFormsModule,
     RouterLink,
     DatePipe,

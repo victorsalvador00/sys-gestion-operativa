@@ -45,7 +45,8 @@ public sealed record ProductionOrderDto(
     decimal PlannedQty, decimal? ProducedQty, DateOnly ScheduledDate, ProductionOrderStatus Status, string? Notes,
     DateTimeOffset? ReleasedAt, Guid? OutputLotId, string? OutputLotNumber, DateOnly? OutputLotExpiration,
     decimal? UnitCost, decimal? TotalCost, decimal? TotalWasteCost, DateTimeOffset? CompletedAt, Guid? CompletedBy,
-    IReadOnlyList<ProductionOrderLineDto> Lines, DateTimeOffset CreatedAt, Guid? CreatedBy, uint Version);
+    string? CompletedByName, IReadOnlyList<ProductionOrderLineDto> Lines, DateTimeOffset CreatedAt, Guid? CreatedBy,
+    string? CreatedByName, uint Version);
 
 public sealed class CreateProductionOrderRequestValidator : AbstractValidator<CreateProductionOrderRequest>
 {
@@ -101,6 +102,7 @@ public sealed class ProductionOrderService(
     IClock clock,
     ICurrentUser currentUser,
     ILotRegistry lots,
+    IUserDirectory userDirectory,
     IInventoryPostingService posting) : IProductionOrderService
 {
     private static readonly Dictionary<string, Expression<Func<ProductionOrder, object?>>> SortColumns = new()
@@ -266,11 +268,12 @@ public sealed class ProductionOrderService(
 
         var output = items[o.OutputItemId];
         var outputLot = o.OutputLotId is { } outputLotId ? lotInfo[outputLotId] : null;
+        var users = await userDirectory.GetNamesAsync([o.CompletedBy, o.CreatedBy], ct);
         return new ProductionOrderDto(o.Id, o.Folio, o.LocationId, location, o.RecipeId, recipeVersion, o.OutputItemId, output.Sku, output.Name,
             output.Uom, output.TracksLots, o.PlannedQty, o.ProducedQty, o.ScheduledDate, o.Status, o.Notes, o.ReleasedAt,
             o.OutputLotId, outputLot?.LotNumber, outputLot?.ExpirationDate, o.UnitCost,
             o.Status == ProductionOrderStatus.Completed ? lines.Sum(l => l.TotalCost ?? 0) : null,
             o.Status == ProductionOrderStatus.Completed ? lines.Sum(l => l.WasteCost ?? 0) : null,
-            o.CompletedAt, o.CompletedBy, lines, o.CreatedAt, o.CreatedBy, o.Version);
+            o.CompletedAt, o.CompletedBy, users.Of(o.CompletedBy), lines, o.CreatedAt, o.CreatedBy, users.Of(o.CreatedBy), o.Version);
     }
 }

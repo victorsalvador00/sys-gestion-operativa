@@ -41,8 +41,15 @@ builder.Services
         options.Conventions.Add(new ApiRoutePrefixConvention());
         options.Conventions.Add(new DefaultSuccessResponseConvention());
         options.Filters.Add<ValidationFilter>();
+        ModelStateProblem.UseSpanishMessages(options.ModelBindingMessageProvider);
     })
-    .AddJsonOptions(options => ConfigureJson(options.JsonSerializerOptions));
+    .ConfigureApiBehaviorOptions(options => options.InvalidModelStateResponseFactory = ModelStateProblem.Response)
+    .AddJsonOptions(options =>
+    {
+        ConfigureJson(options.JsonSerializerOptions);
+        // System.Text.Json messages name .NET types; ModelStateProblem gives a Spanish one instead.
+        options.AllowInputFormatterExceptionMessages = false;
+    });
 
 // Same options for the minimal-API/OpenAPI serializer, so the documented schema matches the wire format.
 builder.Services.ConfigureHttpJsonOptions(options => ConfigureJson(options.SerializerOptions));

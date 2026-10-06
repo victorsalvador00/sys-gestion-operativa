@@ -235,6 +235,10 @@
           <mat-card-content>
             <dl>
               <div>
+                <dt>Creado</dt>
+                <dd><app-stamp [at]="count.createdAt" [by]="count.createdByName" /></dd>
+              </div>
+              <div>
                 <dt>Iniciado</dt>
                 <dd>{{ (count.startedAt | date: 'dd/MM/yyyy HH:mm') ?? '—' }}</dd>
               </div>
