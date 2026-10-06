@@ -47,9 +47,27 @@
 | 4 | F-14 Pedidos de sucursal con sugerido y aprobación (+ E2E #3 completo) | ✅ | (ver `git log`) |
 | 4 | F-15 Tablero (+ Chart.js, filtros por URL en listas, E2E) | ✅ | (ver `git log`) |
 
-**Siguiente paso (al retomar):** F-15 terminada. Proponer el plan de **F-16** (pulido: revisión móvil de las
-pantallas ★, accesibilidad, estados vacíos, build de producción; Lighthouse de accesibilidad ≥ 90 en login,
-tablero y recepción) y esperar OK.
+**Siguiente paso (al retomar, 2026-10-06):** F-15 terminada y subida (`2672626`). El plan de **F-16** ya se
+presentó (abajo); **falta que el usuario decida** los dos puntos marcados antes de implementar.
+
+**Plan F-16 (pulido final; criterio: Lighthouse de accesibilidad ≥ 90 en login, tablero y recepción):**
+1. Revisión móvil (360 y 390 px, con capturas) de las pantallas ★ (conteos, consumo nuevo, pedidos lista/nuevo,
+   recepción de traspaso) más login y tablero. Barra de acción fija abajo donde falte (spec §4: "Nuevo pedido",
+   "Consumo"); objetivos táctiles ≥ 48 px; sin desbordes.
+2. Accesibilidad: escaneo axe en E2E (falla con violaciones serious/critical) en login, tablero, recepción y
+   pantallas ★; revisar labels, foco, contraste, `aria-live`, orden de tabulación. Script `npm run lighthouse`
+   para las tres pantallas con sesión (cookie de refresh del admin por API); resultado en este archivo.
+3. Estados vacíos con acción sugerida en todas las listas (botón en el estado vacío de `app-data-table` si hace
+   falta) y verificar que todo botón que guarda se deshabilite durante la petición.
+4. Build de producción: `ng build` sin avisos; construir la imagen `frontend/Dockerfile` y probarla con Caddy
+   (rutas profundas con F5, proxy `/api`, compresión, caché).
+5. Subconjunto de Material Symbols (~4 MB → ~50 kB) con script manual de `fonttools` (Python, MIT; no instalado
+   aún: `pip install fonttools brotli`), woff2 versionado y prueba unitaria que falla si se usa un ícono fuera
+   del subconjunto.
+
+**Decisiones pendientes del usuario para F-16 (recomendación: sí a ambas):**
+- ¿Agregar como devDependencies **@axe-core/playwright 4.13.0 (MPL-2.0)** y **lighthouse 13.5.0 (Apache-2.0)**?
+- ¿Hacer el subconjunto de íconos (punto 5) o dejar la fuente completa?
 Antes: `API_PORT=8090 docker compose -f deploy/docker-compose.dev.yml up -d` y `npm start` en `frontend/` (Node ≥ 24.15).
 La base de desarrollo tiene existencias de ejemplo: AJ-000006 (SUC-01 AZU-001 25 kg) y AJ-000007 (COM HAR-001 lote L-2409 100 kg).
 
