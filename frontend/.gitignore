@@ -48,3 +48,4 @@ Thumbs.db
 /playwright-report
 /blob-report
 lighthouse-report
+public/help/.tmp

@@ -1,0 +1,21 @@
+
+[2mRunning [22m17[2m tests using [22m1[2m worker[22m
+
+[1A[2K[1/17] [grabacion] › scripts\help-videos\record.spec.ts:159:5 › catalogos-articulos-nuevo
+[1A[2K[2/17] [grabacion] › scripts\help-videos\record.spec.ts:175:5 › catalogos-ubicaciones
+[1A[2K[3/17] [grabacion] › scripts\help-videos\record.spec.ts:189:5 › inventario-ajustes-nuevo
+[1A[2K[4/17] [grabacion] › scripts\help-videos\record.spec.ts:200:5 › inventario-conteos-captura
+[1A[2K[5/17] [grabacion] › scripts\help-videos\record.spec.ts:226:5 › inventario-consumos-nuevo
+[1A[2K[6/17] [grabacion] › scripts\help-videos\record.spec.ts:238:5 › logistica-pedidos-nuevo
+[1A[2K[7/17] [grabacion] › scripts\help-videos\record.spec.ts:252:5 › logistica-traspasos-nuevo
+[1A[2K[8/17] [grabacion] › scripts\help-videos\record.spec.ts:263:5 › logistica-traspasos-recibir
+[1A[2K[9/17] [grabacion] › scripts\help-videos\record.spec.ts:276:5 › produccion-recetas-nueva
+[1A[2K[10/17] [grabacion] › scripts\help-videos\record.spec.ts:287:5 › produccion-ordenes-nueva
+[1A[2K[11/17] [grabacion] › scripts\help-videos\record.spec.ts:300:5 › produccion-ordenes-completar
+[1A[2K[12/17] [grabacion] › scripts\help-videos\record.spec.ts:323:5 › compras-proveedores-nuevo
+[1A[2K[13/17] [grabacion] › scripts\help-videos\record.spec.ts:335:5 › compras-requisiciones-nueva
+[1A[2K[14/17] [grabacion] › scripts\help-videos\record.spec.ts:347:5 › compras-ordenes-nueva
+[1A[2K[15/17] [grabacion] › scripts\help-videos\record.spec.ts:360:5 › compras-recepciones-nueva
+[1A[2K[16/17] [grabacion] › scripts\help-videos\record.spec.ts:395:5 › admin-usuarios-nuevo
+[1A[2K[17/17] [grabacion] › scripts\help-videos\record.spec.ts:411:5 › admin-roles-nuevo
+[1A[2K[32m  17 passed[39m[2m (4.1m)[22m

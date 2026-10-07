@@ -14,7 +14,8 @@
     "api:types": "node scripts/api-types.mjs",
     "icons": "node scripts/icons.mjs",
     "icons:check": "node scripts/icons.mjs --check",
-    "lighthouse": "node scripts/lighthouse.mjs"
+    "lighthouse": "node scripts/lighthouse.mjs",
+    "help:record": "playwright test -c scripts/help-videos/playwright.config.ts"
   },
   "private": true,
   "packageManager": "npm@11.17.0",

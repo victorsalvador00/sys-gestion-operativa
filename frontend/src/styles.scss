@@ -12,6 +12,7 @@
 @use 'styles/dark';
 @use 'styles/nav-tag';
 @use 'styles/ui';
+@use 'styles/help';
 
 // Claro y oscuro en una sola hoja: los tokens de Material usan light-dark(), así que el tema lo decide
 // `color-scheme`. Sin `data-theme` sigue al sistema; ThemeService lo fija a "light" o "dark".

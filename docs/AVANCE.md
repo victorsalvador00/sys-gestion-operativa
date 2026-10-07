@@ -501,6 +501,25 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
   ancho). Etiquetas de estado más grandes, con palomita dibujada con CSS en los estados verdes (no es texto). Barra
   superior de color (azul en claro, azul marino en oscuro) con el selector de ubicación en píldora sin etiqueta
   flotante (`aria-label="Ubicación activa"`). Títulos de página en negrita.
+- **Ayuda contextual (manual de usuario)**: botón flotante en la esquina inferior derecha (`core/help/help-button.ts`,
+  estilos en `styles/_help.scss`), anillos tipo HUD recreados en SVG (la imagen de referencia no se usó) que giran y se
+  detienen al abrir; sube si hay barra de acción fija; quieto con "reducir movimiento". El panel sale de la esquina
+  del botón con el manual de la pantalla actual (`HelpService` resuelve el patrón de ruta, p. ej.
+  `logistica/traspasos/:id/recibir`): descripción, pasos, campos y consejos (`core/help/help-content.ts`, **todas** las
+  rutas; una prueba unitaria falla si una pantalla nueva no tiene ayuda) y video en bucle en las 17 pantallas de
+  captura (`public/help/*.webm`, ~13 MB en total, 9–25 s cada uno, se descargan solo al abrir la ayuda). Se cierra con
+  X, Esc, el botón o al cambiar de pantalla; el foco regresa al botón.
+- **Videos**: `npm run help:record` (API y frontend en marcha) graba con Playwright cada pantalla a 1024×640, menú
+  contraído, recuadro naranja y leyenda sobre cada campo, sin guardar nunca. Crea por API y cancela al final un conteo
+  en SUC-01, una OP liberada y una OC aprobada (quedan **canceladas** en la base de desarrollo); el de recibir traspaso
+  usa uno que ya esté en tránsito. Formato WebM (se ve como GIF y pesa ~10 veces menos). Tras regenerarlos, reiniciar
+  `ng serve` para que sirva los archivos nuevos de `public/`.
+- E2E `16-help` (abrir, video cargado, Esc y foco, axe en claro y oscuro, todos los videos existen). 42 E2E en verde.
+- **Oscuro, ajuste (2026-10-07):** el contenido de las pantallas (`mat-sidenav-content` y capas emergentes: diálogos,
+  listas, calendario) vuelve a letras blancas y líneas grises de Material, sin resplandor; el menú lateral, la barra
+  superior y la ayuda conservan el azul neón; botones principales, enlaces y pestañas siguen en el primario azul. Los
+  tokens que se fijan en `<html>` (color de texto, contorno de campos, tarjetas, pestañas) se redeclaran en ese
+  ámbito porque llegarían ya resueltos en azul. Botón de ayuda: rotación a la mitad de velocidad (18/28/10/7 s).
 - Pruebas: unitarias de `ThemeService` (219 en total) y E2E `15-theme` (login y app, escritorio y celular: persistencia
   tras F5, "según el sistema" y **axe sin violaciones en modo oscuro**). 36 E2E en verde; Lighthouse 100/100/100.
 

@@ -16,6 +16,7 @@ import { map } from 'rxjs';
 import { AuthService } from '../../auth/auth.service';
 import { LocationContextService } from '../../context/location-context.service';
 import { provideAppDates } from '../../i18n/date-adapter';
+import { HelpButton } from '../../help/help-button';
 import { THEME_OPTIONS, ThemeService } from '../../theme/theme.service';
 import { filterMenu, MENU } from '../menu';
 
@@ -23,6 +24,7 @@ import { filterMenu, MENU } from '../menu';
 @Component({
   selector: 'app-shell',
   imports: [
+    HelpButton,
     RouterOutlet,
     RouterLink,
     RouterLinkActive,

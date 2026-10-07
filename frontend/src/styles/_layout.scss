@@ -10,9 +10,12 @@
   max-width: var(--sgo-content-max-width);
   margin-inline: auto;
   padding: var(--sgo-space-6);
+  // Aire al final para que el botón de ayuda flotante no tape lo último de la página.
+  padding-bottom: calc(var(--sgo-space-6) + 72px);
 
   @media (max-width: 767.98px) {
     padding: var(--sgo-space-4);
+    padding-bottom: calc(var(--sgo-space-4) + 64px);
   }
 }
 
