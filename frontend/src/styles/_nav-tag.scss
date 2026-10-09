@@ -11,6 +11,8 @@
       list-item-focus-state-layer-opacity: 0,
       list-item-leading-icon-color: var(--sgo-tag-icon),
       list-item-hover-leading-icon-color: var(--sgo-tag-icon),
+      // Aire entre el ícono (sobre su bloque) y el texto.
+      list-item-leading-icon-end-space: 28px,
     )
   );
 
