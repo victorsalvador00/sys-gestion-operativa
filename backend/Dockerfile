@@ -19,11 +19,14 @@ COPY src/ src/
 RUN dotnet publish src/Sgo.Api/Sgo.Api.csproj -c Release -o /app/publish --no-restore /p:UseAppHost=false
 
 FROM build AS bundle
-RUN dotnet tool restore \
+# TARGETARCH comes from BuildKit: amd64 (DigitalOcean) or arm64 (Oracle Ampere, Apple Silicon).
+ARG TARGETARCH
+RUN case "$TARGETARCH" in arm64) RID=linux-arm64 ;; *) RID=linux-x64 ;; esac \
+ && dotnet tool restore \
  && dotnet ef migrations bundle \
       --project src/Sgo.Infrastructure/Sgo.Infrastructure.csproj \
       --startup-project src/Sgo.Api/Sgo.Api.csproj \
-      --configuration Release --self-contained --target-runtime linux-x64 \
+      --configuration Release --self-contained --target-runtime "$RID" \
       --output /app/efbundle
 
 FROM mcr.microsoft.com/dotnet/runtime-deps:10.0 AS migrator

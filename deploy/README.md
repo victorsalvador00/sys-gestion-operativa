@@ -40,6 +40,39 @@ Sin nombre de archivo, `restore.sh` lista los respaldos más recientes.
    ```
 4. En el Droplet: `docker compose build`, `docker compose run --rm migrate` (aplica solo las migraciones que falten) y `docker compose up -d`. **No** correr `--seed`: los datos base ya vienen en el respaldo.
 
+## Demo en Oracle Cloud (Always Free)
+
+Entorno de prueba para el cliente antes de contratar el hosting: el mismo stack de producción más un Postgres local en contenedor (`docker-compose.demo.yml`) y respaldos diarios en `deploy/backups/`. La VM es ARM (Ampere); las imágenes se construyen en la VM y el bundle de migraciones detecta la arquitectura.
+
+1. En la VM (Ubuntu 24.04 con Docker), clonar y crear `.env`:
+   ```bash
+   git clone https://github.com/victorsalvador00/sys-gestion-operativa.git sgo
+   cd sgo/deploy
+   cp .env.example .env
+   ```
+2. En `deploy/.env` (las demás variables de producción igual):
+   ```bash
+   COMPOSE_FILE=docker-compose.yml:docker-compose.demo.yml
+   ASPNETCORE_ENVIRONMENT=Production
+   POSTGRES_PASSWORD=<contraseña larga>
+   SGO__ConnectionStrings__Default=Host=db;Port=5432;Database=sgo;Username=sgo;Password=<la misma>
+   SGO_DOMAIN=sgo.<ip-con-guiones>.sslip.io     # o un subdominio propio con registro A a la IP
+   ```
+3. Build del frontend (con un contenedor de Node; no hace falta instalar Node en la VM):
+   ```bash
+   docker run --rm -v "$PWD/../frontend:/app" -w /app node:24-alpine sh -c "npm ci && npm run build"
+   ```
+4. Construir, migrar, sembrar y levantar (con `COMPOSE_FILE` en `.env` no hace falta `-f`):
+   ```bash
+   docker compose build
+   docker compose run --rm migrate
+   docker compose run --rm api --seed
+   docker compose up -d
+   ```
+5. Verificar `https://<SGO_DOMAIN>/health/ready` y entrar con el administrador.
+
+Para publicar cambios: `git pull`, repetir el paso 3 si cambió el frontend y luego el paso 4 sin `--seed`.
+
 # Despliegue en producción
 
 Servidor: un Droplet de DigitalOcean con Docker. Base de datos: Postgres administrado de DigitalOcean (no corre en el Droplet).
