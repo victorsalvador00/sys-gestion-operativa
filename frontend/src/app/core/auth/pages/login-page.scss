@@ -58,6 +58,23 @@
 }
 
 .welcome {
+  .logo {
+    display: inline-grid;
+    place-items: center;
+    margin-bottom: var(--sgo-space-6);
+    padding: clamp(14px, 2vw, 24px) clamp(18px, 2.6vw, 32px);
+    border: 2px solid #b38b45; // dorado del logo
+    border-radius: 24px;
+    background: rgb(255 255 255 / 94%);
+    box-shadow: 0 16px 40px rgb(0 0 0 / 35%);
+
+    img {
+      display: block;
+      width: clamp(150px, 20vw, 240px);
+      height: auto;
+    }
+  }
+
   h1 {
     margin: 0;
     font:
