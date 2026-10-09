@@ -3,7 +3,7 @@ using Sgo.Domain.Common;
 
 namespace Sgo.Infrastructure.Identity;
 
-/// <summary>SGO user (dominio §4.7) on top of ASP.NET Core Identity.</summary>
+/// <summary>SGO AR user (dominio §4.7) on top of ASP.NET Core Identity.</summary>
 [Audited]
 public class AppUser : IdentityUser<Guid>, IVersioned
 {

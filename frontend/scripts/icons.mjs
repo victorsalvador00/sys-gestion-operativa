@@ -1,4 +1,4 @@
-// Subconjunto de Material Symbols: la fuente completa pesa ~4 MB; el SGO solo usa unas decenas de íconos.
+// Subconjunto de Material Symbols: la fuente completa pesa ~4 MB; el SGO AR solo usa unas decenas de íconos.
 //
 //   npm run icons          Busca los íconos usados en src/app, actualiza la lista y regenera el woff2
 //                          (requiere Python con `pip install fonttools brotli`).

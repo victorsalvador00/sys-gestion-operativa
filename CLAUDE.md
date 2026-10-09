@@ -1,4 +1,4 @@
-# SGO — Sistema de Gestión Operativa
+# SGO AR — Sistema de Gestión Operativa AR
 
 Sistema web para una franquicia de cafeterías: 10 sucursales, fábrica y comisariato. Tiene módulos de inventario, producción, logística (pedidos y traspasos), compras y usuarios/permisos. Un solo programador; sin licencias de software de pago.
 

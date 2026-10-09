@@ -35,7 +35,7 @@ describe('App', () => {
 
     const el = await open('/');
 
-    expect(el.querySelector('.brand-name')?.textContent).toBe('SGO');
+    expect(el.querySelector('.brand-name')?.textContent).toBe('SGO AR');
     expect(el.querySelector('main h1')?.textContent).toContain('Tablero');
     const menu = Array.from(el.querySelectorAll('nav a')).map((a) => a.textContent?.trim());
     expect(menu).toEqual([

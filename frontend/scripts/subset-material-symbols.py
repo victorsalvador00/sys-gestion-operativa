@@ -1,4 +1,4 @@
-"""Genera el subconjunto de Material Symbols Outlined con solo los íconos que usa el SGO.
+"""Genera el subconjunto de Material Symbols Outlined con solo los íconos que usa el SGO AR.
 
 Uso (desde /frontend; lo invoca `npm run icons`):
     python scripts/subset-material-symbols.py <fuente.woff2> <lista.json> <salida.woff2>

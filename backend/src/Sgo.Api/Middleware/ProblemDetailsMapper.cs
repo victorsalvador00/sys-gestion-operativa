@@ -34,7 +34,7 @@ public static class ProblemDetailsMapper
 
     /// <summary>
     /// Gives framework-generated problems (routing 404, 401/403 from auth, model binding 400)
-    /// the SGO type, code and a Spanish title. Problems created by <see cref="Map"/> are left as is.
+    /// the SGO AR type, code and a Spanish title. Problems created by <see cref="Map"/> are left as is.
     /// </summary>
     public static void Normalize(ProblemDetails problem)
     {

@@ -1,10 +1,10 @@
-# Especificación Backend — SGO API
+# Especificación Backend — SGO AR API
 
 > Lee primero `docs/specs/dominio.md`: define entidades, estados y reglas (RN-xx) que este documento implementa.
 
 ## 1. Objetivo
 
-API REST que implementa los módulos de Organización, Catálogos, Inventario, Producción, Logística, Compras y Seguridad del SGO. La consume únicamente el frontend Angular del mismo dominio.
+API REST que implementa los módulos de Organización, Catálogos, Inventario, Producción, Logística, Compras y Seguridad del SGO AR. La consume únicamente el frontend Angular del mismo dominio.
 
 ## 2. Stack
 

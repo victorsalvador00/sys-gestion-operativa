@@ -1,10 +1,10 @@
-# Especificación Frontend — SGO Web
+# Especificación Frontend — SGO AR Web
 
 > Lee primero `docs/specs/dominio.md` (entidades, estados, reglas y permisos) y la sección de API de `docs/specs/backend.md`.
 
 ## 1. Objetivo
 
-SPA en Angular para operar el SGO desde computadora, tableta y celular. La usan cuatro perfiles con necesidades distintas:
+SPA en Angular para operar el SGO AR desde computadora, tableta y celular. La usan cuatro perfiles con necesidades distintas:
 
 - **Oficina** (compras, gerencia): escritorio, tablas grandes, aprobaciones.
 - **Comisariato y fábrica**: producción, despacho y recepción de compras. Escritorio o tableta.

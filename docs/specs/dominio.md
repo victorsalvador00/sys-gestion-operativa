@@ -1,4 +1,4 @@
-# Especificación de dominio — Sistema de Gestión Operativa (SGO)
+# Especificación de dominio — Sistema de Gestión Operativa AR (SGO AR)
 
 > Documento compartido por backend y frontend. Define el vocabulario, las entidades, los estados y las reglas de negocio. Si una regla de este documento contradice otro spec, **este documento manda**.
 

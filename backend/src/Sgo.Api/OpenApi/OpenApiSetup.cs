@@ -195,7 +195,7 @@ public static class OpenApiSetup
         {
             options.AddDocumentTransformer((document, _, _) =>
             {
-                document.Info.Title = "SGO API";
+                document.Info.Title = "SGO AR API";
                 document.Components ??= new OpenApiComponents();
                 document.Components.SecuritySchemes ??= new Dictionary<string, IOpenApiSecurityScheme>();
                 document.Components.SecuritySchemes["Bearer"] = new OpenApiSecurityScheme

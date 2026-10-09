@@ -1,4 +1,4 @@
-# Avance del SGO (backend y frontend)
+# Avance del SGO AR (backend y frontend)
 
 > Bitácora de trabajo para retomar entre sesiones. Última actualización: 2026-10-06 (pendientes técnicos).
 > Fuente de verdad de reglas: `docs/specs/dominio.md`; tareas: `docs/specs/backend.md` §12.
@@ -440,7 +440,7 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
   ligaduras por texto, porque el nombre del glifo no siempre es el del ícono). `npm run lint` corre `icons:check`, que
   falla si se usa un ícono fuera del subconjunto.
 - **Móvil:** barra de acción fija abajo (`.sgo-action-bar` global, antes `.bottom-bar` duplicada en 4 pantallas) también
-  en consumo nuevo y pedido nuevo/editar. Barra superior < 600 px: se oculta el texto "SGO" (queda el ícono con
+  en consumo nuevo y pedido nuevo/editar. Barra superior < 600 px: se oculta el texto "SGO AR" (queda el ícono con
   `aria-label`) y el selector de ubicación usa el espacio libre ("Ubicación activa" ya no se corta en 360 px); el
   enlace de la marca mide 48 px. Migas de pan con área táctil de 24 px (WCAG 2.5.8). Revisión a 360 y 390 px de todas
   las pantallas: sin scroll horizontal.
@@ -485,11 +485,11 @@ Migraciones (en orden): `InitialCreate`, `AddRefreshTokens`, `AddRoleSystemKey`,
   el ícono y tres cuadritos a la derecha en la página actual; hover y foco la iluminan (contorno de foco visible); menú
   contraído: solo el bloque. Un tono por estado (no opacidad) para mantener contraste ≥ 3:1 del ícono. Se desactivaron
   el indicador activo y las capas de estado de Material en esos items. Respeta `prefers-reduced-motion`.
-- **Login rediseñado** (referencia del cliente, sin la imagen de fondo): "Bienvenido / Sistema de Gestión Operativa" a
+- **Login rediseñado** (referencia del cliente, sin la imagen de fondo): "Bienvenido / Sistema de Gestión Operativa AR" a
   la izquierda y tarjeta translúcida a la derecha (en celular, apilados). Claro: morados de la referencia
   (#3D12A0 → #9C218B, tarjeta #440A70, botón #9B3CC9 → #5A0A85); oscuro: azul neón (botón #19D3FF → #3D7BFF con
   texto #001233). Campos nativos en píldora con etiqueta arriba, errores con `aria-describedby` y contorno de error;
-  sin "Recordarme", "Registrarse" ni "¿Olvidaste tu contraseña?" (sin función en el SGO). Fondo: red de partículas
+  sin "Recordarme", "Registrarse" ni "¿Olvidaste tu contraseña?" (sin función en el SGO AR). Fondo: red de partículas
   **plexus** (`shared/components/plexus`, canvas sin librerías: nodos que flotan unidos por líneas; cantidad según el
   tamaño, cuadro fijo con "reducir movimiento", colores por tema).
 - **Estilo de pantallas** (referencia del cliente; acento azul conservado): `styles/_ui.scss` + tokens `--sgo-page-bg`,
